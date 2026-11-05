@@ -232,10 +232,15 @@ def qty_received(ctx: CheckContext):
 def po_balance(ctx: CheckContext):
     if (skip := _no_po(ctx)):
         return skip
-    value = ctx.po.value
-    invoiced = ctx.ledger.invoiced(ctx.po.po_number)[1]
+    return balance_findings(ctx, ctx.po)
+
+
+def balance_findings(ctx: CheckContext, po):
+    """Invoiced to date + this invoice against the PO value. Shared with the recurring path."""
+    value = po.value
+    invoiced = ctx.ledger.invoiced(po.po_number)[1]
     this = ctx.invoice.taxable_total or sum((l.taxable for l in ctx.invoice.lines), Decimal("0"))
-    data = {"po": ctx.po.po_number, "po_value": fmt_inr(value), "invoiced": fmt_inr(invoiced),
+    data = {"po": po.po_number, "po_value": fmt_inr(value), "invoiced": fmt_inr(invoiced),
             "remaining": fmt_inr(max(value - invoiced, Decimal("0"))), "this_amount": fmt_inr(this),
             "over": fmt_inr(invoiced + this - value)}
     if invoiced >= value:
