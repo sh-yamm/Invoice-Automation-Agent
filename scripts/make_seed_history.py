@@ -4,11 +4,16 @@ Run from the repo root:  py -3.11 scripts/make_seed_history.py
 """
 import json
 import random
+import sys
 from datetime import date, datetime, timedelta
 from decimal import ROUND_HALF_UP, Decimal
 from pathlib import Path
 
-OUT = Path(__file__).resolve().parents[1] / "data" / "seed" / "history.json"
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "backend" / "src"))
+from ap_agent.rules.normalise import normal_invoice_no  # noqa: E402
+
+OUT = ROOT / "data" / "seed" / "history.json"
 rng = random.Random(42)
 
 
@@ -16,7 +21,7 @@ def money(x) -> str:
     return str(Decimal(x).quantize(Decimal("1"), rounding=ROUND_HALF_UP))
 
 
-def case(case_id, vendor_id, vendor_name, invoice_no, norm, inv_date, taxable, gst_pct, lines, txn_type,
+def case(case_id, vendor_id, vendor_name, invoice_no, _norm, inv_date, taxable, gst_pct, lines, txn_type,
          outcome="APPROVED", code="ALL_CHECKS_PASSED", ledger=None, period=None, handling_s=None,
          owner="No one, handled automatically", why="Every required check passed.", status=None):
     total = Decimal(taxable) * (1 + Decimal(gst_pct) / 100)
@@ -25,7 +30,7 @@ def case(case_id, vendor_id, vendor_name, invoice_no, norm, inv_date, taxable, g
     decided = created + timedelta(seconds=handling_s or rng.randint(24, 55))
     return {
         "case_id": case_id, "vendor_id": vendor_id, "vendor_name": vendor_name,
-        "invoice_no": invoice_no, "invoice_no_norm": norm, "invoice_date": inv_date.isoformat(),
+        "invoice_no": invoice_no, "invoice_no_norm": normal_invoice_no(invoice_no), "invoice_date": inv_date.isoformat(),
         "grand_total": money(total), "line_texts": lines, "txn_type": txn_type,
         "outcome": outcome, "primary_code": code, "owner": owner, "why": why, "status": status,
         "created_at": created.isoformat(timespec="seconds"), "decided_at": decided.isoformat(timespec="seconds"),
