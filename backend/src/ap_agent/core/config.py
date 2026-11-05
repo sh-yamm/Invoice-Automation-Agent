@@ -13,8 +13,9 @@ class Settings(BaseSettings):
     nvidia_base_url: str = "https://integrate.api.nvidia.com/v1"
     parse_url: str = "https://ai.api.nvidia.com/v1/retrieval/nvidia/nemotron-3.5-parse/parse"
     model_parse: str = "nvidia/nemotron-3.5-parse"
-    model_extract: str = "mistralai/mistral-large-4-1t-a52b"
-    model_fast: str = "mistralai/mistral-large-4-1t-a52b"
+    model_extract: str = "mistralai/mistral-large-4-1t-a52b"        # vision: scanned invoices
+    model_extract_text: str = "nvidia/nemotron-3-ultra-550b-a55b"  # text: digital invoices (much faster)
+    model_fast: str = "nvidia/nemotron-3-ultra-550b-a55b"
     model_agent: str = "nvidia/nemotron-3-ultra-550b-a55b"
     model_embed: str = "nvidia/nemotron-3.5-embed-1b"
     llm_max_rpm: int = 35

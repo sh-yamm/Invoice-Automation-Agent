@@ -57,3 +57,8 @@ def test_messages_carry_blocks_and_the_rules(tmp_path):
     assert any("[1] (page 1, Title) TAX INVOICE" in t for t in texts)
     images = [p for p in user if p["type"] == "image_url"]
     assert len(images) == 1 and images[0]["image_url"]["url"].startswith("data:image/jpeg;base64,")
+
+
+def test_not_printed_fields_are_not_low_confidence():
+    inv = to_invoice(raw(irn={"value": None, "confidence": 0.95, "block": None}))
+    assert inv.irn is None and "irn" not in inv.confidence

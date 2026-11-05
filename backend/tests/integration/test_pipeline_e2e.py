@@ -119,6 +119,8 @@ def test_graph_non_invoice_pdf(tmp_path):
     p, _ = make_pipeline(tmp_path, gateway=gw)
     case = p.start("letter", letter_pdf(tmp_path / "letter.pdf"))
     assert (case["outcome"], case["primary_code"]) == (Outcome.REJECTED, "NOT_A_TAX_INVOICE")
+    # a digital PDF is read from its parsed text by the fast text model; only scans go to the vision model
+    assert gw.calls[0][:3] == ("chat_json", "extract_text", "extract")
 
 
 def test_ai_outage_holds_never_approves(tmp_path):

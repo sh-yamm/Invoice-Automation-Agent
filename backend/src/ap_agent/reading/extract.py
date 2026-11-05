@@ -135,7 +135,4 @@ def to_invoice(raw: dict) -> Invoice:
                           taxable=taxable, gst_rate=_rate(item.get("gst_rate"))))
         line_conf.append(float(item.get("confidence", 0.5) or 0))
     conf["lines"] = min(line_conf) if line_conf else 0.0
-    for name in FIELDS:  # fields the reader mentioned but couldn't parse stay at 0
-        if name in fields and name not in conf:
-            conf[name] = 0.0
     return Invoice(**values, lines=lines, confidence=conf)

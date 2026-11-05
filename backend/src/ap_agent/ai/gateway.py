@@ -56,7 +56,8 @@ class Gateway:
         self.cache_dir = Path(cache_dir) if cache_dir else None
         self.clock, self.sleep = clock, sleep
         self.client = client or httpx.Client(timeout=TIMEOUT)
-        self.models = {"extract": settings.model_extract, "fast": settings.model_fast, "agent": settings.model_agent,
+        self.models = {"extract": settings.model_extract, "extract_text": settings.model_extract_text,
+                       "fast": settings.model_fast, "agent": settings.model_agent,
                        "parse": settings.model_parse, "embed": settings.model_embed}
         self._interval = 60.0 / max(1, settings.llm_max_rpm)
         self._next_slot = 0.0

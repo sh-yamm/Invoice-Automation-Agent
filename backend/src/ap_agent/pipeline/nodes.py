@@ -201,7 +201,8 @@ def extract(state, deps):
     images = [] if state.get("text_blocks") else state.get("pages", [])
     msgs = build_extract_messages(blocks, images)
     try:
-        raw, _ = deps.gateway.chat_json("extract", msgs, EXTRACT_SCHEMA, case_id=state["case_id"], node="extract",
+        slot = "extract" if images else "extract_text"  # vision model only when it has to look at a scan
+        raw, _ = deps.gateway.chat_json(slot, msgs, EXTRACT_SCHEMA, case_id=state["case_id"], node="extract",
                                         cache_key=_cache(state, "extract"))
     except InvalidModelOutput as e:
         f = _finding(aop, "EXTRACTION_FAILED", "The invoice could not be read into fields", "extract", "read",
@@ -210,7 +211,8 @@ def extract(state, deps):
     inv = to_invoice(raw)
     read = sum(1 for k in inv.confidence if k != "lines" and getattr(inv, k, None) not in (None, False))
     f = _ok(f"Read {read} fields and {len(inv.lines)} line(s)", "extract", "read",
-            f"Lowest field confidence {min(inv.confidence.values(), default=1):.0%}")
+            f"Lowest field confidence {min(inv.confidence.values(), default=1):.0%} "
+            f"({deps.gateway.models.get(slot, slot) if hasattr(deps.gateway, 'models') else slot})")
     return {"invoice": _dump(inv), "findings": _record(deps, state, [f])}
 
 
