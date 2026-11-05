@@ -122,6 +122,8 @@ def run_checks(stage: str, ctx: CheckContext, path: str | None = None) -> list[F
         if not found:
             found = [ctx.ok(spec.title)]
         out.extend(found)
+        if any(f.stop for f in found):
+            break  # nothing after a stop finding would be meaningful
     return out
 
 
