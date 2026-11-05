@@ -2,7 +2,7 @@
 
 An AI agent that does the work of an accounts-payable clerk for an Indian company. It reads a vendor invoice PDF, works out what kind of transaction it is, checks it against the company's purchase orders, goods receipts, contracts and vendor master, and applies an editable rulebook. Then it either **approves the invoice on its own** or **hands it to the right person with the exact reason and the evidence**.
 
-> **Status: in development.** This README describes the design being built. Sections describe intended behaviour until the build is complete.
+> **Status:** the full pipeline, API and web UI are built and tested (271 backend tests, 14 frontend tests; all 16 demo samples reach their expected outcome end to end). A visual redesign of the UI is planned.
 
 ---
 
@@ -512,6 +512,7 @@ Deliberately out of scope for this version:
 - **Other transaction shapes.** Foreign-currency invoices, advances and retention, partial payments, multi-entity buyers.
 - **Wider fraud data.** Employee-vendor collusion checks need an employee master. E-way bill validation needs the portal.
 - **Platform concerns.** Real ERP, email and bank integrations; SSO; multi-tenancy.
+- **Free model endpoints are slow under load.** On NVIDIA's free tier a digital invoice takes about 30–60 seconds end to end; reading a *scanned* invoice with the vision model has taken up to 10 minutes. Demo samples replay recorded replies; production would use paid, provisioned endpoints.
 
 ---
 
@@ -556,7 +557,40 @@ storage/                  runtime data, not committed
 
 ## Setup
 
+Requirements: Python 3.11+, Node 20+, an NVIDIA API key from [build.nvidia.com](https://build.nvidia.com) (free endpoints).
+
 ```bash
-cp .env.example .env        # add your NVIDIA API key
-# backend and frontend setup instructions will be added as the build lands
+cp .env.example .env                      # add NVIDIA_API_KEY
+
+# backend
+cd backend
+python -m pip install -e ".[dev]"
+python -m pytest                          # unit + end-to-end tests (no network: model replies are replayed)
+
+# frontend
+cd ../frontend
+npm ci
+npm test
+npm run build                             # the backend serves frontend/dist
+
+# run it
+cd ../backend
+python -m uvicorn ap_agent.api.app:app --app-dir src --port 8000
+# open http://localhost:8000
 ```
+
+For frontend development with hot reload, run `npm run dev` in `frontend/` (it proxies `/api` to port 8000).
+
+**Demo samples and recorded replies.** The 16 demo invoices in `samples/pdf/` replay recorded model replies from `samples/cache/`, so the demo does not depend on a live model call. Uploaded PDFs always call the models live. To re-record: `python samples/seed_cache.py` (or `--fresh S08` for one sample). To regenerate the PDFs: `python samples/generate.py`.
+
+**Live model tests** (off by default): `python -m pytest -m live tests/live`.
+
+**Docker**
+
+```bash
+docker build -t ap-agent .
+docker run -p 8000:8000 --env-file .env -v ap-agent-storage:/app/storage ap-agent
+scripts/smoke.sh http://localhost:8000    # resets the demo data, runs sample S01, expects APPROVED
+```
+
+The image holds no secrets: `NVIDIA_API_KEY` and the `MODEL_*` settings come from the environment. Mount a persistent volume at `/app/storage` (case records, uploads, page images).
