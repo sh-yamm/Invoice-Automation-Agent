@@ -1,0 +1,326 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="graph" width="1400" height="1550" viewBox="0 0 1400 1550" role="img" aria-label="LangGraph architecture of the invoice agent: ingest, render and text layer, parse, reconcile, extract, ground and normalise, classify document, classify transaction, validate, three paths for standard PO, recurring and PO-less, controls, completeness guard, decide with rules engine then agent review then verdict, human gate, finalise. Left side holds the existing CSV data and the rulebook; right side holds the LLM gateway, the case record and the live UI.">
+      <style>svg{--bg:#F4F6FA;--sheet:#FFFFFF;--ink:#152038;--ink2:#4B5672;--muted:#7E889F;--line:#C9D0DD;--wash:#EBEFF6;
+--ai:#2B5FD9;--ai-wash:#E6EDFC;--agent:#7A3FC8;--agent-wash:#F0E8FB;--hold:#B26A0E;--rej:#B9342A;--ok:#1F7F55;
+--f-body:"Segoe UI",Helvetica,Arial,sans-serif;--f-mono:"Cascadia Mono",Consolas,"DejaVu Sans Mono",monospace;color:#4B5672}
+.n-code{fill:var(--sheet);stroke:var(--line);stroke-width:1.5}
+.n-ai{fill:var(--ai-wash);stroke:var(--ai);stroke-width:1.5}
+.n-agent{fill:var(--agent-wash);stroke:var(--agent);stroke-width:1.5}
+.n-gate{fill:var(--wash);stroke:var(--hold);stroke-width:1.5;stroke-dasharray:5 3}
+.n-side{fill:var(--wash);stroke:var(--line);stroke-width:1}
+.n-sub{fill:var(--sheet);stroke:var(--line);stroke-width:1}
+.pill{fill:var(--ink);stroke:none}
+.t-pill{fill:var(--sheet);font:600 12.5px var(--f-body)}
+.t-title{fill:var(--ink);font:700 13.5px var(--f-body)}
+.t-tag{font:600 10.5px var(--f-mono);letter-spacing:.04em}
+.t-tool{fill:var(--ink2);font:400 11.5px var(--f-mono)}
+.t-catch{fill:var(--muted);font:500 10.5px var(--f-mono)}
+.t-edge{fill:var(--ink2);font:500 11px var(--f-body)}
+.t-side{fill:var(--ink);font:700 13px var(--f-body)}
+.c-ai{fill:var(--ai)} .c-agent{fill:var(--agent)} .c-code{fill:var(--muted)} .c-hold{fill:var(--hold)}
+.edge{stroke:currentColor;stroke-width:1.4;fill:none}
+.edge-dash{stroke:currentColor;stroke-width:1.4;fill:none;stroke-dasharray:5 4}
+.bus{stroke:var(--ai);stroke-width:2;fill:none;stroke-dasharray:2 4}
+.bus-stub{stroke:var(--ai);stroke-width:1.2;fill:none;stroke-dasharray:2 4}
+.wbus{stroke:var(--ok);stroke-width:1.6;fill:none}
+.c-ok{fill:var(--ok)}
+.rule-ai{stroke:var(--ai);stroke-width:1;opacity:.5}
+.rule-line{stroke:var(--line);stroke-width:1}
+.wbus{stroke:var(--ok);stroke-width:1.6;fill:none}
+.c-ok{fill:var(--ok)}
+.rule-ai{stroke:var(--ai);stroke-width:1;opacity:.5}
+.rule-line{stroke:var(--line);stroke-width:1}</style><rect x="0" y="0" width="1400" height="1550" fill="#FFFFFF"/><defs>
+        <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="currentColor"/></marker>
+        <marker id="ahb" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="c-ai"/></marker>
+        <marker id="ahw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="c-ok"/></marker>
+      </defs>
+
+      <!-- Legend -->
+      <rect x="20" y="16" width="230" height="132" rx="8" class="n-side"/>
+      <text x="34" y="38" class="t-side">Legend</text>
+      <rect x="34" y="50" width="18" height="14" rx="3" class="n-code"/><text x="60" y="61" class="t-tool">code · deterministic</text>
+      <rect x="34" y="72" width="18" height="14" rx="3" class="n-ai"/><text x="60" y="83" class="t-tool">AI call · one model</text>
+      <rect x="34" y="94" width="18" height="14" rx="3" class="n-agent"/><text x="60" y="105" class="t-tool">agent · LLM + tools</text>
+      <rect x="34" y="116" width="18" height="14" rx="3" class="n-gate"/><text x="60" y="127" class="t-tool">human gate</text>
+      <text x="34" y="143" class="t-catch">* agent tool · A1…O5 = risk IDs</text>
+
+      <!-- Start -->
+      <rect x="500" y="16" width="300" height="30" rx="15" class="pill"/>
+      <text x="650" y="36" text-anchor="middle" class="t-pill">Upload or demo sample → POST /api/cases</text>
+      <line x1="650" y1="46" x2="650" y2="68" class="edge" marker-end="url(#ah)"/>
+
+      <!-- ingest -->
+      <rect x="290" y="70" width="720" height="56" rx="8" class="n-code"/>
+      <text x="306" y="92" class="t-title">ingest</text><text x="360" y="92" class="t-tag c-code">CODE</text>
+      <text x="994" y="92" text-anchor="end" class="t-catch">A1 A2 A3 K1</text>
+      <text x="306" y="114" class="t-tool">sha256_fingerprint · sniff_file_type · pdf_info(pages, encrypted, metadata) · store original</text>
+      <line x1="465" y1="126" x2="465" y2="148" class="edge" marker-end="url(#ah)"/>
+      <line x1="835" y1="126" x2="835" y2="148" class="edge" marker-end="url(#ah)"/>
+
+      <!-- render + text layer -->
+      <rect x="290" y="150" width="350" height="56" rx="8" class="n-code"/>
+      <text x="306" y="172" class="t-title">render_pages</text><text x="410" y="172" class="t-tag c-code">CODE</text>
+      <text x="306" y="194" class="t-tool">pypdfium2 → one PNG per page, 200 dpi</text>
+      <rect x="660" y="150" width="350" height="56" rx="8" class="n-code"/>
+      <text x="676" y="172" class="t-title">text_layer</text><text x="760" y="172" class="t-tag c-code">CODE</text>
+      <text x="994" y="172" text-anchor="end" class="t-catch">digital PDFs only</text>
+      <text x="676" y="194" class="t-tool">pdfplumber → words + boxes</text>
+      <line x1="465" y1="206" x2="465" y2="228" class="edge" marker-end="url(#ah)"/>
+
+      <!-- parse -->
+      <rect x="290" y="230" width="350" height="56" rx="8" class="n-ai"/>
+      <text x="306" y="252" class="t-title">parse_pages</text><text x="400" y="252" class="t-tag c-ai">AI</text>
+      <text x="624" y="252" text-anchor="end" class="t-catch">A4 A5 A6</text>
+      <text x="306" y="274" class="t-tool">nemotron-3.5-parse · per page → blocks+boxes</text>
+      <line x1="465" y1="286" x2="465" y2="308" class="edge" marker-end="url(#ah)"/>
+      <line x1="835" y1="206" x2="835" y2="308" class="edge" marker-end="url(#ah)"/>
+      <text x="845" y="292" class="t-edge">embedded text</text>
+
+      <!-- reconcile -->
+      <rect x="290" y="310" width="720" height="56" rx="8" class="n-code"/>
+      <text x="306" y="332" class="t-title">reconcile</text><text x="378" y="332" class="t-tag c-code">CODE</text>
+      <text x="994" y="332" text-anchor="end" class="t-catch">L4 L5 L6</text>
+      <text x="306" y="354" class="t-tool">layer_vs_parse_diff (amounts, account no.) · pdf_metadata_tamper · injection_scan</text>
+      <line x1="650" y1="366" x2="650" y2="388" class="edge" marker-end="url(#ah)"/>
+
+      <!-- extract -->
+      <rect x="290" y="390" width="720" height="56" rx="8" class="n-ai"/>
+      <text x="306" y="412" class="t-title">extract</text><text x="362" y="412" class="t-tag c-ai">AI</text>
+      <text x="994" y="412" text-anchor="end" class="t-catch">B6 B7</text>
+      <text x="306" y="434" class="t-tool">mistral-large-4 · parsed blocks + page images → JSON schema · per field: value, confidence, block_ref</text>
+      <line x1="650" y1="446" x2="650" y2="468" class="edge" marker-end="url(#ah)"/>
+
+      <!-- ground -->
+      <rect x="290" y="470" width="720" height="56" rx="8" class="n-code"/>
+      <text x="306" y="492" class="t-title">ground_normalise</text><text x="430" y="492" class="t-tag c-code">CODE</text>
+      <text x="994" y="492" text-anchor="end" class="t-catch">B1 B4 D5 G8</text>
+      <text x="306" y="514" class="t-tool">locate_in_blocks (no value without a source) · dates DD/MM · ₹ · GSTIN · invoice_no · units · tax-incl→excl</text>
+      <line x1="650" y1="526" x2="650" y2="548" class="edge" marker-end="url(#ah)"/>
+
+      <!-- classify document -->
+      <rect x="290" y="550" width="720" height="56" rx="8" class="n-ai"/>
+      <text x="306" y="572" class="t-title">classify_document</text><text x="436" y="572" class="t-tag c-ai">CODE + AI</text>
+      <text x="994" y="572" text-anchor="end" class="t-catch">C1 C2 E4</text>
+      <text x="306" y="594" class="t-tool">title/keyword signals · negative totals · model only if unclear → tax invoice | credit note | proforma | other</text>
+      <line x1="650" y1="606" x2="650" y2="628" class="edge" marker-end="url(#ah)"/>
+      <text x="660" y="621" class="t-edge">payable invoice</text>
+
+      <!-- classify transaction -->
+      <rect x="290" y="630" width="720" height="70" rx="8" class="n-agent"/>
+      <text x="306" y="652" class="t-title">classify_transaction</text><text x="452" y="652" class="t-tag c-agent">AGENT</text>
+      <text x="994" y="652" text-anchor="end" class="t-catch">E1 E3</text>
+      <text x="306" y="674" class="t-tool">nemotron-3-ultra · tools: vendor_lookup · po_search · contract_lookup → {type, confidence, why}</text>
+      <text x="306" y="691" class="t-tool">Standard PO | Recurring | PO-less · below min confidence → CLASSIFICATION_UNCERTAIN</text>
+      <line x1="650" y1="700" x2="650" y2="722" class="edge" marker-end="url(#ah)"/>
+
+      <!-- validate -->
+      <rect x="290" y="724" width="720" height="70" rx="8" class="n-code"/>
+      <text x="306" y="746" class="t-title">validate</text><text x="370" y="746" class="t-tag c-code">CODE · INDIA RULE PACK</text>
+      <text x="994" y="746" text-anchor="end" class="t-catch">B2 B3 B5 C3–C10 D1–D7</text>
+      <text x="306" y="768" class="t-tool">gstin_checksum · rule46_fields · buyer_gstin · tax_type (state vs place of supply) · arithmetic</text>
+      <text x="306" y="785" class="t-tool">amount_in_words · irn_check (vendor flag) · date_sanity</text>
+
+      <!-- router edges -->
+      <path d="M650 794 L650 812 L405 812 L405 848" class="edge" marker-end="url(#ah)"/>
+      <line x1="650" y1="812" x2="650" y2="848" class="edge" marker-end="url(#ah)"/>
+      <path d="M650 812 L895 812 L895 848" class="edge" marker-end="url(#ah)"/>
+      <text x="414" y="836" class="t-edge">standard_po</text>
+      <text x="659" y="836" class="t-edge">recurring</text>
+      <text x="904" y="836" class="t-edge">po_less</text>
+
+      <!-- branches -->
+      <rect x="290" y="850" width="230" height="150" rx="8" class="n-code"/>
+      <text x="304" y="872" class="t-title">Standard PO</text><text x="506" y="872" text-anchor="end" class="t-catch">G1–G15 H1–H3</text>
+      <text x="304" y="894" class="t-tool">po_lookup</text>
+      <text x="304" y="912" class="t-tool">infer_po* (rank open POs)</text>
+      <text x="304" y="930" class="t-tool">pair_lines (embed + agent*)</text>
+      <text x="304" y="948" class="t-tool">price_check · qty_check</text>
+      <text x="304" y="966" class="t-tool">ledger_balance</text>
+      <text x="304" y="984" class="t-tool">grn_lookup (goods → 3-way)</text>
+
+      <rect x="535" y="850" width="230" height="150" rx="8" class="n-code"/>
+      <text x="549" y="872" class="t-title">Recurring</text><text x="751" y="872" text-anchor="end" class="t-catch">I1–I7</text>
+      <text x="549" y="894" class="t-tool">contract_lookup</text>
+      <text x="549" y="912" class="t-tool">period_ledger (billed?)</text>
+      <text x="549" y="930" class="t-tool">schedule_amount_check</text>
+      <text x="549" y="948" class="t-tool">contract_dates_check</text>
+      <text x="549" y="966" class="t-tool">ledger_balance</text>
+
+      <rect x="780" y="850" width="230" height="150" rx="8" class="n-agent"/>
+      <text x="794" y="872" class="t-title">PO-less</text><text x="996" y="872" text-anchor="end" class="t-catch">E2 J1–J5</text>
+      <text x="794" y="894" class="t-tool">open_po_check → reroute</text>
+      <text x="794" y="912" class="t-tool">category_policy</text>
+      <text x="794" y="930" class="t-tool">gl_coder* (chart of accts)</text>
+      <text x="794" y="948" class="t-tool">approver_route</text>
+      <text x="794" y="966" class="t-tool">history_anomaly</text>
+
+      <!-- merge -->
+      <line x1="405" y1="1000" x2="405" y2="1024" class="edge" marker-end="url(#ah)"/>
+      <line x1="650" y1="1000" x2="650" y2="1024" class="edge" marker-end="url(#ah)"/>
+      <line x1="895" y1="1000" x2="895" y2="1024" class="edge" marker-end="url(#ah)"/>
+
+      <!-- controls -->
+      <rect x="290" y="1026" width="720" height="70" rx="8" class="n-code"/>
+      <text x="306" y="1048" class="t-title">controls</text><text x="372" y="1048" class="t-tag c-code">CODE + EMBED</text>
+      <text x="994" y="1048" text-anchor="end" class="t-catch">F1–F4 K1–K8 L1 L7 M1</text>
+      <text x="306" y="1070" class="t-tool">vendor_status · bank_verify (locked) · lookalike_vendor · split_limit_check · authority_check</text>
+      <text x="306" y="1087" class="t-tool">duplicate_search: exact key + fuzzy (embeddings) across approved, open and rejected cases</text>
+      <line x1="650" y1="1096" x2="650" y2="1118" class="edge" marker-end="url(#ah)"/>
+
+      <!-- guard -->
+      <rect x="290" y="1120" width="720" height="50" rx="8" class="n-code"/>
+      <text x="306" y="1140" class="t-title">completeness_guard</text><text x="450" y="1140" class="t-tag c-code">CODE</text>
+      <text x="994" y="1140" text-anchor="end" class="t-catch">N2</text>
+      <text x="306" y="1160" class="t-tool">required_checks[path] all ran? else CHECKS_INCOMPLETE → hold</text>
+      <line x1="650" y1="1170" x2="650" y2="1192" class="edge" marker-end="url(#ah)"/>
+
+      <!-- decide -->
+      <rect x="290" y="1194" width="720" height="96" rx="8" class="n-code"/>
+      <text x="306" y="1213" class="t-title">decide</text>
+      <text x="994" y="1213" text-anchor="end" class="t-catch">N1 N3 N5</text>
+      <rect x="302" y="1224" width="220" height="56" rx="6" class="n-sub"/>
+      <text x="314" y="1244" class="t-title">1 · rules engine</text>
+      <text x="314" y="1264" class="t-tool">worst severity = floor</text>
+      <rect x="540" y="1224" width="220" height="56" rx="6" class="n-agent"/>
+      <text x="552" y="1244" class="t-title">2 · agent review</text>
+      <text x="552" y="1264" class="t-tool">may only escalate · cites IDs</text>
+      <rect x="778" y="1224" width="220" height="56" rx="6" class="n-sub"/>
+      <text x="790" y="1244" class="t-title">3 · verdict composer</text>
+      <text x="790" y="1264" class="t-tool">AOP templates · owner · next</text>
+      <line x1="522" y1="1252" x2="538" y2="1252" class="edge" marker-end="url(#ah)"/>
+      <line x1="760" y1="1252" x2="776" y2="1252" class="edge" marker-end="url(#ah)"/>
+
+      <!-- decide → gate / finalise -->
+      <line x1="575" y1="1290" x2="575" y2="1318" class="edge" marker-end="url(#ah)"/>
+      <text x="584" y="1309" class="t-edge">hold · sign-off</text>
+      <line x1="935" y1="1290" x2="935" y2="1414" class="edge" marker-end="url(#ah)"/>
+      <text x="944" y="1308" class="t-edge">approve · reject</text>
+
+      <!-- human gate -->
+      <rect x="290" y="1320" width="570" height="70" rx="8" class="n-gate"/>
+      <text x="306" y="1342" class="t-title">human_gate</text><text x="394" y="1342" class="t-tag c-hold">interrupt()</text>
+      <text x="844" y="1342" text-anchor="end" class="t-catch">M2 M3 O3 O4</text>
+      <text x="306" y="1364" class="t-tool">approve anyway (locked → verification note) · reject</text>
+      <text x="306" y="1381" class="t-tool">ask vendor · sign off · confirm field · re-check</text>
+      <line x1="575" y1="1390" x2="575" y2="1414" class="edge" marker-end="url(#ah)"/>
+
+      <!-- finalise -->
+      <rect x="290" y="1416" width="720" height="56" rx="8" class="n-code"/>
+      <text x="306" y="1438" class="t-title">finalise</text><text x="366" y="1438" class="t-tag c-code">CODE</text>
+      <text x="994" y="1438" text-anchor="end" class="t-catch">O2</text>
+      <text x="306" y="1460" class="t-tool">ledger_write (approved only, idempotent per case) · payment_date (vendor terms) · seal audit bundle</text>
+      <line x1="650" y1="1472" x2="650" y2="1494" class="edge" marker-end="url(#ah)"/>
+      <rect x="520" y="1496" width="260" height="30" rx="15" class="pill"/>
+      <text x="650" y="1516" text-anchor="middle" class="t-pill">Case closed · decision + reasons</text>
+
+      <!-- left: skip path for non-payable docs -->
+      <path d="M290 578 L278 578 L278 1236 L300 1236" class="edge-dash" marker-end="url(#ah)"/>
+      <text x="270" y="574" text-anchor="end" class="t-edge">not payable</text>
+      <text x="270" y="589" text-anchor="end" class="t-edge">(proforma, quote) → reject</text>
+      <!-- left: confirm-field loop -->
+      <path d="M290 1355 L262 1355 L262 760 L288 760" class="edge-dash" marker-end="url(#ah)"/>
+      <text x="254" y="1384" text-anchor="end" class="t-edge">confirm field /</text>
+      <text x="254" y="1399" text-anchor="end" class="t-edge">re-check → re-validate</text>
+
+      <!-- left: existing systems -->
+      <rect x="20" y="820" width="226" height="188" rx="8" class="n-side"/>
+      <text x="34" y="842" class="t-side">Existing systems</text>
+      <text x="34" y="858" class="t-catch">read-only CSV "ERP"</text>
+      <text x="34" y="880" class="t-tool">vendors.csv</text>
+      <text x="34" y="898" class="t-tool">purchase_orders.csv</text>
+      <text x="34" y="916" class="t-tool">goods_receipts.csv</text>
+      <text x="34" y="934" class="t-tool">contracts.csv</text>
+      <text x="34" y="952" class="t-tool">chart_of_accounts.csv</text>
+      <text x="34" y="970" class="t-tool">service_accounts.csv</text>
+      <text x="34" y="994" class="t-catch">+ po_ledger, period_ledger</text>
+      <line x1="246" y1="900" x2="288" y2="900" class="edge" marker-end="url(#ah)"/>
+      <line x1="246" y1="990" x2="288" y2="1060" class="edge" marker-end="url(#ah)"/>
+      <text x="34" y="1026" class="t-edge">lookups by vendor, PO, GSTIN</text>
+
+      <!-- left: rulebook -->
+      <rect x="20" y="1100" width="226" height="118" rx="8" class="n-side"/>
+      <text x="34" y="1122" class="t-side">Rulebook (AOP)</text>
+      <text x="34" y="1138" class="t-catch">aop/ap_invoice_aop.yaml</text>
+      <text x="34" y="1160" class="t-tool">tolerances · limits</text>
+      <text x="34" y="1178" class="t-tool">locked rules</text>
+      <text x="34" y="1196" class="t-tool">code → owner, next, text</text>
+      <text x="34" y="1212" class="t-catch">version pinned per case (M4)</text>
+      <path d="M246 1160 L270 1160 L270 1250 L300 1250" class="edge" marker-end="url(#ah)"/>
+
+      <!-- right: LLM bus -->
+      <path d="M1045 258 L1045 1212" class="bus"/>
+      <line x1="640" y1="258" x2="1045" y2="258" class="bus-stub"/>
+      <line x1="1010" y1="418" x2="1045" y2="418" class="bus-stub"/>
+      <line x1="1010" y1="578" x2="1045" y2="578" class="bus-stub"/>
+      <line x1="1010" y1="665" x2="1045" y2="665" class="bus-stub"/>
+      <line x1="1010" y1="925" x2="1045" y2="925" class="bus-stub"/>
+      <line x1="1010" y1="1061" x2="1045" y2="1061" class="bus-stub"/>
+      <line x1="1010" y1="1212" x2="1045" y2="1212" class="bus-stub"/>
+      <line x1="1045" y1="300" x2="1073" y2="300" class="bus-stub" marker-end="url(#ahb)"/>
+      <text x="1053" y="760" class="t-tag c-ai" transform="rotate(90 1053 760)">ALL MODEL CALLS</text>
+
+      <!-- right: gateway -->
+      <rect x="1075" y="230" width="305" height="270" rx="8" class="n-ai"/>
+      <text x="1091" y="254" class="t-side">LLM gateway</text>
+      <text x="1091" y="270" class="t-catch">NVIDIA build · OpenAI-compatible</text>
+      <text x="1091" y="294" class="t-tool">throttle ≤35 req/min · backoff (B8)</text>
+      <text x="1091" y="312" class="t-tool">temperature 0 · JSON schema</text>
+      <text x="1091" y="330" class="t-tool">cache by file hash (demo-safe)</text>
+      <text x="1091" y="348" class="t-tool">logs prompt, output, reasoning</text>
+      <text x="1091" y="366" class="t-tool">fail closed → hold</text>
+      <line x1="1091" y1="380" x2="1364" y2="380" class="rule-ai"/>
+      <text x="1091" y="400" class="t-tool">parse   nemotron-3.5-parse</text>
+      <text x="1091" y="418" class="t-tool">extract mistral-large-4</text>
+      <text x="1091" y="436" class="t-tool">fast    mistral-large-4</text>
+      <text x="1091" y="454" class="t-tool">agent   nemotron-3-ultra</text>
+      <text x="1091" y="472" class="t-tool">embed   nemotron-3.5-embed-1b</text>
+
+      <!-- right: case record -->
+      <rect x="1075" y="560" width="305" height="300" rx="8" class="n-side"/>
+      <text x="1091" y="584" class="t-side">Case record</text>
+      <text x="1091" y="600" class="t-catch">SQLite + file store · written by every node</text>
+      <text x="1091" y="624" class="t-tool">cases · events · findings</text>
+      <text x="1091" y="642" class="t-tool">tool_calls (args + JSON result)</text>
+      <text x="1091" y="660" class="t-tool">llm_calls (+ reasoning trace)</text>
+      <text x="1091" y="678" class="t-tool">human_actions · aop_versions</text>
+      <text x="1091" y="696" class="t-tool">po_ledger · period_ledger</text>
+      <text x="1091" y="714" class="t-tool">langgraph checkpoints</text>
+      <line x1="1091" y1="728" x2="1364" y2="728" class="rule-line"/>
+      <text x="1091" y="748" class="t-tool">files: original PDF</text>
+      <text x="1091" y="766" class="t-tool">page PNGs · parse JSON</text>
+      <text x="1091" y="784" class="t-tool">extraction JSON</text>
+      <text x="1091" y="812" class="t-catch">= the audit bundle per case</text>
+      <!-- write bus: every node writes findings, tool calls and events to the case record -->
+      <path d="M1025 84 L1025 1488 L1300 1488 L1300 864" class="wbus" marker-end="url(#ahw)"/>
+      <line x1="1010" y1="84" x2="1025" y2="84" class="wbus"/>
+      <line x1="1010" y1="164" x2="1025" y2="164" class="wbus"/>
+      <line x1="1010" y1="324" x2="1025" y2="324" class="wbus"/>
+      <line x1="1010" y1="404" x2="1025" y2="404" class="wbus"/>
+      <line x1="1010" y1="484" x2="1025" y2="484" class="wbus"/>
+      <line x1="1010" y1="564" x2="1025" y2="564" class="wbus"/>
+      <line x1="1010" y1="644" x2="1025" y2="644" class="wbus"/>
+      <line x1="1010" y1="738" x2="1025" y2="738" class="wbus"/>
+      <line x1="1010" y1="864" x2="1025" y2="864" class="wbus"/>
+      <line x1="1010" y1="1040" x2="1025" y2="1040" class="wbus"/>
+      <line x1="1010" y1="1134" x2="1025" y2="1134" class="wbus"/>
+      <line x1="1010" y1="1200" x2="1025" y2="1200" class="wbus"/>
+      <line x1="860" y1="1334" x2="1025" y2="1334" class="wbus"/>
+      <line x1="1010" y1="1430" x2="1025" y2="1430" class="wbus"/>
+      <text x="1310" y="1300" class="t-tag c-ok" transform="rotate(-90 1310 1300)">EVERY NODE WRITES</text>
+      <text x="1060" y="1508" class="t-edge">findings · tool calls · events · actions · ledgers</text>
+      <!-- gateway logs every model call -->
+      <line x1="1227" y1="500" x2="1227" y2="558" class="edge" marker-end="url(#ah)"/>
+      <text x="1237" y="534" class="t-edge">logs llm_calls + reasoning</text>
+
+      <!-- right: UI -->
+      <rect x="1075" y="930" width="140" height="150" rx="8" class="n-side"/>
+      <text x="1089" y="954" class="t-side">Live UI</text>
+      <text x="1089" y="976" class="t-tool">live case</text>
+      <text x="1089" y="994" class="t-tool">work queue</text>
+      <text x="1089" y="1012" class="t-tool">rulebook</text>
+      <text x="1089" y="1030" class="t-tool">connected</text>
+      <text x="1089" y="1046" class="t-tool">data</text>
+      <path d="M1145 862 L1145 928" class="edge" marker-end="url(#ah)"/>
+      <text x="1155" y="900" class="t-edge">SSE events</text>
+      <path d="M1145 1080 L1145 1355 L862 1355" class="edge-dash" marker-end="url(#ah)"/>
+      <text x="1000" y="1349" class="t-edge">human actions</text>
+    </svg>
