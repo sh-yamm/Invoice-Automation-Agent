@@ -1,0 +1,149 @@
+{
+ "data": {
+  "fields": {
+   "doc_title": {
+    "value": "TAX INVOICE",
+    "confidence": 1.0,
+    "block": 4
+   },
+   "supplier_name": {
+    "value": "Shree Ganesh Office Furniture",
+    "confidence": 1.0,
+    "block": 1
+   },
+   "supplier_gstin": {
+    "value": "29AAKFS4417M1ZM",
+    "confidence": 1.0,
+    "block": 2
+   },
+   "supplier_phone": {
+    "value": "+91 80 4110 2290",
+    "confidence": 1.0,
+    "block": 2
+   },
+   "supplier_email": {
+    "value": "accounts@shreeganeshfurniture.in",
+    "confidence": 1.0,
+    "block": 2
+   },
+   "buyer_name": {
+    "value": "Zentra Retail Pvt Ltd",
+    "confidence": 1.0,
+    "block": 5
+   },
+   "buyer_gstin": {
+    "value": "29AABCZ5821K1ZW",
+    "confidence": 1.0,
+    "block": 5
+   },
+   "invoice_no": {
+    "value": "SGOF/26-27/0431",
+    "confidence": 1.0,
+    "block": 6
+   },
+   "invoice_date": {
+    "value": "02/11/2026",
+    "confidence": 1.0,
+    "block": 7
+   },
+   "po_ref": {
+    "value": null,
+    "confidence": 1.0,
+    "block": null
+   },
+   "place_of_supply_state": {
+    "value": "Karnataka (29)",
+    "confidence": 1.0,
+    "block": 7
+   },
+   "irn": {
+    "value": null,
+    "confidence": 1.0,
+    "block": null
+   },
+   "has_qr": {
+    "value": false,
+    "confidence": 1.0,
+    "block": null
+   },
+   "bank_name": {
+    "value": "ICICI Bank",
+    "confidence": 1.0,
+    "block": 11
+   },
+   "bank_account": {
+    "value": "000405112290",
+    "confidence": 1.0,
+    "block": 11
+   },
+   "ifsc": {
+    "value": "ICIC0000004",
+    "confidence": 1.0,
+    "block": 11
+   },
+   "taxable_total": {
+    "value": "78,400.00",
+    "confidence": 1.0,
+    "block": 10
+   },
+   "cgst": {
+    "value": "7,056.00",
+    "confidence": 1.0,
+    "block": 10
+   },
+   "sgst": {
+    "value": "7,056.00",
+    "confidence": 1.0,
+    "block": 10
+   },
+   "igst": {
+    "value": null,
+    "confidence": 1.0,
+    "block": null
+   },
+   "round_off": {
+    "value": "0.00",
+    "confidence": 1.0,
+    "block": 10
+   },
+   "grand_total": {
+    "value": "92,512.00",
+    "confidence": 1.0,
+    "block": 10
+   },
+   "amount_in_words": {
+    "value": "Rupees Ninety Two Thousand Five Hundred Twelve Only",
+    "confidence": 1.0,
+    "block": 9
+   },
+   "period_start": {
+    "value": null,
+    "confidence": 1.0,
+    "block": null
+   },
+   "period_end": {
+    "value": null,
+    "confidence": 1.0,
+    "block": null
+   },
+   "consumer_no": {
+    "value": null,
+    "confidence": 1.0,
+    "block": null
+   }
+  },
+  "lines": [
+   {
+    "description": "Filing cabinet, 4 drawer",
+    "hsn_sac": "9403",
+    "qty": 8,
+    "unit": "Nos",
+    "rate": "9,800.00",
+    "taxable": "78,400.00",
+    "gst_rate": null,
+    "confidence": 0.99
+   }
+  ]
+ },
+ "reasoning": "The user wants me to extract information from an Indian GST invoice and return it as JSON. Let me carefully read all the fields from the provided blocks and image.\n\nFrom the blocks:\n- Block 1: \"Shree Ganesh Office Furniture\" - supplier name\n- Block 2: Address, GSTIN: 29AAKFS4417M1ZM, State: Karnataka (29), Phone: +91 80 4110 2290, Email: accounts@shreeganeshfurniture.in\n- Block 3: \"Original for recipient\"\n- Block 4: \"TAX INVOICE\" - doc_title\n- Block 5: Bill to Zentra Retail Pvt Ltd, address, GSTIN:29AABCZ5821K1ZW - buyer info\n- Block 6: Invoice No.SGOF/26-27/0431 - invoice_no\n- Block 7: Invoice Date02/11/2026, Place of Supply Karnataka (29) - invoice_date, place_of_supply_state\n- Block 8: Table with line item: Filing cabinet, 4 drawer | 9403 | 8 | Nos | 9,800.00 | 78,400.00\n- Block 9: Amount in words: Rupees Ninety Two Thousand Five Hundred Twelve Only\n- Block 10: Taxable Value 78,400.00, CGST @ 9% 7,056.00, SGST @ 9% 7,056.00, Round Off 0.00, Invoice Total (Rs.) 92,512.00\n- Block 11: Bank details: ICICI Bank A/c No.: 000405112290 IFSC: ICIC0000004\n- Block 12-14: signature stuff\n\nNow let me map to fields:\n\n- doc_title: \"TAX INVOICE\" (block 4)\n- supplier_name: \"Shree Ganesh Office Furniture\" (block 1)\n- supplier_gstin: \"29AAKFS4417M1ZM\" (block 2)\n- supplier_phone: \"+91 80 4110 2290\" (block 2)\n- supplier_email: \"accounts@shreeganeshfurniture.in\" (block 2)\n- buyer_name: \"Zentra Retail Pvt Ltd\" (block 5)\n- buyer_gstin: \"29AABCZ5821K1ZW\" (block 5)\n- invoice_no: \"SGOF/26-27/0431\" (block 6) - note block says \"Invoice No.SGOF/26-27/0431\" so value is SGOF/26-27/0431\n- invoice_date: \"02/11/2026\" (block 7) - printed as 02/11/2026\n- po_ref: not printed -> null\n- place_of_supply_state: \"Karnataka (29)\" (block 7)\n- irn: not printed -> null\n- has_qr: false (no QR code visible)\n- bank_name: \"ICICI Bank\" (block 11)\n- bank_account: \"000405112290\" (block 11)\n- ifsc: \"ICIC0000004\" (block 11)\n- taxable_total: 78400.00 (block 10) - should I keep as number or string? The example shows value can be ... I'll use number 78400.00 or string \"78,400.00\"? The instruction says copy printed figures exactly. Printed is \"78,400.00\". But JSON value... I'll use the numeric value but maybe keep as string to preserve formatting? The shape says \"value\": ... I'll use numbers for amounts where clear, but to be safe and \"copy exactly\", maybe use the printed string. However typical extraction uses numbers. The instruction: \"Never compute totals or taxes; copy the printed figures exactly.\" So I should copy \"78,400.00\" as printed? But JSON numbers can't have commas. I'll provide as number 78400.00 or string \"78,400.00\". Given \"copy printed figures exactly\", I'll use string with comma? Hmm. The example in prompt: \"taxable\": ... not specified. I'll use numeric values without commas for amounts (78400.00) since that's the figure, but confidence high. Actually to be safe, I'll represent amounts as numbers (float) since they are figures: 78400.00, 7056.00, etc. But \"copy exactly\" might mean keep \"78,400.00\". JSON can hold string \"78,400.00\". I'll use strings for amounts to preserve exact printed format including commas and decimals. Wait, but grand_total etc. Let me use numbers? The prompt says value: ... no type constraint. I'll use the printed string for amount_in_words verbatim, and for numeric fields I'll use numbers (e.g., 78400.0) — but to \"copy exactly\" I'll keep two decimals as number 78400.00 which JSON renders as 78400.0. That loses trailing zero. Better to use string \"78,400.00\" to be exact. I'll use strings for all monetary values to preserve formatting exactly as printed.\n\nActually, let me reconsider. The fields like taxable_total, cgst, etc. — I'll provide as numbers? The safest for \"copy printed figures exactly\" is to give the string as printed: \"78,400.00\". I'll do that.\n\n- cgst: \"7,056.00\" (block 10)\n- sgst: \"7,056.00\" (block 10)\n- igst: null (not printed)\n- round_off: \"0.00\" (block 10)\n- grand_total: \"92,512.00\" (block 10)\n- amount_in_words: \"Rupees Ninety Two Thousand Five Hundred Twelve Only\" (block 9) — verbatim. Block 9: \"Amount in words: Rupees Ninety Two Thousand Five Hundred Twelve\\nOnly\". The amount in words is \"Rupees Ninety Two Thousand Five Hundred Twelve Only\". I'll include \"Only\" as it's part of the printed words. Verbatim: \"Rupees Ninety Two Thousand Five Hundred Twelve Only\".\n- period_start: null\n- period_end: null\n- consumer_no: null\n\nLines: one line from block 8:\n- description: \"Filing cabinet, 4 drawer\"\n- hsn_sac: \"9403\"\n- qty: 8 (or \"8\") — I'll use 8\n- unit: \"Nos\"\n- rate: \"9,800.00\" (printed) — use string or number 9800.00. I'll use \"9,800.00\" string to be exact? For lines, rate: ... I'll use number 9800.0? To be consistent, use strings with commas for rate/taxable. Hmm. I'll use numbers for qty (8) and strings for money. Actually let me use numbers for qty and rate/taxable as numbers without commas? The instruction says copy printed figures exactly for totals/taxes; for line items it says description, hsn_sac, qty, unit, rate, taxable. I'll provide rate as 9800.00 (number) and taxable as 78400.00 (number), qty 8. But to preserve exact, maybe strings. I'll go with numbers for qty and strings for monetary in lines? Inconsistent. Let me just use numbers for all numeric line fields: qty: 8, rate: 9800.00, taxable: 78400.00, gst_rate: 18? Wait gst_rate: CGST @9% and SGST @9% means total GST 18%, but the line doesn't print gst_rate explicitly; the tax table shows CGST @9% SGST @9%. The line item table doesn't have gst_rate column. The fields for lines include gst_rate. Since not printed on the line, but the tax summary shows 9% CGST and 9% SGST (total 18%). Should I put gst_rate 18? The rule: return only what is printed. The line doesn't print gst_rate. But the document prints CGST @ 9% and SGST @ 9%. The gst_rate for the line could be inferred as 18% but rule says never compute. However the printed tax rates are 9% each. The line's gst_rate isn't printed in the line table. I'll set gst_rate to null? But the tax section prints @9% for CGST and SGST. Hmm. The line item doesn't have a gst_rate column. I think gst_rate should be null for the line since not printed on the line, OR 18 (9+9) but that's computing. Safer: null. But maybe they expect 18? The field is \"gst_rate\" singular. The document shows CGST @ 9% and SGST @ 9%, implying 18% total. But rule says never compute taxes; copy printed figures. The printed rate is 9% for each. There's no single printed gst_rate. I'll put gst_rate: null to avoid guessing. Actually, many invoice extractors put the total GST rate (18) on the line. But given strict rules, I'll set gst_rate to null since not printed as a single value on the line. Hmm, but the tax table prints \"CGST @ 9%\" and \"SGST @ 9%\". The line could be considered to have gst_rate 18% (9+9) but that's computation. I'll leave gst_rate null. Wait, but maybe better to put 18? No—rules say never compute. I'll use null.\n\nActually, reconsider: the line table header is \"| Description | HSN/SAC | Qty | Unit | Rate (Rs.) | Taxable Value (Rs.) |\" — no GST column. So gst_rate not printed for line -> null. Good.\n\nconfidence for line: high, 0.98.\n\nNow block numbers: assign block numbers as given.\n- doc_title block 4\n- supplier_name block 1\n- supplier_gstin block 2\n- supplier_phone block 2\n- supplier_email block 2\n- buyer_name block 5\n- buyer_gstin block 5\n- invoice_no block 6\n- invoice_date block 7\n- place_of_supply_state block 7\n- bank_name block 11\n- bank_account block 11\n- ifsc block 11\n- taxable_total block 10\n- cgst block 10\n- sgst block 10\n- round_off block 10\n- grand_total block 10\n- amount_in_words block 9\n- has_qr: false, block null (no QR). Confidence 1.0? It's a boolean; confidence maybe 1.0 block null.\n- irn null block null confidence 1.0 (sure not printed)\n- po_ref null\n- igst null\n- period_start null, period_end null, consumer_no null\n\nFor null fields, confidence: I'll set 1.0 (confident it's absent) and block null. Or 0.0? Confidence is how sure you read the printed value correctly. For absent fields, value null, confidence 1.0 (sure not present) seems fine. I'll use 1.0 for nulls that are clearly absent, block null.\n\nhas_qr: value false, confidence 1.0, block null.\n\nLet me format amounts. I'll use strings exactly as printed with commas: \"78,400.00\", \"7,056.00\", \"0.00\", \"92,512.00\". For line rate \"9,800.00\", taxable \"78,400.00\", qty 8 (number), unit \"Nos\", hsn_sac \"9403\".\n\nActually for consistency maybe use numbers for money. But \"copy printed figures exactly\" strongly suggests preserving \"78,400.00\". I'll use strings for money fields. qty as number 8.\n\ninvoice_date: printed \"02/11/2026\" (block 7 shows \"Invoice Date02/11/2026\"). Use \"02/11/2026\".\n\ninvoice_no: block 6 \"Invoice No.SGOF/26-27/0431\" -> \"SGOF/26-27/0431\".\n\nplace_of_supply_state: \"Karnataka (29)\".\n\namount_in_words: block 9 text: \"Amount in words: Rupees Ninety Two Thousand Five Hundred Twelve\\nOnly\". The amount in words verbatim: \"Rupees Ninety Two Thousand Five Hundred Twelve Only\". I'll join with space: \"Rupees Ninety Two Thousand Five Hundred Twelve Only\".\n\nNow produce JSON only. Ensure no markdown fences? User says \"JSON only.\" So output raw JSON.\n\nLet me write it.\n\nConfidence values: mostly 0.98-1.0. The image is clear. I'll use 0.99 for most, 1.0 for booleans/nulls.\n\nFor supplier_phone: \"+91 80 4110 2290\" block 2.\nsupplier_email: \"accounts@shreeganeshfurniture.in\" block 2.\n\nbuyer_gstin: block 5 \"GSTIN:29AABCZ5821K1ZW\" -> \"29AABCZ5821K1ZW\".\n\nbank_account: \"000405112290\" block 11. ifsc \"ICIC0000004\". bank_name \"ICICI Bank\".\n\nLine confidence 0.99.\n\nFinal JSON."
+}

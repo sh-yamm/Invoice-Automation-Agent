@@ -1,0 +1,11 @@
+{
+ "data": {
+  "escalate_to": null,
+  "reason": null,
+  "cites": [
+   "76bb791d"
+  ],
+  "rationale": "The only issue is that the invoice exceeds the remaining PO balance (₹60,000 left vs ₹1,20,000 billed), which is already captured by finding 76bb791d and caused the on_hold outcome. All other validations pass: vendor is approved, GST details correct, contract CT-901 matches, period is valid and not previously billed, and the amount matches the contracted monthly rate. No additional risks such as split invoicing, round-number manipulation, or vague descriptions are present."
+ },
+ "reasoning": "The rules outcome is \"on_hold\" due to finding 76bb791d: \"Invoice exceeds the PO balance\" - the PO-4490 was for ₹6,60,000, ₹6,00,000 already billed, leaving ₹60,000 balance, but this invoice bills ₹1,20,000 (₹60,000 over).\n\nThis is a clear contract/PO balance issue. The invoice amount matches the contract monthly amount (₹1,20,000), but the PO balance is insufficient. This could indicate:\n1. PO needs to be increased/renewed\n2. Billing error\n3. Contract amendment not reflected in PO\n\nThe rules have already flagged this and put it on hold. As a reviewer, I need to see if there's any additional risk not covered. The findings show all other checks pass: vendor approved, GST valid, contract matches, period correct, no duplicates, etc.\n\nThe only issue is the PO balance. This is already captured by the failed finding 76bb791d. No additional suspicious patterns: amount is not round in a suspicious way (it's the exact contract monthly amount), no urgency pressure indicated, description is clear (\"IT support retainer, November 2026\"), transaction type is recurring.\n\nThus, no need to escalate further. The on_hold outcome is appropriate. I'll set escalate_to: null."
+}

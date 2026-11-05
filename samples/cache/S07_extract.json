@@ -1,0 +1,149 @@
+{
+ "data": {
+  "fields": {
+   "doc_title": {
+    "value": "TAX INVOICE",
+    "confidence": 0.98,
+    "block": 2
+   },
+   "supplier_name": {
+    "value": "Mehta Electricals Pvt Ltd",
+    "confidence": 0.98,
+    "block": 1
+   },
+   "supplier_gstin": {
+    "value": "27AACCM4471B1ZR",
+    "confidence": 0.98,
+    "block": 1
+   },
+   "supplier_phone": {
+    "value": "+91 22 2386 3306",
+    "confidence": 0.98,
+    "block": 1
+   },
+   "supplier_email": {
+    "value": "ar@mehtaelectricals.in",
+    "confidence": 0.98,
+    "block": 1
+   },
+   "buyer_name": {
+    "value": "Zentra Retail Pvt Ltd",
+    "confidence": 0.98,
+    "block": 5
+   },
+   "buyer_gstin": {
+    "value": "29AABCZ5821K1ZW",
+    "confidence": 0.98,
+    "block": 6
+   },
+   "invoice_no": {
+    "value": "ME/26-27/2210",
+    "confidence": 0.98,
+    "block": 7
+   },
+   "invoice_date": {
+    "value": "02/11/2026",
+    "confidence": 0.98,
+    "block": 8
+   },
+   "po_ref": {
+    "value": "PO-4530",
+    "confidence": 0.98,
+    "block": 9
+   },
+   "place_of_supply_state": {
+    "value": "Karnataka (29)",
+    "confidence": 0.98,
+    "block": 10
+   },
+   "irn": {
+    "value": null,
+    "confidence": 0.9,
+    "block": null
+   },
+   "has_qr": {
+    "value": false,
+    "confidence": 0.9,
+    "block": null
+   },
+   "bank_name": {
+    "value": "Kotak Mahindra Bank",
+    "confidence": 0.98,
+    "block": 18
+   },
+   "bank_account": {
+    "value": "4512113306",
+    "confidence": 0.98,
+    "block": 18
+   },
+   "ifsc": {
+    "value": "KKBK0000654",
+    "confidence": 0.98,
+    "block": 18
+   },
+   "taxable_total": {
+    "value": "2,22,000.00",
+    "confidence": 0.98,
+    "block": 13
+   },
+   "cgst": {
+    "value": null,
+    "confidence": 0.9,
+    "block": null
+   },
+   "sgst": {
+    "value": null,
+    "confidence": 0.9,
+    "block": null
+   },
+   "igst": {
+    "value": "39,960.00",
+    "confidence": 0.98,
+    "block": 14
+   },
+   "round_off": {
+    "value": "0.00",
+    "confidence": 0.98,
+    "block": 15
+   },
+   "grand_total": {
+    "value": "2,61,960.00",
+    "confidence": 0.98,
+    "block": 16
+   },
+   "amount_in_words": {
+    "value": "Rupees Two Lakh Sixty One Thousand Nine Hundred Sixty Only",
+    "confidence": 0.98,
+    "block": 12
+   },
+   "period_start": {
+    "value": null,
+    "confidence": 0.9,
+    "block": null
+   },
+   "period_end": {
+    "value": null,
+    "confidence": 0.9,
+    "block": null
+   },
+   "consumer_no": {
+    "value": null,
+    "confidence": 0.9,
+    "block": null
+   }
+  },
+  "lines": [
+   {
+    "description": "LED panel 2x2 ft, 36 W",
+    "hsn_sac": "9405",
+    "qty": "120",
+    "unit": "Nos",
+    "rate": "1,850.00",
+    "taxable": "2,22,000.00",
+    "gst_rate": "18%",
+    "confidence": 0.95
+   }
+  ]
+ },
+ "reasoning": "The user wants me to extract invoice data from the parsed page blocks and return JSON only. I need to carefully read each block and extract the required fields.\n\nLet me go through the blocks:\n\nBlock 1: Supplier info - Mehta Electricals Pvt Ltd, address, GSTIN: 27AACCM4471B1ZR, State: Maharashtra (27), Phone: +91 22 2386 3306, Email: ar@mehtaelectricals.in\n\nBlock 2: Title - TAX INVOICE\n\nBlock 3: \"Original for recipient\" - not a field we need\n\nBlock 4: \"Bill to\" - section header\n\nBlock 5: Buyer name - Zentra Retail Pvt Ltd\n\nBlock 6: Buyer address and GSTIN: 29AABCZ5821K1ZW\n\nBlock 7: Invoice No. ME/26-27/2210\n\nBlock 8: Invoice Date 02/11/2026\n\nBlock 9: PO Ref. PO-4530\n\nBlock 10: Place of Supply Karnataka (29)\n\nBlock 11: Table with line item: Description: LED panel 2x2 ft, 36 W, HSN/SAC: 9405, Qty: 120, Unit: Nos, Rate: 1,850.00, Taxable Value: 2,22,000.00\n\nBlock 12: Amount in words: Rupees Two Lakh Sixty One Thousand Nine Hundred Sixty Only\n\nBlock 13: Taxable Value 2,22,000.00\n\nBlock 14: IGST @ 18% 39,960.00\n\nBlock 15: Round Off 0.00\n\nBlock 16: Invoice Total (Rs.) 2,61,960.00\n\nBlock 17: Bank details for payment\n\nBlock 18: Kotak Mahindra Bank A/c No.: 4512113306 IFSC: KKBK0000654\n\nBlock 19: For Mehta Electricals Pvt Ltd\n\nBlock 20: Authorised Signatory\n\nBlock 21: Subject to local jurisdiction...\n\nNow I need to map these to the required fields.\n\nFields:\n- doc_title: \"TAX INVOICE\" from block 2\n- supplier_name: \"Mehta Electricals Pvt Ltd\" from block 1\n- supplier_gstin: \"27AACCM4471B1ZR\" from block 1\n- supplier_phone: \"+91 22 2386 3306\" from block 1\n- supplier_email: \"ar@mehtaelectricals.in\" from block 1\n- buyer_name: \"Zentra Retail Pvt Ltd\" from block 5\n- buyer_gstin: \"29AABCZ5821K1ZW\" from block 6\n- invoice_no: \"ME/26-27/2210\" from block 7\n- invoice_date: \"02/11/2026\" from block 8\n- po_ref: \"PO-4530\" from block 9\n- place_of_supply_state: \"Karnataka (29)\" from block 10\n- irn: not printed, null\n- has_qr: not mentioned, false\n- bank_name: \"Kotak Mahindra Bank\" from block 18\n- bank_account: \"4512113306\" from block 18\n- ifsc: \"KKBK0000654\" from block 18\n- taxable_total: \"2,22,000.00\" from block 13 (or block 11)\n- cgst: not printed (since it's IGST), null\n- sgst: not printed, null\n- igst: \"39,960.00\" from block 14\n- round_off: \"0.00\" from block 15\n- grand_total: \"2,61,960.00\" from block 16\n- amount_in_words: \"Rupees Two Lakh Sixty One Thousand Nine Hundred Sixty Only\" from block 12\n- period_start: not printed, null\n- period_end: not printed, null\n- consumer_no: not printed, null\n\nLines: one line item from block 11.\n\nConfidence: Since the text is clear, I'll use high confidence like 0.95 for most fields. For block numbers, I'll reference the block numbers from the parsed blocks.\n\nNote: The parsed blocks are numbered 1-21. I'll use those numbers.\n\nFor lines, I need to include: description, hsn_sac, qty, unit, rate, taxable, gst_rate, confidence.\n\nFrom block 11: description \"LED panel 2x2 ft, 36 W\", hsn_sac \"9405\", qty \"120\", unit \"Nos\", rate \"1,850.00\", taxable \"2,22,000.00\", gst_rate \"18%\" (from block 14 IGST @ 18%). But gst_rate should be the rate, maybe \"18\". I'll include as \"18%\".\n\nConfidence for line: 0.95.\n\nNow produce JSON."
+}

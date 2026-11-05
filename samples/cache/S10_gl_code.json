@@ -1,0 +1,13 @@
+{
+ "data": {
+  "options": [
+   {
+    "gl_code": "6210",
+    "cost_centre": "CC-ADM-BLR",
+    "confidence": 0.98,
+    "why": "Conference table is office furniture; vendor name confirms furniture supply; account 6210 is for office furniture and fixtures (capex) with default cost centre CC-ADM-BLR."
+   }
+  ]
+ },
+ "reasoning": "The user wants me to code a vendor invoice for \"Shree Ganesh Office Furniture\" with line item \"Conference table, 10-seater\". I need to choose up to 3 accounts from the chart of accounts, best first, and reply with JSON only.\n\nLooking at the chart of accounts, the most relevant account for \"Conference table, 10-seater\" would be 6210 Office furniture: Office furniture and fixtures (capex) (category furniture, default cost centre CC-ADM-BLR). This is clearly office furniture.\n\nThe vendor name \"Shree Ganesh Office Furniture\" also suggests they sell office furniture.\n\nSo the primary account should be 6210. Since it's a single line item (conference table), I probably only need one account. But the instruction says \"up to 3 accounts\". I'll provide just the most relevant one with high confidence.\n\nI need to output JSON with options array containing objects with gl_code, cost_centre, confidence (0-1), and why.\n\nLet me construct the response."
+}

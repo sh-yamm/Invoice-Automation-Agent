@@ -1,0 +1,149 @@
+{
+ "data": {
+  "fields": {
+   "doc_title": {
+    "value": "TAX INVOICE",
+    "confidence": 0.99,
+    "block": 2
+   },
+   "supplier_name": {
+    "value": "Orbit Office Systems",
+    "confidence": 0.99,
+    "block": 1
+   },
+   "supplier_gstin": {
+    "value": "29AAJFO5521P1ZM",
+    "confidence": 0.99,
+    "block": 1
+   },
+   "supplier_phone": {
+    "value": "+91 80 4920 4455",
+    "confidence": 0.99,
+    "block": 1
+   },
+   "supplier_email": {
+    "value": "accounts@orbitoffice.in",
+    "confidence": 0.99,
+    "block": 1
+   },
+   "buyer_name": {
+    "value": "Zentra Retail Pvt Ltd",
+    "confidence": 0.99,
+    "block": 5
+   },
+   "buyer_gstin": {
+    "value": "29AABCZ5821K1ZW",
+    "confidence": 0.99,
+    "block": 6
+   },
+   "invoice_no": {
+    "value": "ORB/26-27/0219",
+    "confidence": 0.99,
+    "block": 7
+   },
+   "invoice_date": {
+    "value": "04/11/2026",
+    "confidence": 0.99,
+    "block": 8
+   },
+   "po_ref": {
+    "value": "PO-4540",
+    "confidence": 0.99,
+    "block": 9
+   },
+   "place_of_supply_state": {
+    "value": "Karnataka (29)",
+    "confidence": 0.99,
+    "block": 10
+   },
+   "irn": {
+    "value": null,
+    "confidence": 0.95,
+    "block": null
+   },
+   "has_qr": {
+    "value": false,
+    "confidence": 0.95,
+    "block": null
+   },
+   "bank_name": {
+    "value": "HDFC Bank",
+    "confidence": 0.99,
+    "block": 15
+   },
+   "bank_account": {
+    "value": "50200061234455",
+    "confidence": 0.99,
+    "block": 15
+   },
+   "ifsc": {
+    "value": "HDFC0000789",
+    "confidence": 0.99,
+    "block": 15
+   },
+   "taxable_total": {
+    "value": "4,15,000.00",
+    "confidence": 0.99,
+    "block": 13
+   },
+   "cgst": {
+    "value": "37,350.00",
+    "confidence": 0.99,
+    "block": 13
+   },
+   "sgst": {
+    "value": "37,350.00",
+    "confidence": 0.99,
+    "block": 13
+   },
+   "igst": {
+    "value": null,
+    "confidence": 0.95,
+    "block": null
+   },
+   "round_off": {
+    "value": "0.00",
+    "confidence": 0.99,
+    "block": 13
+   },
+   "grand_total": {
+    "value": "4,89,700.00",
+    "confidence": 0.99,
+    "block": 13
+   },
+   "amount_in_words": {
+    "value": "Rupees Four Lakh Eighty Nine Thousand Seven Hundred Only",
+    "confidence": 0.99,
+    "block": 12
+   },
+   "period_start": {
+    "value": null,
+    "confidence": 0.95,
+    "block": null
+   },
+   "period_end": {
+    "value": null,
+    "confidence": 0.95,
+    "block": null
+   },
+   "consumer_no": {
+    "value": null,
+    "confidence": 0.95,
+    "block": null
+   }
+  },
+  "lines": [
+   {
+    "description": "Workstation set, phase 3",
+    "hsn_sac": "9403",
+    "qty": "1",
+    "unit": "Set",
+    "rate": "4,15,000.00",
+    "taxable": "4,15,000.00",
+    "gst_rate": "18%",
+    "confidence": 0.99
+   }
+  ]
+ },
+ "reasoning": "The user wants me to extract invoice data from the parsed page blocks and return JSON only. I need to carefully read each block and extract the required fields.\n\nLet me go through the blocks:\n\nBlock 1: Supplier info - Orbit Office Systems, address, GSTIN: 29AAJFO5521P1ZM, State: Karnataka (29), Phone: +91 80 4920 4455, Email: accounts@orbitoffice.in\n\nBlock 2: Title - TAX INVOICE\n\nBlock 3: Text - Original for recipient (not a field we need)\n\nBlock 4: Section-header - Bill to\n\nBlock 5: Buyer name - Zentra Retail Pvt Ltd\n\nBlock 6: Buyer address and GSTIN - No. 14, Outer Ring Road, Bellandur, Bengaluru 560103, Karnataka, GSTIN: 29AABCZ5821K1ZW\n\nBlock 7: Invoice No. ORB/26-27/0219\n\nBlock 8: Invoice Date 04/11/2026\n\nBlock 9: PO Ref. PO-4540\n\nBlock 10: Place of Supply Karnataka (29)\n\nBlock 11: Table with line item - Description: Workstation set, phase 3, HSN/SAC: 9403, Qty: 1, Unit: Set, Rate: 4,15,000.00, Taxable Value: 4,15,000.00\n\nBlock 12: Amount in words: Rupees Four Lakh Eighty Nine Thousand Seven Hundred Only\n\nBlock 13: Tax summary table - Taxable Value: 4,15,000.00, CGST @ 9%: 37,350.00, SGST @ 9%: 37,350.00, Round Off: 0.00, Invoice Total: 4,89,700.00\n\nBlock 14: Section-header - Bank details for payment\n\nBlock 15: Bank details - HDFC Bank A/c No.: 50200061234455 IFSC: HDFC0000789\n\nBlock 16: For Orbit Office Systems\n\nBlock 17: Authorised Signatory\n\nBlock 18: Subject to local jurisdiction...\n\nNow I need to map these to the required fields.\n\nFields:\n- doc_title: \"TAX INVOICE\" from block 2\n- supplier_name: \"Orbit Office Systems\" from block 1\n- supplier_gstin: \"29AAJFO5521P1ZM\" from block 1\n- supplier_phone: \"+91 80 4920 4455\" from block 1\n- supplier_email: \"accounts@orbitoffice.in\" from block 1\n- buyer_name: \"Zentra Retail Pvt Ltd\" from block 5\n- buyer_gstin: \"29AABCZ5821K1ZW\" from block 6\n- invoice_no: \"ORB/26-27/0219\" from block 7\n- invoice_date: \"04/11/2026\" from block 8\n- po_ref: \"PO-4540\" from block 9\n- place_of_supply_state: \"Karnataka (29)\" from block 10\n- irn: not printed, null\n- has_qr: not mentioned, false\n- bank_name: \"HDFC Bank\" from block 15\n- bank_account: \"50200061234455\" from block 15\n- ifsc: \"HDFC0000789\" from block 15\n- taxable_total: \"4,15,000.00\" from block 13\n- cgst: \"37,350.00\" from block 13\n- sgst: \"37,350.00\" from block 13\n- igst: not applicable (since CGST+SGST), null\n- round_off: \"0.00\" from block 13\n- grand_total: \"4,89,700.00\" from block 13\n- amount_in_words: \"Rupees Four Lakh Eighty Nine Thousand Seven Hundred Only\" from block 12\n- period_start: not printed, null\n- period_end: not printed, null\n- consumer_no: not printed, null\n\nLines: one line item from block 11.\n\nConfidence: Since the text is clear in the parsed blocks, I'll use high confidence, maybe 0.95 for most.\n\nBlock numbers: I need to reference the block number where the value came from.\n\nLet me construct the JSON."
+}
