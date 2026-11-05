@@ -182,7 +182,7 @@ The signals decide clear cases on their own. For example, a printed PO that exis
 
 ```mermaid
 flowchart TD
-  S(["classified invoice"]) --> V1["GST Rule 46 fields present?<br/>invoice no · date · supplier and buyer GSTIN · HSN/SAC · taxable value · tax · place of supply"]
+  S(["classified invoice"]) --> V1["GST Rule 46 fields present?<br/>invoice no · date · supplier and buyer GSTIN · line items · taxable value · tax · total"]
   V1 -.->|missing| V1x["MISSING_MANDATORY_FIELD → Reject · C3"]:::rej
   V1 --> V2["Supplier GSTIN: format and check digit valid?"]
   V2 -.->|no| V2x["INVALID_GSTIN → Reject · C4"]:::rej
