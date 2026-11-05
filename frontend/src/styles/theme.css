@@ -188,3 +188,21 @@ table { border-collapse: collapse; width: 100%; }
 .grid .r { text-align: right; }
 .cell-bad { color: var(--rej); font-weight: 700; } .cell-ok { color: var(--ok); font-weight: 700; }
 @media (max-width: 1000px) { .desk { grid-template-columns: minmax(0, 1fr); } .sheet-wrap { position: static; } .rail { grid-template-columns: repeat(4, minmax(0, 1fr)); row-gap: 12px; } }
+
+/* ---------- rulebook and data ---------- */
+.rules { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-bottom: 16px; }
+.rule-sec { background: var(--sheet); border: 1px solid var(--rule); border-radius: 12px; padding: 16px; display: grid; gap: 12px; align-content: start; }
+.rule { display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: center; padding-top: 12px; border-top: 1px solid var(--rule); }
+.rule-sec h2 + .rule { border-top: 0; padding-top: 0; }
+.rule p { margin: 0; color: var(--ink-2); font-size: 13.5px; }
+.rule .rt { font-weight: 650; color: var(--ink); font-size: 14.5px; display: block; }
+.rule-in { display: flex; align-items: center; gap: 4px; }
+.rule input[type="number"] { width: 110px; text-align: right; }
+.unit { font-size: 13px; color: var(--muted); min-width: 28px; }
+.lock { font-size: 12px; font-weight: 700; color: var(--muted); border: 1px solid var(--rule); padding: 4px 9px; border-radius: 99px; white-space: nowrap; }
+.save-bar { display: flex !important; gap: 10px; align-items: center; flex-wrap: wrap; }
+.save-bar input { flex: 1; min-width: 220px; }
+.notice { background: var(--ok-wash); color: var(--ok); padding: 10px 14px; border-radius: 8px; font-weight: 600; }
+.minibar { display: flex; height: 10px; border-radius: 3px; overflow: hidden; background: var(--wash); width: 160px; }
+.minibar b { display: block; height: 100%; }
+@media (max-width: 1000px) { .rules { grid-template-columns: minmax(0, 1fr); } }

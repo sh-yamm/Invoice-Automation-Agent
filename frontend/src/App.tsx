@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
+import ConnectedData from "./views/ConnectedData/ConnectedData";
 import LiveCase from "./views/LiveCase/LiveCase";
+import Rulebook from "./views/Rulebook/Rulebook";
 import WorkQueue from "./views/WorkQueue/WorkQueue";
 
 function useHash(): string {
@@ -25,8 +27,8 @@ export default function App() {
   const hash = useHash();
   let view = <WorkQueue />;
   if (hash.startsWith("case-")) view = <LiveCase key={hash} caseId={hash.slice(5)} />;
-  else if (hash === "rules") view = <p className="muted">Rulebook</p>;
-  else if (hash === "data") view = <p className="muted">Connected data</p>;
+  else if (hash === "rules") view = <Rulebook />;
+  else if (hash === "data") view = <ConnectedData />;
 
   return (
     <>
