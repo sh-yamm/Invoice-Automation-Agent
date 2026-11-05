@@ -49,8 +49,9 @@ def _extract_json(text: str | None):
 
 class Gateway:
     def __init__(self, settings, store=None, cache_dir: Path | None = None, *, clock=time.monotonic,
-                 sleep=time.sleep, client: httpx.Client | None = None):
+                 sleep=time.sleep, client: httpx.Client | None = None, offline: bool = False):
         self.s = settings
+        self.offline = offline  # cache only: a miss raises instead of calling the network
         self.store = store
         self.cache_dir = Path(cache_dir) if cache_dir else None
         self.clock, self.sleep = clock, sleep
@@ -72,6 +73,8 @@ class Gateway:
             self.sleep(wait)
 
     def _post(self, url: str, **kwargs) -> dict:
+        if self.offline:
+            raise AiUnavailable("offline mode: no cached response for this call")
         headers = {"Authorization": f"Bearer {self.s.nvidia_api_key}", "Accept": "application/json"}
         last = ""
         for attempt in range(len(BACKOFF) + 1):
@@ -187,10 +190,9 @@ class Gateway:
         """Embeddings, cached in memory per text (not logged per case: they are lookups, not decisions)."""
         key = lambda t: hashlib.sha1(f"{input_type}|{t}".encode()).hexdigest()
         missing = list(dict.fromkeys(t for t in texts if key(t) not in self._embed_cache))
-        if missing:
+        for t in missing:  # one text per request: the endpoint fails on batches (HTTP 500)
             data = self._post(f"{self.s.nvidia_base_url}/embeddings",
-                              json={"model": self.models["embed"], "input": missing, "input_type": input_type,
+                              json={"model": self.models["embed"], "input": [t], "input_type": input_type,
                                     "encoding_format": "float"})
-            for t, row in zip(missing, data["data"]):
-                self._embed_cache[key(t)] = row["embedding"]
+            self._embed_cache[key(t)] = data["data"][0]["embedding"]
         return [self._embed_cache[key(t)] for t in texts]

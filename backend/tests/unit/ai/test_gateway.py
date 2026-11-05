@@ -160,5 +160,17 @@ def test_embed_caches_per_text(gw):
         "data": [{"embedding": [float(i), 1.0]} for i, _ in enumerate(json.loads(req.content)["input"])]}))
     a = gw.embed(["chair", "desk"])
     b = gw.embed(["desk", "chair"])
-    assert route.call_count == 1 and a[0] == b[1] and a[1] == b[0]
+    # one text per request: the endpoint rejects batches (HTTP 500), and results are cached per text
+    assert route.call_count == 2 and a[0] == b[1] and a[1] == b[0]
+    assert all(len(json.loads(c.request.content)["input"]) == 1 for c in route.calls)
     assert json.loads(route.calls[0].request.content)["input_type"] == "query"
+
+
+@respx.mock
+def test_offline_mode_never_calls_the_network(tmp_path, store, clock):
+    s = Settings(nvidia_api_key="k", nvidia_base_url=BASE, parse_url=PARSE, llm_max_rpm=600)
+    g = Gateway(s, store, tmp_path / "cache", clock=clock.now, sleep=clock.sleep, offline=True)
+    route = respx.post(f"{BASE}/chat/completions").mock(return_value=chat_reply('{"total": 1}'))
+    with pytest.raises(AiUnavailable, match="offline"):
+        g.chat_json("fast", [{"role": "user", "content": "x"}], SCHEMA, case_id=None, node="n", cache_key="miss")
+    assert route.call_count == 0

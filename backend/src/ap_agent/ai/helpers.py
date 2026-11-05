@@ -1,10 +1,12 @@
 """RealAi: the model-backed implementation of checks.framework.AiHelpers."""
 from __future__ import annotations
 
-import json
 import math
 from decimal import Decimal
 
+from rapidfuzz import fuzz
+
+from ap_agent.ai.gateway import AiUnavailable
 from ap_agent.core.models import Invoice, PurchaseOrder
 
 GL_SCHEMA = {"type": "object", "required": ["options"], "properties": {"options": {"type": "array", "items": {
@@ -37,7 +39,10 @@ class RealAi:
             return 0.0
         if a.lower() == b.lower():
             return 1.0
-        self._vectors([a, b])
+        try:
+            self._vectors([a, b])
+        except AiUnavailable:  # a lookup aid, not a decision: fall back to string similarity
+            return fuzz.token_set_ratio(a, b) / 100
         x, y = self._vec[a], self._vec[b]
         nx, ny = math.sqrt(sum(i * i for i in x)), math.sqrt(sum(j * j for j in y))
         return max(0.0, min(1.0, sum(i * j for i, j in zip(x, y)) / (nx * ny))) if nx and ny else 0.0
@@ -47,7 +52,6 @@ class RealAi:
         """Score each open PO by how well its lines match the invoice lines (embeddings + same rate + fits balance)."""
         if not invoice.lines or not pos:
             return []
-        self._vectors([l.description for l in invoice.lines] + [pl.description for po in pos for pl in po.lines])
         ranked = []
         for po in pos:
             sims, rate_hits, best_desc = [], 0, []

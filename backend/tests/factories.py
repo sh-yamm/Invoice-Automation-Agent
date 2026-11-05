@@ -74,6 +74,9 @@ class FakeGateway:
 
     def chat_json(self, slot, messages, schema, *, case_id=None, node="", cache_key=None):
         self.calls.append(("chat_json", slot, node, messages))
+        if not self.json_replies:
+            from ap_agent.ai.gateway import AiUnavailable
+            raise AiUnavailable("fake gateway: no scripted reply")
         reply = self.json_replies.pop(0)
         return (reply, None) if not isinstance(reply, tuple) else reply
 

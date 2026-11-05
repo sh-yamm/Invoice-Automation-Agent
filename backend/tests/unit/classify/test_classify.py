@@ -138,3 +138,15 @@ def test_real_ai_rank_po_candidates_prefers_matching_items(store):
     gw = FakeGateway(embeddings=texts)
     ranked = RealAi(gw, repo(), store, "c1").rank_po_candidates(make_invoice("S08"), repo().open_pos("V001"))
     assert ranked[0][0] == "PO-4507" and ranked[0][1] >= 0.9 and ranked[1][1] < 0.5
+
+
+def test_real_ai_similarity_falls_back_when_embeddings_are_down(store):
+    from ap_agent.ai.gateway import AiUnavailable
+    gw = FakeGateway()
+
+    def down(texts, input_type="query"):
+        raise AiUnavailable("embeddings down")
+    gw.embed = down
+    ai = RealAi(gw, repo(), store, "c1")
+    assert ai.similarity("Kaveri Packaging Industry", "Kaveri Packaging Industries") > 0.85
+    assert ai.similarity("Conference table", "MS angle 50x50x5 mm") < 0.5
