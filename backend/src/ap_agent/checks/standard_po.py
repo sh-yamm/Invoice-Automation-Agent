@@ -89,9 +89,7 @@ def line_pairing(ctx: CheckContext):
     if (skip := _no_po(ctx)):
         return skip
     inv, po = ctx.invoice, ctx.po
-    if len(inv.lines) == 1 and len(po.lines) >= 2:
-        ctx.pairs = [LinePair(0, None, "header", 1.0)]
-        return [ctx.warn("HEADER_LEVEL_MATCH_ONLY", "One combined line; checked against the PO total")]
+    bundled_shape = len(inv.lines) == 1 and len(po.lines) >= 2
     out, taken, unpaired = [], set(), []
     for i, line in enumerate(inv.lines):
         free = [pl for pl in po.lines if pl.line_no not in taken]
@@ -102,6 +100,10 @@ def line_pairing(ctx: CheckContext):
             pair = LinePair(i, same_hsn[0][1].line_no, "hsn", same_hsn[0][0])
         elif scored and scored[0][0] >= PAIR_MIN:
             pair = LinePair(i, scored[0][1].line_no, "similarity", scored[0][0])
+        elif bundled_shape:
+            # one combined line that matches none of the PO's lines: check it against the PO total instead
+            ctx.pairs = [LinePair(0, None, "header", 1.0)]
+            return [ctx.warn("HEADER_LEVEL_MATCH_ONLY", "One combined line; checked against the PO total")]
         else:
             line_no, conf, why = ctx.ai.pair_tiebreak(line, free) if free else (None, 0.0, "")
             if line_no is not None and conf >= PAIR_MIN and line_no not in taken:

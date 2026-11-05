@@ -167,3 +167,11 @@ def test_agent_pairing_when_descriptions_differ(store):
     inv.lines[0] = inv.lines[0].model_copy(update={"description": "Revolving office seat, black"})
     ctx, f = run(inv, store, ai=FakeAi(pair=(1, 0.9, "same item, different wording")))
     assert "LLM_LINE_PAIRING" in codes(f, Status.WARN) and ctx.pairs[0].method == "agent"
+
+
+def test_single_line_matching_one_po_line_is_paired_not_header(store):
+    # S14's shape: one invoice line against a 3-line PO; it is clearly phase 3, so match it line by line.
+    inv = make_invoice("S14")
+    ctx, f = run(inv, store)
+    assert [(p.po_line_no, p.method) for p in ctx.pairs] == [(3, "hsn")]
+    assert "HEADER_LEVEL_MATCH_ONLY" not in codes(f)
