@@ -145,3 +145,12 @@ def test_upload_non_pdf_400(client):
     assert r.status_code == 400 and "PDF" in r.json()["detail"]
     assert client.post("/api/cases", data={}).status_code == 400
     assert client.post("/api/cases", data={"sample_id": "S99"}).status_code == 404
+
+
+@pytest.mark.skipif(not cached("S03"), reason="S03 replies not recorded yet")
+def test_case_lists_locked_codes(client):
+    cid = client.post("/api/cases", data={"sample_id": "S03", "pace": "fast"}).json()["case_id"]
+    case = wait_done(client, cid)
+    assert case["locked_codes"] == ["BANK_DETAILS_MISMATCH"]
+    r = client.post(f"/api/cases/{cid}/actions", json={"action": "approve_anyway", "action_key": "a"})
+    assert r.status_code == 422 and "note" in r.json()["detail"]

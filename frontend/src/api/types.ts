@@ -75,7 +75,7 @@ export interface Invoice {
   [key: string]: unknown;
 }
 
-export interface CaseDetail extends CaseSummary {
+export interface CaseDetail extends CaseSummary, CaseDetailExtras {
   invoice: Invoice | null;
   findings: Finding[];
   tool_calls: { node: string; tool: string; args: unknown; result: unknown; at: string }[];
@@ -126,4 +126,8 @@ export interface ActionBody {
   value?: string;
   actor?: string;
   action_key: string;
+}
+
+export interface CaseDetailExtras {
+  locked_codes: string[];
 }

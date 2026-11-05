@@ -14,6 +14,7 @@ from fastapi.responses import Response
 
 from ap_agent.core.constants import OUTCOME_LABELS
 from ap_agent.pipeline.graph import Deps, Pipeline
+from ap_agent.rulebook.loader import load_aop
 
 
 @dataclass
@@ -55,6 +56,7 @@ def case_json(case: dict, deps: Deps, full: bool = True) -> dict:
     if not full:
         return out
     cid = case["case_id"]
+    locked = load_aop(deps.aop_path).locked
     pages = sorted((deps.files_dir / cid / "pages").glob("page-*.png"), key=lambda p: int(p.stem.split("-")[1]))
     out.update({
         "invoice": json.loads(case["invoice_json"]) if case.get("invoice_json") else None,
@@ -62,6 +64,8 @@ def case_json(case: dict, deps: Deps, full: bool = True) -> dict:
         "tool_calls": case.get("tool_calls", []),
         "llm_calls": case.get("llm_calls", []),
         "human_actions": case.get("human_actions", []),
+        "locked_codes": sorted({f.code for f in case.get("findings", []) if f.status.value == "fail"
+                                and f.code in locked}),
         "file": f"/api/cases/{cid}/file" if (deps.files_dir / cid / "original.pdf").exists() else None,
         "pages": [f"/api/cases/{cid}/pages/{p.stem.split('-')[1]}.png" for p in pages],
     })
