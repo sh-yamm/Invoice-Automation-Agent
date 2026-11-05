@@ -61,3 +61,30 @@ def make_ctx(invoice, store, *, ai=None, case_id="t-case", today=None, **kw):
     if today is not None:
         ctx.today = today
     return ctx
+
+
+class FakeGateway:
+    """Scripted stand-in for ai.gateway.Gateway. Queue replies; it records every call."""
+
+    def __init__(self, json_replies=None, tool_replies=None, embeddings=None):
+        self.json_replies = list(json_replies or [])
+        self.tool_replies = list(tool_replies or [])
+        self.embeddings = embeddings or {}
+        self.calls: list[tuple] = []
+
+    def chat_json(self, slot, messages, schema, *, case_id=None, node="", cache_key=None):
+        self.calls.append(("chat_json", slot, node, messages))
+        reply = self.json_replies.pop(0)
+        return (reply, None) if not isinstance(reply, tuple) else reply
+
+    def chat_tools(self, slot, messages, tools, *, case_id=None, node="", cache_key=None):
+        self.calls.append(("chat_tools", slot, node, list(messages)))
+        return self.tool_replies.pop(0) if len(self.tool_replies) > 1 else self.tool_replies[0]
+
+    def embed(self, texts, *, input_type="query"):
+        self.calls.append(("embed", texts))
+        return [self.embeddings.get(t, [1.0, 0.0]) for t in texts]
+
+    def parse_page(self, png, *, case_id=None, cache_key=None):
+        self.calls.append(("parse_page", str(png)))
+        return ""
