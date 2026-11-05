@@ -65,6 +65,15 @@ class Repository:
     def po(self, po_number: str | None) -> PurchaseOrder | None:
         return self._pos.get((po_number or "").strip().upper())
 
+    def pos(self) -> list[PurchaseOrder]:
+        return list(self._pos.values())
+
+    def all_grns(self) -> list[Grn]:
+        return [g for gs in self._grns.values() for g in gs]
+
+    def contracts(self) -> list[Contract]:
+        return list(self._contracts)
+
     def open_pos(self, vendor_id: str) -> list[PurchaseOrder]:
         return [p for p in self._pos.values() if p.vendor_id == vendor_id and p.status == "open"]
 

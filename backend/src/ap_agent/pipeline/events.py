@@ -12,14 +12,16 @@ class EventBus:
         self.sleep = sleep
         self._cond = threading.Condition()
         self._version = 0
+        self.pace_by_case: dict[str, int] = {}
 
     def publish(self, case_id: str, type: str, payload: dict) -> int:
         seq = self.store.add_event(case_id, type, payload)
         with self._cond:
             self._version += 1
             self._cond.notify_all()
-        if type == "finding" and self.pace_ms:
-            self.sleep(self.pace_ms / 1000)
+        pace = self.pace_by_case.get(case_id, self.pace_ms)
+        if type in ("finding", "node_started") and pace:
+            self.sleep(pace / 1000 / (3 if type == "node_started" else 1))
         return seq
 
     def wait(self, last_version: int, timeout: float) -> int:

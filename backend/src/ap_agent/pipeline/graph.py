@@ -117,17 +117,26 @@ class Pipeline:
     def _config(self, case_id):
         return {"configurable": {"thread_id": case_id}, "recursion_limit": 60}
 
-    def start(self, case_id: str, pdf_path: Path, sample_id: str | None = None, filename: str | None = None) -> dict:
+    def prepare(self, case_id: str, pdf_path: Path, sample_id: str | None = None, filename: str | None = None) -> None:
+        """Store the file and create the case record (so the UI can open it before the run starts)."""
         folder = self.deps.files_dir / case_id
         folder.mkdir(parents=True, exist_ok=True)
         original = folder / "original.pdf"
         shutil.copyfile(pdf_path, original)
         info = inspect_pdf(original)
         self.deps.store.create_case(case_id, filename or Path(pdf_path).name, info["sha256"], sample_id)
+
+    def run(self, case_id: str) -> dict:
+        case = self.deps.store.get_case(case_id)
+        original = self.deps.files_dir / case_id / "original.pdf"
         with self._locks[case_id]:
-            self.app.invoke({"case_id": case_id, "pdf_path": str(original), "sample_id": sample_id, "findings": [],
-                             "stopped": False}, self._config(case_id))
+            self.app.invoke({"case_id": case_id, "pdf_path": str(original), "sample_id": case["sample_id"],
+                             "findings": [], "stopped": False}, self._config(case_id))
         return self.deps.store.get_case(case_id)
+
+    def start(self, case_id: str, pdf_path: Path, sample_id: str | None = None, filename: str | None = None) -> dict:
+        self.prepare(case_id, pdf_path, sample_id, filename)
+        return self.run(case_id)
 
     def check_action(self, case: dict, action: dict) -> None:
         if case is None:
