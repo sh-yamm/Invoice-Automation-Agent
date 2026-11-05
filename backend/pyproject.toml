@@ -39,4 +39,5 @@ markers = ["live: hits real NVIDIA endpoints"]
 filterwarnings = [
   "ignore:pkg_resources is deprecated:UserWarning",
   "ignore:Deprecated call to `pkg_resources.declare_namespace:DeprecationWarning",
+  "ignore:Passing 'msg' argument to (Task|Future).cancel:DeprecationWarning",
 ]

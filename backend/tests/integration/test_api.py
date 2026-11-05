@@ -71,7 +71,8 @@ def test_create_sample_case_and_stream(client):
     assert case["pages"] == [f"/api/cases/{cid}/pages/1.png"] and case["findings"]
     events = sse_events(client, cid)
     decision = next(d for t, d in events if t == "decision")
-    assert decision["outcome"] == 0 and events[-1][0] in ("finalised", "node_finished")
+    assert events[-1][0] == "end"  # the server closes the stream once the case stops running
+    assert decision["outcome"] == 0 and [t for t, _ in events if t != "end"][-1] in ("finalised", "node_finished")
     assert client.get(f"/api/cases/{cid}/pages/1.png").headers["content-type"] == "image/png"
     assert client.get(f"/api/cases/{cid}/file").headers["content-type"] == "application/pdf"
 

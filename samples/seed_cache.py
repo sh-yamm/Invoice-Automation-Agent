@@ -26,6 +26,7 @@ from ap_agent.storage.seed import reset_demo  # noqa: E402
 from samples.specs import SPECS  # noqa: E402
 
 CACHE = ROOT / "samples" / "cache"
+sys.stdout.reconfigure(encoding="utf-8")  # the Windows console default can't print ₹
 
 
 def run(sid: str, fresh: bool) -> bool:
