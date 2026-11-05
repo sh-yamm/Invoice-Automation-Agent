@@ -32,7 +32,7 @@ dev = ["pytest>=8.2", "respx>=0.21"]
 where = ["src"]
 
 [tool.pytest.ini_options]
-pythonpath = ["src", "tests"]
+pythonpath = ["src", "tests", ".."]
 testpaths = ["tests"]
 addopts = "-m 'not live' --import-mode=importlib -p no:dash -p no:cacheprovider"
 markers = ["live: hits real NVIDIA endpoints"]
