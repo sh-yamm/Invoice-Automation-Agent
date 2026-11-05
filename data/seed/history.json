@@ -248,15 +248,15 @@
    "period": null
   },
   {
-   "case_id": "H-NPD-05",
+   "case_id": "H-NF-05",
    "vendor_id": "V007",
-   "vendor_name": "Namma Power Distribution Ltd",
-   "invoice_no": "NPD/KA/2605-48213",
-   "invoice_no_norm": "NPDKA260548213",
+   "vendor_name": "Namma Fibernet Pvt Ltd",
+   "invoice_no": "NF/BLR/2605-48213",
+   "invoice_no_norm": "NFBLR260548213",
    "invoice_date": "2026-05-28",
    "grand_total": "17200",
    "line_texts": [
-    "Electricity charges, Bellandur HQ"
+    "Internet leased line 100 Mbps, Bellandur HQ"
    ],
    "txn_type": "po_less",
    "outcome": "APPROVED",
@@ -270,15 +270,15 @@
    "period": null
   },
   {
-   "case_id": "H-NPD-06",
+   "case_id": "H-NF-06",
    "vendor_id": "V007",
-   "vendor_name": "Namma Power Distribution Ltd",
-   "invoice_no": "NPD/KA/2606-48213",
-   "invoice_no_norm": "NPDKA260648213",
+   "vendor_name": "Namma Fibernet Pvt Ltd",
+   "invoice_no": "NF/BLR/2606-48213",
+   "invoice_no_norm": "NFBLR260648213",
    "invoice_date": "2026-06-28",
    "grand_total": "18100",
    "line_texts": [
-    "Electricity charges, Bellandur HQ"
+    "Internet leased line 100 Mbps, Bellandur HQ"
    ],
    "txn_type": "po_less",
    "outcome": "APPROVED",
@@ -292,15 +292,15 @@
    "period": null
   },
   {
-   "case_id": "H-NPD-07",
+   "case_id": "H-NF-07",
    "vendor_id": "V007",
-   "vendor_name": "Namma Power Distribution Ltd",
-   "invoice_no": "NPD/KA/2607-48213",
-   "invoice_no_norm": "NPDKA260748213",
+   "vendor_name": "Namma Fibernet Pvt Ltd",
+   "invoice_no": "NF/BLR/2607-48213",
+   "invoice_no_norm": "NFBLR260748213",
    "invoice_date": "2026-07-28",
    "grand_total": "19099",
    "line_texts": [
-    "Electricity charges, Bellandur HQ"
+    "Internet leased line 100 Mbps, Bellandur HQ"
    ],
    "txn_type": "po_less",
    "outcome": "APPROVED",
@@ -314,15 +314,15 @@
    "period": null
   },
   {
-   "case_id": "H-NPD-08",
+   "case_id": "H-NF-08",
    "vendor_id": "V007",
-   "vendor_name": "Namma Power Distribution Ltd",
-   "invoice_no": "NPD/KA/2608-48213",
-   "invoice_no_norm": "NPDKA260848213",
+   "vendor_name": "Namma Fibernet Pvt Ltd",
+   "invoice_no": "NF/BLR/2608-48213",
+   "invoice_no_norm": "NFBLR260848213",
    "invoice_date": "2026-08-28",
    "grand_total": "18650",
    "line_texts": [
-    "Electricity charges, Bellandur HQ"
+    "Internet leased line 100 Mbps, Bellandur HQ"
    ],
    "txn_type": "po_less",
    "outcome": "APPROVED",
@@ -336,15 +336,15 @@
    "period": null
   },
   {
-   "case_id": "H-NPD-09",
+   "case_id": "H-NF-09",
    "vendor_id": "V007",
-   "vendor_name": "Namma Power Distribution Ltd",
-   "invoice_no": "NPD/KA/2609-48213",
-   "invoice_no_norm": "NPDKA260948213",
+   "vendor_name": "Namma Fibernet Pvt Ltd",
+   "invoice_no": "NF/BLR/2609-48213",
+   "invoice_no_norm": "NFBLR260948213",
    "invoice_date": "2026-09-28",
    "grand_total": "17899",
    "line_texts": [
-    "Electricity charges, Bellandur HQ"
+    "Internet leased line 100 Mbps, Bellandur HQ"
    ],
    "txn_type": "po_less",
    "outcome": "APPROVED",
@@ -358,15 +358,15 @@
    "period": null
   },
   {
-   "case_id": "H-NPD-10",
+   "case_id": "H-NF-10",
    "vendor_id": "V007",
-   "vendor_name": "Namma Power Distribution Ltd",
-   "invoice_no": "NPD/KA/2610-48213",
-   "invoice_no_norm": "NPDKA261048213",
+   "vendor_name": "Namma Fibernet Pvt Ltd",
+   "invoice_no": "NF/BLR/2610-48213",
+   "invoice_no_norm": "NFBLR261048213",
    "invoice_date": "2026-10-28",
    "grand_total": "18400",
    "line_texts": [
-    "Electricity charges, Bellandur HQ"
+    "Internet leased line 100 Mbps, Bellandur HQ"
    ],
    "txn_type": "po_less",
    "outcome": "APPROVED",

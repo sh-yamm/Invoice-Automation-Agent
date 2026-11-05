@@ -22,7 +22,7 @@ def test_vendor_by_gstin(repo):
 
 def test_einvoice_flag_and_category(repo):
     assert repo.vendor("V005").einvoice_required is True
-    assert repo.vendor("V007").category == "utilities"
+    assert repo.vendor("V007").category == "telecom"
 
 
 def test_po_value(repo):
@@ -63,8 +63,8 @@ def test_lookalike_not_in_master(repo):
 def test_gl_and_service_accounts(repo):
     codes = {a.gl_code for a in repo.gl_accounts()}
     assert {"6110", "6120", "6130", "6210"} <= codes and len(codes) >= 8
-    assert repo.service_account("V007", "KA-BLR-0048213").cost_centre
-    assert repo.service_account("V007", "KA-BLR-0000000") is None
+    assert repo.service_account("V007", "NF-BLR-0048213").cost_centre
+    assert repo.service_account("V007", "NF-BLR-0000000") is None
 
 
 def test_factory_s01_is_clean_and_overridable():

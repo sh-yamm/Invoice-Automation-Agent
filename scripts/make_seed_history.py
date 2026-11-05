@@ -59,11 +59,11 @@ for i, (num, d) in enumerate([("0211", date(2026, 11, 2)), ("0214", date(2026, 1
                       d, 415000, 18, [f"Workstation set, phase {i}"], "standard_po",
                       ledger=[{"po_number": "PO-4540", "line_no": i, "qty": "1", "amount": "415000"}]))
 
-# Namma Power electricity bills, May–Oct 2026: the baseline for the amount-anomaly check.
+# Namma Fibernet leased-line bills, May–Oct 2026: the baseline for the amount-anomaly check.
 for month, taxable in [(5, 14576), (6, 15339), (7, 16186), (8, 15805), (9, 15169), (10, 15593)]:
-    cases.append(case(f"H-NPD-{month:02d}", "V007", "Namma Power Distribution Ltd", f"NPD/KA/26{month:02d}-48213",
+    cases.append(case(f"H-NF-{month:02d}", "V007", "Namma Fibernet Pvt Ltd", f"NF/BLR/26{month:02d}-48213",
                       f"NPDKA26{month:02d}48213", date(2026, month, 28), taxable, 18,
-                      ["Electricity charges, Bellandur HQ"], "po_less",
+                      ["Internet leased line 100 Mbps, Bellandur HQ"], "po_less",
                       ledger=[], period=None))
 
 # Older cases across vendors, Aug–Sep 2026, so the dashboard has history. Dates are kept well away from the
