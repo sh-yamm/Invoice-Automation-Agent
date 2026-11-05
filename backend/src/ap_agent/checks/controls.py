@@ -151,8 +151,12 @@ def duplicate_fuzzy(ctx: CheckContext):
     norm = normal_invoice_no(inv.invoice_no)
     window = ctx.aop.duplicates.window_days
     min_sim = ctx.aop.duplicates.min_similarity_pct / 100
+    mine = {(ctx.po.po_number, p.po_line_no) for p in ctx.pairs if p.po_line_no} if ctx.po else set()
     best = None
     for h in _history(ctx):
+        theirs = ctx.ledger.lines_for_case(h.case_id)
+        if mine and theirs and mine.isdisjoint(theirs):
+            continue  # bills different PO lines: a separate delivery, not a resend (ledger ruling, Task 13)
         if norm and h.invoice_no_norm == norm and h.outcome is not Outcome.REJECTED:
             continue  # handled by duplicate_exact
         if not _same_amount(inv.grand_total, h.grand_total):

@@ -154,3 +154,28 @@ def test_authority_limit(store):
 def test_contact_details_changed_warns(store):
     _, f = run(make_invoice("S01", supplier_phone="+91 98450 00000"), store)
     assert "CONTACT_DETAILS_CHANGED" in codes(f, Status.WARN)
+
+
+def test_split_invoices_for_different_po_lines_are_not_duplicates(store):
+    # S14's shape: same vendor, same amount, sequential numbers, but each bills a different PO line.
+    from ap_agent.checks.framework import LinePair
+    inv = make_invoice("S01", supplier_gstin=ORBIT, supplier_name="Orbit Office Systems", supplier_phone=None,
+                       supplier_email=None, invoice_no="ORB/26-27/0219", invoice_date=date(2026, 11, 4),
+                       po_ref="PO-4540", bank_name=None, bank_account=None, ifsc=None,
+                       taxable_total=D("415000"), cgst=D("37350"), sgst=D("37350"), grand_total=D("489700"),
+                       lines=[Line(description="Workstation set, phase 3", hsn_sac="9403", qty=D("1"), unit="Set",
+                                   rate=D("415000"), taxable=D("415000"), gst_rate=D("18"))])
+    ctx = make_ctx(inv, store, today=TODAY, txn_type="standard_po")
+    ctx.po = ctx.repo.po("PO-4540")
+    ctx.pairs = [LinePair(0, 3, "hsn", 1.0)]
+    f = run_checks("controls", ctx)
+    assert "DUPLICATE_PROBABLE" not in codes(f)
+    assert "SPLIT_BELOW_LIMIT" in codes(f)
+
+
+def test_same_po_line_resend_still_duplicate(store):
+    from ap_agent.checks.framework import LinePair
+    ctx = make_ctx(freight("SKL/1048"), store, today=TODAY, txn_type="standard_po")
+    ctx.po = ctx.repo.po("PO-4475")
+    ctx.pairs = [LinePair(0, 1, "hsn", 1.0)]
+    assert "DUPLICATE_PROBABLE" in codes(run_checks("controls", ctx))

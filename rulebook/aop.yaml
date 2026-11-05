@@ -125,16 +125,16 @@ reasons:
     owner: Vendor master team
     explain: "The supplier \"{vendor}\" closely resembles the approved vendor \"{similar}\" but has a different GSTIN."
     next: "Treat as a possible impersonation. Confirm with {similar} through the contact on file."
-  - code: DUPLICATE_PROBABLE
-    outcome: hold
-    owner: AP team
-    explain: "This looks like a resend of {other_no} (case {other_case}, {other_outcome}): {reasons}."
-    next: "Ask the vendor whether this is a resend. If it is, reject it."
   - code: PERIOD_ALREADY_BILLED
     outcome: hold
     owner: AP team
     explain: "{period} under contract {contract} was already billed on {other_no} (case {other_case})."
     next: "Ask the vendor why the same period is billed twice. Reject if it is a repeat."
+  - code: DUPLICATE_PROBABLE
+    outcome: hold
+    owner: AP team
+    explain: "This looks like a resend of {other_no} (case {other_case}, {other_outcome}): {reasons}."
+    next: "Ask the vendor whether this is a resend. If it is, reject it."
   - code: UNREADABLE_DOCUMENT
     outcome: hold
     owner: AP team

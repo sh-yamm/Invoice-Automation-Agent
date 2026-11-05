@@ -95,3 +95,7 @@ def test_priority_order(aop):
     assert r["SUSPICIOUS_INSTRUCTIONS_IN_DOCUMENT"].priority < r["PRICE_VARIANCE"].priority
     assert r["NOT_A_TAX_INVOICE"].priority < r["VENDOR_NOT_APPROVED"].priority < r["MISSING_MANDATORY_FIELD"].priority
     assert r["SPLIT_BELOW_LIMIT"].priority < r["NEEDS_SIGNOFF"].priority
+
+
+def test_period_already_billed_outranks_probable_duplicate(aop):
+    assert aop.reasons["PERIOD_ALREADY_BILLED"].priority < aop.reasons["DUPLICATE_PROBABLE"].priority
