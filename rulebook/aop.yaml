@@ -362,6 +362,11 @@ reasons:
     owner: AP team
     explain: "The supplier and buyer GSTINs were read the wrong way round and have been swapped back."
     next: "No action needed."
+  - code: UNGROUNDED_VALUE
+    outcome: warn
+    owner: AP team
+    explain: "I removed {fields} because I could not find them on the page."
+    next: "No action needed. Checks that need these values treat them as missing."
   - code: PO_INFERRED
     outcome: warn
     owner: AP team
