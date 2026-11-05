@@ -1,0 +1,911 @@
+{
+ "cases": [
+  {
+   "case_id": "H-NIT-06",
+   "vendor_id": "V003",
+   "vendor_name": "Nimbus IT Services LLP",
+   "invoice_no": "NIT/26-27/080",
+   "invoice_no_norm": "NIT2627080",
+   "invoice_date": "2026-06-02",
+   "grand_total": "141600",
+   "line_texts": [
+    "IT support retainer"
+   ],
+   "txn_type": "recurring",
+   "outcome": "APPROVED",
+   "primary_code": "ALL_CHECKS_PASSED",
+   "owner": "No one, handled automatically",
+   "why": "Every required check passed.",
+   "status": null,
+   "created_at": "2026-06-05T10:01:00",
+   "decided_at": "2026-06-05T10:01:41",
+   "ledger": [
+    {
+     "po_number": "PO-4490",
+     "line_no": 1,
+     "qty": "0",
+     "amount": "120000"
+    }
+   ],
+   "period": {
+    "contract_id": "CT-901",
+    "period_start": "2026-06-01"
+   }
+  },
+  {
+   "case_id": "H-NIT-07",
+   "vendor_id": "V003",
+   "vendor_name": "Nimbus IT Services LLP",
+   "invoice_no": "NIT/26-27/082",
+   "invoice_no_norm": "NIT2627082",
+   "invoice_date": "2026-07-02",
+   "grand_total": "141600",
+   "line_texts": [
+    "IT support retainer"
+   ],
+   "txn_type": "recurring",
+   "outcome": "APPROVED",
+   "primary_code": "ALL_CHECKS_PASSED",
+   "owner": "No one, handled automatically",
+   "why": "Every required check passed.",
+   "status": null,
+   "created_at": "2026-07-03T12:08:00",
+   "decided_at": "2026-07-03T12:08:30",
+   "ledger": [
+    {
+     "po_number": "PO-4490",
+     "line_no": 1,
+     "qty": "0",
+     "amount": "120000"
+    }
+   ],
+   "period": {
+    "contract_id": "CT-901",
+    "period_start": "2026-07-01"
+   }
+  },
+  {
+   "case_id": "H-NIT-08",
+   "vendor_id": "V003",
+   "vendor_name": "Nimbus IT Services LLP",
+   "invoice_no": "NIT/26-27/084",
+   "invoice_no_norm": "NIT2627084",
+   "invoice_date": "2026-08-02",
+   "grand_total": "141600",
+   "line_texts": [
+    "IT support retainer"
+   ],
+   "txn_type": "recurring",
+   "outcome": "APPROVED",
+   "primary_code": "ALL_CHECKS_PASSED",
+   "owner": "No one, handled automatically",
+   "why": "Every required check passed.",
+   "status": null,
+   "created_at": "2026-08-05T17:05:00",
+   "decided_at": "2026-08-05T17:05:51",
+   "ledger": [
+    {
+     "po_number": "PO-4490",
+     "line_no": 1,
+     "qty": "0",
+     "amount": "120000"
+    }
+   ],
+   "period": {
+    "contract_id": "CT-901",
+    "period_start": "2026-08-01"
+   }
+  },
+  {
+   "case_id": "H-NIT-09",
+   "vendor_id": "V003",
+   "vendor_name": "Nimbus IT Services LLP",
+   "invoice_no": "NIT/26-27/086",
+   "invoice_no_norm": "NIT2627086",
+   "invoice_date": "2026-09-02",
+   "grand_total": "141600",
+   "line_texts": [
+    "IT support retainer"
+   ],
+   "txn_type": "recurring",
+   "outcome": "APPROVED",
+   "primary_code": "ALL_CHECKS_PASSED",
+   "owner": "No one, handled automatically",
+   "why": "Every required check passed.",
+   "status": null,
+   "created_at": "2026-09-03T09:05:00",
+   "decided_at": "2026-09-03T09:05:37",
+   "ledger": [
+    {
+     "po_number": "PO-4490",
+     "line_no": 1,
+     "qty": "0",
+     "amount": "120000"
+    }
+   ],
+   "period": {
+    "contract_id": "CT-901",
+    "period_start": "2026-09-01"
+   }
+  },
+  {
+   "case_id": "H-NIT-10",
+   "vendor_id": "V003",
+   "vendor_name": "Nimbus IT Services LLP",
+   "invoice_no": "NIT/26-27/088",
+   "invoice_no_norm": "NIT2627088",
+   "invoice_date": "2026-10-02",
+   "grand_total": "141600",
+   "line_texts": [
+    "IT support retainer"
+   ],
+   "txn_type": "recurring",
+   "outcome": "APPROVED",
+   "primary_code": "ALL_CHECKS_PASSED",
+   "owner": "No one, handled automatically",
+   "why": "Every required check passed.",
+   "status": null,
+   "created_at": "2026-10-03T17:38:00",
+   "decided_at": "2026-10-03T17:38:25",
+   "ledger": [
+    {
+     "po_number": "PO-4490",
+     "line_no": 1,
+     "qty": "0",
+     "amount": "120000"
+    }
+   ],
+   "period": {
+    "contract_id": "CT-901",
+    "period_start": "2026-10-01"
+   }
+  },
+  {
+   "case_id": "H-SKL-1043",
+   "vendor_id": "V006",
+   "vendor_name": "Sai Krishna Logistics",
+   "invoice_no": "SKL-1043",
+   "invoice_no_norm": "SKL1043",
+   "invoice_date": "2026-10-24",
+   "grand_total": "58275",
+   "line_texts": [
+    "Freight Bengaluru to Chennai, 32 ft trailer"
+   ],
+   "txn_type": "standard_po",
+   "outcome": "APPROVED",
+   "primary_code": "ALL_CHECKS_PASSED",
+   "owner": "No one, handled automatically",
+   "why": "Every required check passed.",
+   "status": null,
+   "created_at": "2026-10-27T12:45:00",
+   "decided_at": "2026-10-27T12:45:50",
+   "ledger": [
+    {
+     "po_number": "PO-4475",
+     "line_no": 1,
+     "qty": "3",
+     "amount": "55500"
+    }
+   ],
+   "period": null
+  },
+  {
+   "case_id": "H-ORB-0211",
+   "vendor_id": "V008",
+   "vendor_name": "Orbit Office Systems",
+   "invoice_no": "ORB/26-27/0211",
+   "invoice_no_norm": "ORB2627211",
+   "invoice_date": "2026-11-02",
+   "grand_total": "489700",
+   "line_texts": [
+    "Workstation set, phase 1"
+   ],
+   "txn_type": "standard_po",
+   "outcome": "APPROVED",
+   "primary_code": "ALL_CHECKS_PASSED",
+   "owner": "No one, handled automatically",
+   "why": "Every required check passed.",
+   "status": null,
+   "created_at": "2026-11-03T16:37:00",
+   "decided_at": "2026-11-03T16:37:41",
+   "ledger": [
+    {
+     "po_number": "PO-4540",
+     "line_no": 1,
+     "qty": "1",
+     "amount": "415000"
+    }
+   ],
+   "period": null
+  },
+  {
+   "case_id": "H-ORB-0214",
+   "vendor_id": "V008",
+   "vendor_name": "Orbit Office Systems",
+   "invoice_no": "ORB/26-27/0214",
+   "invoice_no_norm": "ORB2627214",
+   "invoice_date": "2026-11-03",
+   "grand_total": "489700",
+   "line_texts": [
+    "Workstation set, phase 2"
+   ],
+   "txn_type": "standard_po",
+   "outcome": "APPROVED",
+   "primary_code": "ALL_CHECKS_PASSED",
+   "owner": "No one, handled automatically",
+   "why": "Every required check passed.",
+   "status": null,
+   "created_at": "2026-11-04T11:44:00",
+   "decided_at": "2026-11-04T11:44:51",
+   "ledger": [
+    {
+     "po_number": "PO-4540",
+     "line_no": 2,
+     "qty": "1",
+     "amount": "415000"
+    }
+   ],
+   "period": null
+  },
+  {
+   "case_id": "H-NPD-05",
+   "vendor_id": "V007",
+   "vendor_name": "Namma Power Distribution Ltd",
+   "invoice_no": "NPD/KA/2605-48213",
+   "invoice_no_norm": "NPDKA260548213",
+   "invoice_date": "2026-05-28",
+   "grand_total": "17200",
+   "line_texts": [
+    "Electricity charges, Bellandur HQ"
+   ],
+   "txn_type": "po_less",
+   "outcome": "APPROVED",
+   "primary_code": "ALL_CHECKS_PASSED",
+   "owner": "No one, handled automatically",
+   "why": "Every required check passed.",
+   "status": null,
+   "created_at": "2026-05-30T13:09:00",
+   "decided_at": "2026-05-30T13:09:37",
+   "ledger": [],
+   "period": null
+  },
+  {
+   "case_id": "H-NPD-06",
+   "vendor_id": "V007",
+   "vendor_name": "Namma Power Distribution Ltd",
+   "invoice_no": "NPD/KA/2606-48213",
+   "invoice_no_norm": "NPDKA260648213",
+   "invoice_date": "2026-06-28",
+   "grand_total": "18100",
+   "line_texts": [
+    "Electricity charges, Bellandur HQ"
+   ],
+   "txn_type": "po_less",
+   "outcome": "APPROVED",
+   "primary_code": "ALL_CHECKS_PASSED",
+   "owner": "No one, handled automatically",
+   "why": "Every required check passed.",
+   "status": null,
+   "created_at": "2026-06-30T10:05:00",
+   "decided_at": "2026-06-30T10:05:48",
+   "ledger": [],
+   "period": null
+  },
+  {
+   "case_id": "H-NPD-07",
+   "vendor_id": "V007",
+   "vendor_name": "Namma Power Distribution Ltd",
+   "invoice_no": "NPD/KA/2607-48213",
+   "invoice_no_norm": "NPDKA260748213",
+   "invoice_date": "2026-07-28",
+   "grand_total": "19099",
+   "line_texts": [
+    "Electricity charges, Bellandur HQ"
+   ],
+   "txn_type": "po_less",
+   "outcome": "APPROVED",
+   "primary_code": "ALL_CHECKS_PASSED",
+   "owner": "No one, handled automatically",
+   "why": "Every required check passed.",
+   "status": null,
+   "created_at": "2026-07-29T14:54:00",
+   "decided_at": "2026-07-29T14:54:46",
+   "ledger": [],
+   "period": null
+  },
+  {
+   "case_id": "H-NPD-08",
+   "vendor_id": "V007",
+   "vendor_name": "Namma Power Distribution Ltd",
+   "invoice_no": "NPD/KA/2608-48213",
+   "invoice_no_norm": "NPDKA260848213",
+   "invoice_date": "2026-08-28",
+   "grand_total": "18650",
+   "line_texts": [
+    "Electricity charges, Bellandur HQ"
+   ],
+   "txn_type": "po_less",
+   "outcome": "APPROVED",
+   "primary_code": "ALL_CHECKS_PASSED",
+   "owner": "No one, handled automatically",
+   "why": "Every required check passed.",
+   "status": null,
+   "created_at": "2026-08-31T13:51:00",
+   "decided_at": "2026-08-31T13:51:26",
+   "ledger": [],
+   "period": null
+  },
+  {
+   "case_id": "H-NPD-09",
+   "vendor_id": "V007",
+   "vendor_name": "Namma Power Distribution Ltd",
+   "invoice_no": "NPD/KA/2609-48213",
+   "invoice_no_norm": "NPDKA260948213",
+   "invoice_date": "2026-09-28",
+   "grand_total": "17899",
+   "line_texts": [
+    "Electricity charges, Bellandur HQ"
+   ],
+   "txn_type": "po_less",
+   "outcome": "APPROVED",
+   "primary_code": "ALL_CHECKS_PASSED",
+   "owner": "No one, handled automatically",
+   "why": "Every required check passed.",
+   "status": null,
+   "created_at": "2026-10-01T16:34:00",
+   "decided_at": "2026-10-01T16:34:31",
+   "ledger": [],
+   "period": null
+  },
+  {
+   "case_id": "H-NPD-10",
+   "vendor_id": "V007",
+   "vendor_name": "Namma Power Distribution Ltd",
+   "invoice_no": "NPD/KA/2610-48213",
+   "invoice_no_norm": "NPDKA261048213",
+   "invoice_date": "2026-10-28",
+   "grand_total": "18400",
+   "line_texts": [
+    "Electricity charges, Bellandur HQ"
+   ],
+   "txn_type": "po_less",
+   "outcome": "APPROVED",
+   "primary_code": "ALL_CHECKS_PASSED",
+   "owner": "No one, handled automatically",
+   "why": "Every required check passed.",
+   "status": null,
+   "created_at": "2026-10-30T10:35:00",
+   "decided_at": "2026-10-30T10:35:42",
+   "ledger": [],
+   "period": null
+  },
+  {
+   "case_id": "H-OLD-00",
+   "vendor_id": "V001",
+   "vendor_name": "Shree Ganesh Office Furniture",
+   "invoice_no": "SGOF/26-27/0310",
+   "invoice_no_norm": "SGOF26270310",
+   "invoice_date": "2026-08-03",
+   "grand_total": "400610",
+   "line_texts": [
+    "Visitor chair"
+   ],
+   "txn_type": "standard_po",
+   "outcome": "APPROVED",
+   "primary_code": "ALL_CHECKS_PASSED",
+   "owner": "No one, handled automatically",
+   "why": "Every required check passed.",
+   "status": null,
+   "created_at": "2026-08-06T14:36:00",
+   "decided_at": "2026-08-06T14:36:36",
+   "ledger": [],
+   "period": null
+  },
+  {
+   "case_id": "H-OLD-01",
+   "vendor_id": "V002",
+   "vendor_name": "Kaveri Packaging Industries",
+   "invoice_no": "KPI/26-27/1011",
+   "invoice_no_norm": "KPI26271011",
+   "invoice_date": "2026-08-05",
+   "grand_total": "446630",
+   "line_texts": [
+    "Carton sealing tape"
+   ],
+   "txn_type": "standard_po",
+   "outcome": "APPROVED",
+   "primary_code": "ALL_CHECKS_PASSED",
+   "owner": "No one, handled automatically",
+   "why": "Every required check passed.",
+   "status": null,
+   "created_at": "2026-08-06T09:42:00",
+   "decided_at": "2026-08-06T09:42:38",
+   "ledger": [],
+   "period": null
+  },
+  {
+   "case_id": "H-OLD-02",
+   "vendor_id": "V004",
+   "vendor_name": "Deccan Steel Traders",
+   "invoice_no": "DST/2627/0712",
+   "invoice_no_norm": "DST26270712",
+   "invoice_date": "2026-08-07",
+   "grand_total": "195880",
+   "line_texts": [
+    "MS flat bar 40x6 mm"
+   ],
+   "txn_type": "standard_po",
+   "outcome": "APPROVED",
+   "primary_code": "ALL_CHECKS_PASSED",
+   "owner": "No one, handled automatically",
+   "why": "Every required check passed.",
+   "status": null,
+   "created_at": "2026-08-08T12:55:00",
+   "decided_at": "2026-08-08T12:55:30",
+   "ledger": [],
+   "period": null
+  },
+  {
+   "case_id": "H-OLD-03",
+   "vendor_id": "V005",
+   "vendor_name": "Mehta Electricals Pvt Ltd",
+   "invoice_no": "ME/26-27/1913",
+   "invoice_no_norm": "ME26271913",
+   "invoice_date": "2026-08-09",
+   "grand_total": "250750",
+   "line_texts": [
+    "Copper cable 4 sq mm"
+   ],
+   "txn_type": "standard_po",
+   "outcome": "APPROVED",
+   "primary_code": "ALL_CHECKS_PASSED",
+   "owner": "No one, handled automatically",
+   "why": "Every required check passed.",
+   "status": null,
+   "created_at": "2026-08-11T16:40:00",
+   "decided_at": "2026-08-11T16:40:47",
+   "ledger": [],
+   "period": null
+  },
+  {
+   "case_id": "H-OLD-04",
+   "vendor_id": "V006",
+   "vendor_name": "Sai Krishna Logistics",
+   "invoice_no": "SKL-0914",
+   "invoice_no_norm": "SKL0914",
+   "invoice_date": "2026-08-11",
+   "grand_total": "119180",
+   "line_texts": [
+    "Freight Bengaluru to Hyderabad, 20 ft"
+   ],
+   "txn_type": "standard_po",
+   "outcome": "APPROVED",
+   "primary_code": "ALL_CHECKS_PASSED",
+   "owner": "No one, handled automatically",
+   "why": "Every required check passed.",
+   "status": null,
+   "created_at": "2026-08-13T14:13:00",
+   "decided_at": "2026-08-13T14:13:41",
+   "ledger": [],
+   "period": null
+  },
+  {
+   "case_id": "H-OLD-05",
+   "vendor_id": "V001",
+   "vendor_name": "Shree Ganesh Office Furniture",
+   "invoice_no": "SGOF/26-27/0315",
+   "invoice_no_norm": "SGOF26270315",
+   "invoice_date": "2026-08-13",
+   "grand_total": "444860",
+   "line_texts": [
+    "Storage locker"
+   ],
+   "txn_type": "standard_po",
+   "outcome": "ON_HOLD",
+   "primary_code": "PRICE_VARIANCE",
+   "owner": "Procurement",
+   "why": "Held for review.",
+   "status": "waiting",
+   "created_at": "2026-08-16T11:34:00",
+   "decided_at": "2026-08-16T11:34:34",
+   "ledger": [],
+   "period": null
+  },
+  {
+   "case_id": "H-OLD-06",
+   "vendor_id": "V002",
+   "vendor_name": "Kaveri Packaging Industries",
+   "invoice_no": "KPI/26-27/1016",
+   "invoice_no_norm": "KPI26271016",
+   "invoice_date": "2026-08-15",
+   "grand_total": "168740",
+   "line_texts": [
+    "Shrink wrap roll"
+   ],
+   "txn_type": "standard_po",
+   "outcome": "APPROVED",
+   "primary_code": "ALL_CHECKS_PASSED",
+   "owner": "No one, handled automatically",
+   "why": "Every required check passed.",
+   "status": null,
+   "created_at": "2026-08-16T16:24:00",
+   "decided_at": "2026-08-16T16:24:41",
+   "ledger": [],
+   "period": null
+  },
+  {
+   "case_id": "H-OLD-07",
+   "vendor_id": "V004",
+   "vendor_name": "Deccan Steel Traders",
+   "invoice_no": "DST/2627/0717",
+   "invoice_no_norm": "DST26270717",
+   "invoice_date": "2026-08-17",
+   "grand_total": "407690",
+   "line_texts": [
+    "MS flat bar 40x6 mm"
+   ],
+   "txn_type": "standard_po",
+   "outcome": "APPROVED",
+   "primary_code": "ALL_CHECKS_PASSED",
+   "owner": "No one, handled automatically",
+   "why": "Every required check passed.",
+   "status": null,
+   "created_at": "2026-08-20T17:14:00",
+   "decided_at": "2026-08-20T17:14:44",
+   "ledger": [],
+   "period": null
+  },
+  {
+   "case_id": "H-OLD-08",
+   "vendor_id": "V005",
+   "vendor_name": "Mehta Electricals Pvt Ltd",
+   "invoice_no": "ME/26-27/1918",
+   "invoice_no_norm": "ME26271918",
+   "invoice_date": "2026-08-19",
+   "grand_total": "54870",
+   "line_texts": [
+    "Distribution board 12-way"
+   ],
+   "txn_type": "standard_po",
+   "outcome": "APPROVED",
+   "primary_code": "ALL_CHECKS_PASSED",
+   "owner": "No one, handled automatically",
+   "why": "Every required check passed.",
+   "status": null,
+   "created_at": "2026-08-20T09:51:00",
+   "decided_at": "2026-08-20T09:51:44",
+   "ledger": [],
+   "period": null
+  },
+  {
+   "case_id": "H-OLD-09",
+   "vendor_id": "V006",
+   "vendor_name": "Sai Krishna Logistics",
+   "invoice_no": "SKL-0919",
+   "invoice_no_norm": "SKL0919",
+   "invoice_date": "2026-08-21",
+   "grand_total": "263140",
+   "line_texts": [
+    "Freight Bengaluru to Hyderabad, 20 ft"
+   ],
+   "txn_type": "standard_po",
+   "outcome": "APPROVED",
+   "primary_code": "ALL_CHECKS_PASSED",
+   "owner": "No one, handled automatically",
+   "why": "Every required check passed.",
+   "status": null,
+   "created_at": "2026-08-23T10:13:00",
+   "decided_at": "2026-08-23T10:13:44",
+   "ledger": [],
+   "period": null
+  },
+  {
+   "case_id": "H-OLD-10",
+   "vendor_id": "V001",
+   "vendor_name": "Shree Ganesh Office Furniture",
+   "invoice_no": "SGOF/26-27/0320",
+   "invoice_no_norm": "SGOF26270320",
+   "invoice_date": "2026-08-23",
+   "grand_total": "149270",
+   "line_texts": [
+    "Visitor chair"
+   ],
+   "txn_type": "standard_po",
+   "outcome": "APPROVED",
+   "primary_code": "ALL_CHECKS_PASSED",
+   "owner": "No one, handled automatically",
+   "why": "Every required check passed.",
+   "status": null,
+   "created_at": "2026-08-26T16:25:00",
+   "decided_at": "2026-08-26T16:25:53",
+   "ledger": [],
+   "period": null
+  },
+  {
+   "case_id": "H-OLD-11",
+   "vendor_id": "V002",
+   "vendor_name": "Kaveri Packaging Industries",
+   "invoice_no": "KPI/26-27/1021",
+   "invoice_no_norm": "KPI26271021",
+   "invoice_date": "2026-08-25",
+   "grand_total": "107380",
+   "line_texts": [
+    "Carton sealing tape"
+   ],
+   "txn_type": "standard_po",
+   "outcome": "ON_HOLD",
+   "primary_code": "RECEIPT_MISSING",
+   "owner": "Warehouse",
+   "why": "Held for review.",
+   "status": "waiting",
+   "created_at": "2026-08-26T12:47:00",
+   "decided_at": "2026-08-26T12:47:46",
+   "ledger": [],
+   "period": null
+  },
+  {
+   "case_id": "H-OLD-12",
+   "vendor_id": "V004",
+   "vendor_name": "Deccan Steel Traders",
+   "invoice_no": "DST/2627/0722",
+   "invoice_no_norm": "DST26270722",
+   "invoice_date": "2026-08-27",
+   "grand_total": "359900",
+   "line_texts": [
+    "MS flat bar 40x6 mm"
+   ],
+   "txn_type": "standard_po",
+   "outcome": "APPROVED",
+   "primary_code": "ALL_CHECKS_PASSED",
+   "owner": "No one, handled automatically",
+   "why": "Every required check passed.",
+   "status": null,
+   "created_at": "2026-08-30T13:47:00",
+   "decided_at": "2026-08-30T13:47:51",
+   "ledger": [],
+   "period": null
+  },
+  {
+   "case_id": "H-OLD-13",
+   "vendor_id": "V005",
+   "vendor_name": "Mehta Electricals Pvt Ltd",
+   "invoice_no": "ME/26-27/1923",
+   "invoice_no_norm": "ME26271923",
+   "invoice_date": "2026-08-29",
+   "grand_total": "373470",
+   "line_texts": [
+    "Copper cable 4 sq mm"
+   ],
+   "txn_type": "standard_po",
+   "outcome": "APPROVED",
+   "primary_code": "ALL_CHECKS_PASSED",
+   "owner": "No one, handled automatically",
+   "why": "Every required check passed.",
+   "status": null,
+   "created_at": "2026-08-31T14:14:00",
+   "decided_at": "2026-08-31T14:14:32",
+   "ledger": [],
+   "period": null
+  },
+  {
+   "case_id": "H-OLD-14",
+   "vendor_id": "V006",
+   "vendor_name": "Sai Krishna Logistics",
+   "invoice_no": "SKL-0924",
+   "invoice_no_norm": "SKL0924",
+   "invoice_date": "2026-08-31",
+   "grand_total": "328630",
+   "line_texts": [
+    "Freight Bengaluru to Hyderabad, 20 ft"
+   ],
+   "txn_type": "standard_po",
+   "outcome": "APPROVED",
+   "primary_code": "ALL_CHECKS_PASSED",
+   "owner": "No one, handled automatically",
+   "why": "Every required check passed.",
+   "status": null,
+   "created_at": "2026-09-02T10:48:00",
+   "decided_at": "2026-09-02T10:48:27",
+   "ledger": [],
+   "period": null
+  },
+  {
+   "case_id": "H-OLD-15",
+   "vendor_id": "V001",
+   "vendor_name": "Shree Ganesh Office Furniture",
+   "invoice_no": "SGOF/26-27/0325",
+   "invoice_no_norm": "SGOF26270325",
+   "invoice_date": "2026-09-02",
+   "grand_total": "87320",
+   "line_texts": [
+    "Storage locker"
+   ],
+   "txn_type": "standard_po",
+   "outcome": "APPROVED",
+   "primary_code": "ALL_CHECKS_PASSED",
+   "owner": "No one, handled automatically",
+   "why": "Every required check passed.",
+   "status": null,
+   "created_at": "2026-09-03T11:50:00",
+   "decided_at": "2026-09-03T11:50:51",
+   "ledger": [],
+   "period": null
+  },
+  {
+   "case_id": "H-OLD-16",
+   "vendor_id": "V002",
+   "vendor_name": "Kaveri Packaging Industries",
+   "invoice_no": "KPI/26-27/1026",
+   "invoice_no_norm": "KPI26271026",
+   "invoice_date": "2026-09-04",
+   "grand_total": "381140",
+   "line_texts": [
+    "Shrink wrap roll"
+   ],
+   "txn_type": "standard_po",
+   "outcome": "APPROVED",
+   "primary_code": "ALL_CHECKS_PASSED",
+   "owner": "No one, handled automatically",
+   "why": "Every required check passed.",
+   "status": null,
+   "created_at": "2026-09-05T15:24:00",
+   "decided_at": "2026-09-05T15:24:53",
+   "ledger": [],
+   "period": null
+  },
+  {
+   "case_id": "H-OLD-17",
+   "vendor_id": "V004",
+   "vendor_name": "Deccan Steel Traders",
+   "invoice_no": "DST/2627/0727",
+   "invoice_no_norm": "DST26270727",
+   "invoice_date": "2026-09-06",
+   "grand_total": "340430",
+   "line_texts": [
+    "MS flat bar 40x6 mm"
+   ],
+   "txn_type": "standard_po",
+   "outcome": "ON_HOLD",
+   "primary_code": "UNEXPECTED_CHARGES",
+   "owner": "Procurement",
+   "why": "Held for review.",
+   "status": "waiting",
+   "created_at": "2026-09-09T09:43:00",
+   "decided_at": "2026-09-09T09:43:46",
+   "ledger": [],
+   "period": null
+  },
+  {
+   "case_id": "H-OLD-18",
+   "vendor_id": "V005",
+   "vendor_name": "Mehta Electricals Pvt Ltd",
+   "invoice_no": "ME/26-27/1928",
+   "invoice_no_norm": "ME26271928",
+   "invoice_date": "2026-09-08",
+   "grand_total": "90270",
+   "line_texts": [
+    "Distribution board 12-way"
+   ],
+   "txn_type": "standard_po",
+   "outcome": "APPROVED",
+   "primary_code": "ALL_CHECKS_PASSED",
+   "owner": "No one, handled automatically",
+   "why": "Every required check passed.",
+   "status": null,
+   "created_at": "2026-09-11T17:48:00",
+   "decided_at": "2026-09-11T17:48:41",
+   "ledger": [],
+   "period": null
+  },
+  {
+   "case_id": "H-OLD-19",
+   "vendor_id": "V006",
+   "vendor_name": "Sai Krishna Logistics",
+   "invoice_no": "SKL-0929",
+   "invoice_no_norm": "SKL0929",
+   "invoice_date": "2026-09-10",
+   "grand_total": "408280",
+   "line_texts": [
+    "Freight Bengaluru to Hyderabad, 20 ft"
+   ],
+   "txn_type": "standard_po",
+   "outcome": "APPROVED",
+   "primary_code": "ALL_CHECKS_PASSED",
+   "owner": "No one, handled automatically",
+   "why": "Every required check passed.",
+   "status": null,
+   "created_at": "2026-09-12T10:18:00",
+   "decided_at": "2026-09-12T10:18:51",
+   "ledger": [],
+   "period": null
+  },
+  {
+   "case_id": "H-OLD-20",
+   "vendor_id": "V001",
+   "vendor_name": "Shree Ganesh Office Furniture",
+   "invoice_no": "SGOF/26-27/0330",
+   "invoice_no_norm": "SGOF26270330",
+   "invoice_date": "2026-09-12",
+   "grand_total": "116230",
+   "line_texts": [
+    "Visitor chair"
+   ],
+   "txn_type": "standard_po",
+   "outcome": "APPROVED",
+   "primary_code": "ALL_CHECKS_PASSED",
+   "owner": "No one, handled automatically",
+   "why": "Every required check passed.",
+   "status": null,
+   "created_at": "2026-09-14T09:46:00",
+   "decided_at": "2026-09-14T09:46:40",
+   "ledger": [],
+   "period": null
+  },
+  {
+   "case_id": "H-OLD-21",
+   "vendor_id": "V002",
+   "vendor_name": "Kaveri Packaging Industries",
+   "invoice_no": "KPI/26-27/1031",
+   "invoice_no_norm": "KPI26271031",
+   "invoice_date": "2026-09-14",
+   "grand_total": "323320",
+   "line_texts": [
+    "Carton sealing tape"
+   ],
+   "txn_type": "standard_po",
+   "outcome": "APPROVED",
+   "primary_code": "ALL_CHECKS_PASSED",
+   "owner": "No one, handled automatically",
+   "why": "Every required check passed.",
+   "status": null,
+   "created_at": "2026-09-15T17:58:00",
+   "decided_at": "2026-09-15T17:58:30",
+   "ledger": [],
+   "period": null
+  },
+  {
+   "case_id": "H-OLD-22",
+   "vendor_id": "V004",
+   "vendor_name": "Deccan Steel Traders",
+   "invoice_no": "DST/2627/0732",
+   "invoice_no_norm": "DST26270732",
+   "invoice_date": "2026-09-16",
+   "grand_total": "398840",
+   "line_texts": [
+    "MS flat bar 40x6 mm"
+   ],
+   "txn_type": "standard_po",
+   "outcome": "APPROVED",
+   "primary_code": "ALL_CHECKS_PASSED",
+   "owner": "No one, handled automatically",
+   "why": "Every required check passed.",
+   "status": null,
+   "created_at": "2026-09-18T17:38:00",
+   "decided_at": "2026-09-18T17:38:36",
+   "ledger": [],
+   "period": null
+  },
+  {
+   "case_id": "H-OLD-23",
+   "vendor_id": "V005",
+   "vendor_name": "Mehta Electricals Pvt Ltd",
+   "invoice_no": "ME/26-27/1933",
+   "invoice_no_norm": "ME26271933",
+   "invoice_date": "2026-09-18",
+   "grand_total": "113280",
+   "line_texts": [
+    "Copper cable 4 sq mm"
+   ],
+   "txn_type": "standard_po",
+   "outcome": "REJECTED",
+   "primary_code": "MISSING_MANDATORY_FIELD",
+   "owner": "Vendor",
+   "why": "Held for review.",
+   "status": "done",
+   "created_at": "2026-09-19T17:49:00",
+   "decided_at": "2026-09-19T17:49:53",
+   "ledger": [],
+   "period": null
+  }
+ ]
+}
