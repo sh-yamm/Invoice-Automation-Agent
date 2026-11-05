@@ -89,6 +89,90 @@ class Invoice(BaseModel):
     sources: dict[str, Evidence] = Field(default_factory=dict)
 
 
+# ---------- records from the company's existing systems (data/erp) ----------
+
+class Vendor(BaseModel):
+    vendor_id: str
+    name: str
+    gstin: str
+    state_code: str
+    address: str
+    phone: str
+    email: str
+    bank_name: str
+    bank_account: str
+    ifsc: str
+    einvoice_required: bool
+    gst_status: str
+    payment_terms_days: int
+    status: str
+    category: str
+
+
+class PoLine(BaseModel):
+    po_number: str
+    line_no: int
+    item_code: str
+    description: str
+    hsn_sac: str
+    qty: Decimal
+    unit: str
+    rate: Decimal
+    gst_rate: Decimal
+
+
+class PurchaseOrder(BaseModel):
+    po_number: str
+    vendor_id: str
+    po_type: str  # goods | services | blanket
+    po_date: date
+    status: str
+    lines: list[PoLine]
+
+    @property
+    def value(self) -> Decimal:
+        return sum((l.qty * l.rate for l in self.lines), Decimal("0"))
+
+    def line(self, line_no: int) -> PoLine | None:
+        return next((l for l in self.lines if l.line_no == line_no), None)
+
+
+class Grn(BaseModel):
+    grn_number: str
+    po_number: str
+    line_no: int
+    received_qty: Decimal
+    accepted_qty: Decimal
+    received_date: date
+
+
+class Contract(BaseModel):
+    contract_id: str
+    vendor_id: str
+    po_number: str | None
+    start_date: date
+    end_date: date
+    billing_cycle: str
+    amount_per_period: Decimal
+    description: str
+
+
+class GlAccount(BaseModel):
+    gl_code: str
+    name: str
+    description: str
+    category: str
+    cost_centre_default: str
+    budget_owner: str
+
+
+class ServiceAccount(BaseModel):
+    vendor_id: str
+    consumer_no: str
+    description: str
+    cost_centre: str
+
+
 class ParseBlock(BaseModel):
     """One text block from the page parser, with a box normalised to 0–1."""
 

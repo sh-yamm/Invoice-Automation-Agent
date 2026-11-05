@@ -1,0 +1,11 @@
+gl_code,name,description,category,cost_centre_default,budget_owner
+6110,Electricity,Electricity charges for offices and stores,utilities,CC-FAC-BLR,Facilities manager
+6120,Telecom,"Phone, broadband and leased lines",telecom,CC-IT-BLR,IT manager
+6130,Rent,Office and warehouse rent,rent,CC-FAC-BLR,Facilities manager
+6140,Water,Water and sewerage charges,utilities,CC-FAC-BLR,Facilities manager
+6150,Software subscriptions,SaaS and software licences,subscriptions,CC-IT-BLR,IT manager
+6160,Travel,Employee travel and lodging,travel,CC-ADM-BLR,Admin manager
+6170,Statutory fees,"Government fees, licences and registrations",statutory,CC-FIN-BLR,Finance controller
+6210,Office furniture,Office furniture and fixtures (capex),furniture,CC-ADM-BLR,Admin manager
+6220,IT services,Managed IT and support services,it_services,CC-IT-BLR,IT manager
+6310,Freight inward,Inbound freight and logistics,logistics,CC-OPS-BLR,Operations manager

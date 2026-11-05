@@ -1,0 +1,13 @@
+po_number,vendor_id,po_type,po_date,status,line_no,item_code,description,hsn_sac,qty,unit,rate,gst_rate
+PO-4501,V001,goods,2026-10-05,open,1,FUR-CHR-01,Ergonomic mesh chair,9401,20,Nos,6450,18
+PO-4501,V001,goods,2026-10-05,open,2,FUR-DSK-14,Workstation desk 1400mm,9403,10,Nos,11200,18
+PO-4507,V001,goods,2026-10-12,open,1,FUR-CAB-04,"Filing cabinet, 4 drawer",9403,8,Nos,9800,18
+PO-4518,V004,goods,2026-10-08,open,1,STL-ANG-50,MS angle 50x50x5 mm,7216,4000,kg,60.00,18
+PO-4522,V002,goods,2026-10-10,open,1,PKG-BOX-5P,Corrugated box 5-ply 18x12x12,4819,5000,Nos,18.50,18
+PO-4530,V005,goods,2026-10-14,open,1,ELE-LED-22,"LED panel 2x2 ft, 36 W",9405,120,Nos,1850,18
+PO-4475,V006,services,2026-10-15,open,1,LOG-FRT-32,"Freight Bengaluru to Chennai, 32 ft trailer",996511,3,Trips,18500,5
+PO-4476,V006,services,2026-10-28,open,1,LOG-FRT-32,"Freight Bengaluru to Chennai, 32 ft trailer",996511,2,Trips,18500,5
+PO-4490,V003,blanket,2026-06-01,open,1,ITS-RET-01,"IT support retainer, Jun 2026 to Mar 2027",998313,1,Lot,660000,18
+PO-4540,V008,goods,2026-10-20,open,1,FUR-WKS-P1,"Workstation set, phase 1",9403,1,Set,415000,18
+PO-4540,V008,goods,2026-10-20,open,2,FUR-WKS-P2,"Workstation set, phase 2",9403,1,Set,415000,18
+PO-4540,V008,goods,2026-10-20,open,3,FUR-WKS-P3,"Workstation set, phase 3",9403,1,Set,415000,18

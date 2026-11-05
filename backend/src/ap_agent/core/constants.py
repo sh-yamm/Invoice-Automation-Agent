@@ -3,8 +3,8 @@
 BUYER_NAME = "Zentra Retail Pvt Ltd"
 BUYER_STATE = "29"
 BUYER_ADDRESS = "No. 14, Outer Ring Road, Bellandur, Bengaluru 560103, Karnataka"
-# Base 29AABCZ5821K1Z + check digit. The check digit is filled in by Task 5 (rules.india.gstin).
-BUYER_GSTIN = "29AABCZ5821K1Z7"
+# Base 29AABCZ5821K1Z + mod-36 check digit "W" (verified in tests/unit/rules/test_india.py).
+BUYER_GSTIN = "29AABCZ5821K1ZW"
 
 STATE_CODES = {
     "01": "Jammu and Kashmir", "02": "Himachal Pradesh", "03": "Punjab", "04": "Chandigarh",

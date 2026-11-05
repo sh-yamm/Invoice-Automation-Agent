@@ -1,0 +1,9 @@
+vendor_id,name,gstin,state_code,address,phone,email,bank_name,bank_account,ifsc,einvoice_required,gst_status,payment_terms_days,status,category
+V001,Shree Ganesh Office Furniture,29AAKFS4417M1ZM,29,"Peenya Industrial Area, Bengaluru, Karnataka",+91 80 4110 2290,accounts@shreeganeshfurniture.in,ICICI Bank,000405112290,ICIC0000004,false,active,30,active,furniture
+V002,Kaveri Packaging Industries,29AADFK9013C1ZK,29,"Hebbal Industrial Area, Mysuru, Karnataka",+91 821 240 9023,billing@kaveripack.in,ICICI Bank,001205019023,ICIC0000012,false,active,30,active,packaging
+V003,Nimbus IT Services LLP,27AAPFN6620Q1ZH,27,"Hinjawadi Phase 2, Pune, Maharashtra",+91 20 6720 5512,finance@nimbusit.in,HDFC Bank,50200045515512,HDFC0001234,false,active,15,active,it_services
+V004,Deccan Steel Traders,36AAHFD3381L1Z6,36,"Balanagar, Hyderabad, Telangana",+91 40 2377 7781,accounts@deccansteel.in,Axis Bank,917020047781,UTIB0000553,false,active,45,active,raw_materials
+V005,Mehta Electricals Pvt Ltd,27AACCM4471B1ZR,27,"Lamington Road, Mumbai, Maharashtra",+91 22 2386 3306,ar@mehtaelectricals.in,Kotak Mahindra Bank,4512113306,KKBK0000654,true,active,30,active,electricals
+V006,Sai Krishna Logistics,33ABJFS2290H1Z4,33,"Ambattur, Chennai, Tamil Nadu",+91 44 2625 6618,billing@saikrishnalogistics.in,Indian Bank,6012346618,IDIB000A012,false,active,15,active,logistics
+V007,Namma Power Distribution Ltd,29AAACN7712E1ZK,29,"Race Course Road, Bengaluru, Karnataka",+91 80 2235 0000,bills@nammapower.in,State Bank of India,30012345678,SBIN0040563,false,active,15,active,utilities
+V008,Orbit Office Systems,29AAJFO5521P1ZM,29,"Whitefield, Bengaluru, Karnataka",+91 80 4920 4455,accounts@orbitoffice.in,HDFC Bank,50200061234455,HDFC0000789,false,active,30,active,furniture
