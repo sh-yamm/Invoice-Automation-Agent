@@ -1,0 +1,49 @@
+<x_0.0762><y_0.0617>**Shree Ganesh Office Furniture** No. 42, 3rd Phase, Peenya Industrial Area, Bengaluru 560058, Karnataka
+GSTIN: **29AAKFS4417M1ZM** State: Karnataka (29)
+Phone: +91 80 4110 2290 Email: accounts@shreeganeshfurniture.in<x_0.4824><y_0.1125><class_Page-header>
+
+<x_0.7871><y_0.0609># TAX INVOICE<x_0.9219><y_0.0734><class_Title>
+
+<x_0.6475><y_0.0727>Original for recipient<x_0.7588><y_0.082><class_Text>
+
+<x_0.0771><y_0.1313>Bill to<x_0.1055><y_0.1383><class_Section-header>
+
+<x_0.0752><y_0.143>**Zentra Retail Pvt Ltd**<x_0.2158><y_0.1516><class_Text>
+
+<x_0.0762><y_0.1562>No. 14, Outer Ring Road, Bellandur, Bengaluru 560103, Karnataka
+GSTIN: **29AABCZ5821K1ZW**<x_0.4434><y_0.175><class_Text>
+
+<x_0.5625><y_0.1336>Invoice No. **SGOF/26-27/0412**<x_0.8125><y_0.1422><class_Text>
+
+<x_0.5635><y_0.15>Invoice Date **29/10/2026**<x_0.7686><y_0.1586><class_Text>
+
+<x_0.5645><y_0.1664>PO Ref. **PO-4501**<x_0.752><y_0.1758><class_Text>
+
+<x_0.5615><y_0.1836>Place of Supply **Karnataka (29)**<x_0.7939><y_0.1945><class_Text>
+
+<x_0.0654><y_0.2094>\begin{tabular}{ccccccc}
+\thead{\#} & \thead{Description} & \thead{HSN/SAC} & \thead{Qty} & \thead{Unit} & \thead{Rate (Rs.)} & \thead{Taxable Value (Rs.)}\\
+1 & Ergonomic mesh chair & 9401 & 20 & Nos & 6,450.00 & 1,29,000.00\\
+2 & Workstation desk 1400mm & 9403 & 10 & Nos & 11,200.00 & 1,12,000.00\\
+\end{tabular}<x_0.9326><y_0.2695><class_Table>
+
+<x_0.0742><y_0.2828>**Amount in words:** Rupees Two Lakh Eighty Four Thousand Three
+Hundred Eighty Only<x_0.5068><y_0.3063><class_Caption>
+
+<x_0.5654><y_0.2805>\begin{tabular}{cc}
+Taxable Value & 2,41,000.00\\
+CGST @ 9\% & 21,690.00\\
+SGST @ 9\% & 21,690.00\\
+Round Off & 0.00\\
+**Invoice Total (Rs.)** & **2,84,380.00**\\
+\end{tabular}<x_0.9424><y_0.382><class_Table>
+
+<x_0.0781><y_0.4039>**Bank details for payment**<x_0.248><y_0.4141><class_Section-header>
+
+<x_0.0771><y_0.4172>ICICI Bank A/c No.: **000405112290** IFSC: **ICIC0000004**<x_0.4482><y_0.4258><class_Text>
+
+<x_0.6875><y_0.4555>For **Shree Ganesh Office Furniture**<x_0.9229><y_0.4641><class_Text>
+
+<x_0.7891><y_0.4906>Authorised Signatory<x_0.9238><y_0.5008><class_Text>
+
+<x_0.0762><y_0.5148>Subject to local jurisdiction. This is a computer generated invoice.<x_0.4355><y_0.5242><class_Text>
