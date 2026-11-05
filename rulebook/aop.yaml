@@ -321,6 +321,12 @@ reasons:
     explain: "A check failed to run ({check}: {error}). Nothing was approved."
     next: "Re-check the case. Report it if the error repeats."
 
+  - code: AGENT_ESCALATION
+    outcome: hold
+    owner: AP team lead
+    explain: "On review, the agent flagged a concern the rules did not: {reason}"
+    next: "Read the agent's note and decide. The agent cannot approve; only escalate."
+
   # ---------- sign-off ----------
   - code: SPLIT_BELOW_LIMIT
     outcome: signoff
