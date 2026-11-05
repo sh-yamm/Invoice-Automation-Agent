@@ -3,6 +3,7 @@
 Model calls are served from samples/cache (recorded once with `py -3.11 samples/seed_cache.py`).
 The gateway runs offline here, so a missing cache entry fails loudly instead of calling the network.
 """
+import json
 from pathlib import Path
 
 import pytest
@@ -58,9 +59,32 @@ def test_lookalike_lists_both_reasons(tmp_path):
     assert {"VENDOR_NOT_APPROVED", "LOOKALIKE_VENDOR"} <= {f.code for f in case["findings"]}
 
 
+class SmudgedDate:
+    """Replays S08's recorded replies but reports the invoice date as only 71% certain, as a hard-to-read scan would."""
+
+    def __init__(self, inner):
+        self.inner, self.models = inner, inner.models
+
+    def __getattr__(self, name):
+        return getattr(self.inner, name)
+
+    def chat_json(self, slot, messages, schema, **kw):
+        data, reasoning = self.inner.chat_json(slot, messages, schema, **kw)
+        if kw.get("node") == "extract":
+            data = json.loads(json.dumps(data))
+            data["fields"]["invoice_date"]["confidence"] = 0.71
+        return data, reasoning
+
+
 def test_resume_confirm_field_s08(tmp_path):
     require_cache("S08")
-    p, store = make_pipeline(tmp_path)
+    s = Settings()
+    store = Store(tmp_path / "runs.db")
+    reset_demo(store, s.seed_path)
+    gw = SmudgedDate(Gateway(s, store, CACHE, offline=True))
+    deps = Deps(repo=Repository.load(s.erp_dir), store=store, aop_path=s.rulebook_path, gateway=gw,
+                files_dir=tmp_path / "files", checkpoint_path=tmp_path / "cp.db", pace_ms=0)
+    p = Pipeline(deps)
     case = p.start("e2e-S08", PDF / "S08.pdf", sample_id="S08")
     assert case["primary_code"] == "LOW_CONFIDENCE_FIELD" and case["status"] == "waiting"
     case = p.resume("e2e-S08", {"action": "confirm_field", "field": "invoice_date", "value": "02/11/2026",

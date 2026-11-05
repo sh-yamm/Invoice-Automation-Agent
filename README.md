@@ -490,7 +490,7 @@ All served through NVIDIA's OpenAI-compatible API (build.nvidia.com). Every mode
 | Same retainer month billed twice | period already billed |
 | Same invoice resent with a new number | probable duplicate |
 | Vendor must e-invoice, no IRN | reject |
-| Scanned invoice, no PO number | parsing, inferred PO, confirm one field |
+| Scanned invoice, no PO number | reading a skewed, noisy scan; working out the PO itself; auto-approved when every check passes |
 | Electricity bill | PO-less GL coding and routing |
 | Furniture bought without a PO | maverick-spend hold |
 | Proforma invoice | reject |

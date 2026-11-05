@@ -67,5 +67,5 @@ def test_specs_internally_consistent():
             assert words == inv.grand_total, sid
 
 
-def test_s08_date_is_low_confidence_in_spec():
-    assert SPECS["S08"].invoice.confidence["invoice_date"] < 0.85 and SPECS["S08"].invoice.po_ref is None
+def test_s08_is_a_scan_without_a_po():
+    assert SPECS["S08"].scanned and SPECS["S08"].invoice.po_ref is None

@@ -126,7 +126,9 @@ def test_tamper_signals_warn(store):
 
 
 def test_field_confidence_s08(store):
-    ctx = make_ctx(make_invoice("S08"), store)
+    inv = make_invoice("S08")
+    inv.confidence["invoice_date"] = 0.71
+    ctx = make_ctx(inv, store)
     f = run_checks("read", ctx)
     low = next(x for x in f if x.code == "LOW_CONFIDENCE_FIELD")
     assert "invoice date" in low.detail and "71%" in low.detail and low.evidence[0].field == "invoice_date"
