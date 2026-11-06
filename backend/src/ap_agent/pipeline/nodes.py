@@ -162,7 +162,7 @@ def ingest(state, deps):
     st = {**state, "pdf_info": info, "same_file_case": same}
     found = run_checks("ingest", make_ctx(st, deps, aop))
     return {"pdf_info": info, "same_file_case": same, "findings": _record(deps, state, found),
-            "stopped": any(f.stop for f in found), "aop_version": aop.version}
+            "stopped": any(f.stop for f in found), "aop_version": aop.version, "restart": False}
 
 
 @node("render", "ingest")
@@ -390,6 +390,7 @@ def decide(state, deps):
 # ---------- 7. human gate and finalise ----------
 
 REVALIDATE_KEEP = {"ingest", "reconcile", "read", "classify"}
+FAILURE_CODES = {"AI_UNAVAILABLE", "TOOL_ERROR", "EXTRACTION_FAILED"}
 
 
 @node("human_gate", "human")
@@ -399,6 +400,14 @@ def human_gate(state, deps):
     cid, kind = state["case_id"], action["action"]
     deps.bus.publish(cid, "human_action", {k: v for k, v in action.items() if k != "action_key"})
     aop = load_aop(deps.aop_path)
+    failed = any(f.stop and f.code in FAILURE_CODES for f in findings_of(state))
+    if kind == "recheck" and (failed or not state.get("invoice")):
+        # the earlier run broke (model outage, crash, unreadable reply): start the whole case again
+        deps.store.clear_findings(cid)
+        deps.store.set_status(cid, "running")
+        return {"action": action, "restart": True, "findings": [], "invoice": None, "parse_blocks": [],
+                "text_blocks": [], "pages": [], "match": {}, "doc_type": None, "txn_type": None,
+                "rerouted": False, "stopped": False, "outcome": None, "verdict": None}
     if kind in ("confirm_field", "recheck"):
         inv = invoice_of(state)
         if kind == "confirm_field":

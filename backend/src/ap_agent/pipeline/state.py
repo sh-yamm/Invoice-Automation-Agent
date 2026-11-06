@@ -30,3 +30,4 @@ class CaseState(TypedDict, total=False):
     agent_note: str | None
     agent_reasoning: str | None
     action: dict | None
+    restart: bool          # a re-check after a failed run starts the case from the beginning

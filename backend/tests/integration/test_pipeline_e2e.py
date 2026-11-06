@@ -156,3 +156,45 @@ def test_ai_outage_holds_never_approves(tmp_path):
     p, _ = make_pipeline(tmp_path, gateway=gw)
     case = p.start("outage", PDF / "S01.pdf")
     assert (case["outcome"], case["primary_code"]) == (Outcome.ON_HOLD, "AI_UNAVAILABLE")
+
+
+class FlakyParse:
+    """The parse service is down for the first call, then recovers."""
+
+    def __init__(self, inner):
+        self.inner, self.models, self.down = inner, inner.models, True
+
+    def __getattr__(self, name):
+        return getattr(self.inner, name)
+
+    def parse_page(self, png, **kw):
+        if self.down:
+            self.down = False
+            raise AiUnavailable("parse service down")
+        return self.inner.parse_page(png, **kw)
+
+
+def test_recheck_recovers_after_an_ai_outage(tmp_path):
+    require_cache("S01")
+    s = Settings()
+    store = Store(tmp_path / "runs.db")
+    reset_demo(store, s.seed_path)
+    deps = Deps(repo=Repository.load(s.erp_dir), store=store, aop_path=s.rulebook_path,
+                gateway=FlakyParse(Gateway(s, store, CACHE, offline=True)), files_dir=tmp_path / "files",
+                checkpoint_path=tmp_path / "cp.db", pace_ms=0)
+    p = Pipeline(deps)
+    case = p.start("flaky", PDF / "S01.pdf", sample_id="S01")
+    assert (case["outcome"], case["primary_code"]) == (Outcome.ON_HOLD, "AI_UNAVAILABLE")
+    case = p.resume("flaky", {"action": "recheck", "actor": "AP clerk", "action_key": "r1"})
+    assert (case["outcome"], case["primary_code"]) == (Outcome.APPROVED, "ALL_CHECKS_PASSED")
+    assert "AI_UNAVAILABLE" not in {f.code for f in case["findings"]}
+
+
+def test_a_crash_outside_the_nodes_never_leaves_a_case_running(tmp_path, monkeypatch):
+    p, store = make_pipeline(tmp_path, gateway=FakeGateway())
+
+    def boom(*a, **k):
+        raise RuntimeError("graph exploded")
+    monkeypatch.setattr(p.app, "invoke", boom)
+    case = p.start("crash", PDF / "S01.pdf")
+    assert case["status"] == "waiting" and case["outcome"] is Outcome.ON_HOLD and case["primary_code"] == "TOOL_ERROR"

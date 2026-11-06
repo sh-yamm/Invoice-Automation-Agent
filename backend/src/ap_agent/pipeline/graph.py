@@ -90,12 +90,15 @@ def build_graph(deps: Deps, checkpointer):
 
     def after_human(s):
         kind = (s.get("action") or {}).get("action")
+        if s.get("restart"):
+            return "ingest"
         if kind in ("confirm_field", "recheck"):
             return "validate" if s.get("txn_type") else "classify_transaction"
         if kind == "ask_vendor":
             return "human_gate"
         return "finalise"
-    g.add_conditional_edges("human_gate", after_human, ["validate", "classify_transaction", "human_gate", "finalise"])
+    g.add_conditional_edges("human_gate", after_human,
+                            ["ingest", "validate", "classify_transaction", "human_gate", "finalise"])
     g.add_edge("finalise", END)
     return g.compile(checkpointer=checkpointer)
 
@@ -130,9 +133,24 @@ class Pipeline:
         case = self.deps.store.get_case(case_id)
         original = self.deps.files_dir / case_id / "original.pdf"
         with self._locks[case_id]:
-            self.app.invoke({"case_id": case_id, "pdf_path": str(original), "sample_id": case["sample_id"],
-                             "findings": [], "stopped": False}, self._config(case_id))
+            try:
+                self.app.invoke({"case_id": case_id, "pdf_path": str(original), "sample_id": case["sample_id"],
+                                 "findings": [], "stopped": False}, self._config(case_id))
+            except Exception as e:  # fail closed: a crash outside the nodes must not leave the case "running"
+                self._hold_on_crash(case_id, e)
         return self.deps.store.get_case(case_id)
+
+    def _hold_on_crash(self, case_id: str, error: Exception) -> None:
+        aop = load_aop(self.deps.aop_path)
+        f = n._finding(aop, "TOOL_ERROR", "The pipeline stopped unexpectedly", "pipeline", "decide",
+                       {"check": "pipeline", "error": f"{type(error).__name__}: {error}"}, stop=True)
+        self.deps.store.add_finding(case_id, f)
+        why, nxt = f.detail, "Re-check the case. Report it if the error repeats."
+        self.deps.store.set_outcome(case_id, Outcome.ON_HOLD, "TOOL_ERROR", why, aop.reasons["TOOL_ERROR"].owner, nxt,
+                                    None, None, None, status="waiting")
+        self.deps.bus.publish(case_id, "decision", {"outcome": int(Outcome.ON_HOLD), "primary_code": "TOOL_ERROR",
+                                                    "why": why, "owner": aop.reasons["TOOL_ERROR"].owner,
+                                                    "next_step": nxt, "also": []})
 
     def start(self, case_id: str, pdf_path: Path, sample_id: str | None = None, filename: str | None = None) -> dict:
         self.prepare(case_id, pdf_path, sample_id, filename)
@@ -161,6 +179,18 @@ class Pipeline:
                                                      action.get("note"), {k: v for k, v in action.items()
                                                                           if k not in ("action_key",)},
                                                      action_key=action.get("action_key") or action["action"])
-            if fresh:
-                self.app.invoke(Command(resume=action), self._config(case_id))
-        return self.deps.store.get_case(case_id)
+            if not fresh:
+                return self.deps.store.get_case(case_id)
+            if not self.app.get_state(self._config(case_id)).next:
+                # no paused run to resume (the previous run crashed): a re-check starts the case again
+                if action["action"] != "recheck":
+                    raise ActionError("This case's run did not finish; re-check it first.")
+                self.deps.store.clear_findings(case_id)
+                self.deps.store.set_status(case_id, "running")
+            else:
+                try:
+                    self.app.invoke(Command(resume=action), self._config(case_id))
+                except Exception as e:
+                    self._hold_on_crash(case_id, e)
+                return self.deps.store.get_case(case_id)
+        return self.run(case_id)
