@@ -38,7 +38,7 @@ def default_deps(s: Settings) -> Deps:
 def create_app(deps: Deps | None = None, seed_path: Path | None = None) -> FastAPI:
     s = Settings()
     deps = deps or default_deps(s)
-    app = FastAPI(title="Invoice Automation Agent", version="0.1.0")
+    app = FastAPI(title="Zamp Invoice Agent", version="0.1.0")
     app.state.ctx = AppContext(deps=deps, pipeline=Pipeline(deps), executor=ThreadPoolExecutor(max_workers=2),
                                seed_path=seed_path or s.seed_path)
     app.add_middleware(CORSMiddleware, allow_origins=["http://localhost:5173"], allow_methods=["*"],

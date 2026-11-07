@@ -1,4 +1,4 @@
-# Invoice Automation Agent
+# Zamp Invoice Agent
 
 An AI agent that does the work of an accounts-payable clerk for an Indian company. It reads a vendor invoice PDF, works out what kind of transaction it is, checks it against the company's purchase orders, goods receipts, contracts and vendor master, and applies an editable rulebook. Then it either **approves the invoice on its own** or **hands it to the right person with the exact reason and the evidence**.
 

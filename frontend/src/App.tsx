@@ -37,7 +37,7 @@ export default function App() {
           <a className="brand" href="#queue">
             <span className="brand-mark" aria-hidden="true">Z</span>
             <span>
-              Zentra AP Desk<small>Accounts payable, Zentra Retail</small>
+              Zamp Invoice Agent<small>Accounts payable for Zentra Retail</small>
             </span>
           </a>
           <nav className="views" aria-label="Views">
