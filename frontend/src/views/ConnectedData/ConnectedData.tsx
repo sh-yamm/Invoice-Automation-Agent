@@ -24,7 +24,7 @@ function Ledger({ rows }: { rows: Record<string, any>[] }) {
             <td className="amt num">{inr(r.value)}</td><td className="amt num">{inr(r.invoiced)}</td><td className="amt num">{inr(r.remaining)}</td>
             <td style={{ whiteSpace: "nowrap" }}>
               <div className="minibar" style={{ display: "inline-flex", verticalAlign: "middle" }} role="img" aria-label={`${Math.round(r.used_pct)}% used`}>
-                <b style={{ width: `${Math.min(100, r.used_pct)}%`, background: r.used_pct >= 100 ? "var(--rej)" : "var(--ink)" }} />
+                <b style={{ width: `${Math.min(100, r.used_pct)}%`, background: r.used_pct >= 100 ? "var(--rej)" : "var(--accent)" }} />
               </div>
               <span className="pct">{Math.round(r.used_pct)}%</span>
             </td>

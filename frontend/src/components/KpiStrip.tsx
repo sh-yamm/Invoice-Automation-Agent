@@ -12,7 +12,7 @@ function Sparkline({ points }: { points: (number | null)[] }) {
   return (
     <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} role="img" aria-label="Touchless rate, last 7 days" style={{ marginBottom: 4 }}>
       <polyline points={line} fill="none" stroke="var(--ink-2)" strokeWidth="1.5" strokeLinejoin="round" />
-      <circle cx={x(last)} cy={y(vals[last] ?? 0)} r="3" fill="var(--ink)" />
+      <circle cx={x(last)} cy={y(vals[last] ?? 0)} r="3" fill="var(--accent)" />
     </svg>
   );
 }
