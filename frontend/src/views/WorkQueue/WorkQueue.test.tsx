@@ -66,6 +66,15 @@ describe("WorkQueue", () => {
     expect(needs.queryByText("Shree Ganesh Office Furniture")).not.toBeInTheDocument();
   });
 
+  it("shows this week's numbers first and can switch to all time", async () => {
+    render(<WorkQueue />);
+    await table().findByText("Nimbus IT Services LLP");
+    expect(client.getKpis).toHaveBeenCalledWith(7);
+    expect(screen.getByRole("heading", { name: "This week" })).toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: "All time" }));
+    await waitFor(() => expect(client.getKpis).toHaveBeenCalledWith(undefined));
+  });
+
   it("type filter narrows rows", async () => {
     render(<WorkQueue />);
     await table().findByText("Nimbus IT Services LLP");

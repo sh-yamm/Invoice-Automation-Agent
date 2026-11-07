@@ -25,10 +25,19 @@ const PARTS = [
 ] as const;
 
 /** One quiet band of numbers that answer "is the agent doing its job?", with where every invoice ended up. */
-export default function KpiStrip({ kpis }: { kpis: Kpis }) {
+export type Period = 7 | 0;
+
+export default function KpiStrip({ kpis, period, onPeriod }: { kpis: Kpis; period: Period; onPeriod: (p: Period) => void }) {
   const o = kpis.outcomes;
   return (
     <section className="band" aria-label="How the agent is doing">
+      <div className="band-h">
+        <h2>{period === 7 ? "This week" : "All time"}</h2>
+        <div className="seg" role="group" aria-label="Period">
+          <button aria-pressed={period === 7} onClick={() => onPeriod(7)}>This week</button>
+          <button aria-pressed={period === 0} onClick={() => onPeriod(0)}>All time</button>
+        </div>
+      </div>
       <div>
         <div className="v">{kpis.processed}</div>
         <div className="l">Invoices processed</div>
@@ -37,7 +46,7 @@ export default function KpiStrip({ kpis }: { kpis: Kpis }) {
       <div>
         <div className="v">{Math.round(kpis.touchless_pct)}%<Sparkline points={kpis.touchless_series.map((s) => s.touchless_pct)} /></div>
         <div className="l">Done with no person</div>
-        <div className="d">last 7 days</div>
+        <div className="d">{kpis.processed ? `${kpis.touchless} of ${kpis.processed} invoices` : "no invoices yet"}</div>
       </div>
       <div>
         <div className="v">{kpis.exceptions}</div>

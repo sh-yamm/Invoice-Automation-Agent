@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { getCase, sendAction, streamEvents } from "../../api/client";
-import type { ActionBody, CaseDetail, CaseEvent, Finding } from "../../api/types";
+import { getCase, getTrail, sendAction, streamEvents } from "../../api/client";
+import type { ActionBody, CaseDetail, CaseEvent, Finding, Trail } from "../../api/types";
 import { TypeBadge } from "../../components/Chips";
+import PaperTrail, { MatchTable } from "../../components/PaperTrail";
 import PdfEvidence from "../../components/PdfEvidence";
 import StageRail from "../../components/StageRail";
 import { inr, TXN } from "../../lib/format";
@@ -18,7 +19,11 @@ export default function LiveCase({ caseId }: { caseId: string }) {
   const [error, setError] = useState<string | null>(null);
   const close = useRef<() => void>(() => undefined);
 
-  const refresh = useCallback(() => getCase(caseId).then(setC).catch((e) => setError(e.message)), [caseId]);
+  const [trail, setTrail] = useState<Trail | null>(null);
+  const refresh = useCallback(() => {
+    getTrail(caseId).then(setTrail).catch(() => undefined);
+    return getCase(caseId).then(setC).catch((e) => setError(e.message));
+  }, [caseId]);
 
   const connect = useCallback(() => {
     close.current();
@@ -92,7 +97,9 @@ export default function LiveCase({ caseId }: { caseId: string }) {
         </div>
       </div>
       {error && <p className="error">{error}</p>}
+      <h2 className="rail-title">What the agent is checking</h2>
       <StageRail events={events} findings={current} txnType={c.txn_type} running={running || streaming} />
+      {trail && trail.steps.length > 1 && <PaperTrail trail={trail} />}
       <div className="desk">
         <PdfEvidence
           pages={c.pages}
@@ -111,6 +118,7 @@ export default function LiveCase({ caseId }: { caseId: string }) {
           <DecisionCard c={c} />
           <ConfirmField key={`${c.status}-${c.primary_code}`} c={c} findings={current} busy={busy} onAct={act} />
           <ActionBar c={c} busy={busy} onAct={act} />
+          {trail?.po && trail.invoice && <MatchTable trail={trail} />}
           <LedgerBar findings={current} />
           <DuplicateCompare findings={current} />
           <AgentNote c={c} />
@@ -123,7 +131,7 @@ export default function LiveCase({ caseId }: { caseId: string }) {
             </div>
             <FindingLog events={events} fallback={c.findings} onHover={setHover} />
           </div>
-          <LineTable c={c} findings={current} />
+          {!trail?.po && <LineTable c={c} findings={current} />}
         </div>
       </div>
     </section>

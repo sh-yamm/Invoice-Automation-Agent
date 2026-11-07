@@ -20,8 +20,11 @@ def _dt(s):
 
 
 @router.get("/kpis")
-def kpis(request: Request):
+def kpis(request: Request, days: int | None = None):
     cases = [c for c in ctx_of(request).deps.store.list_cases({}) if c["outcome"] is not None]
+    if days:  # only invoices received in the last `days` days
+        cutoff = datetime.now() - timedelta(days=days)
+        cases = [c for c in cases if _dt(c["created_at"]) >= cutoff]
     touchless = [c for c in cases if c["outcome"] is Outcome.APPROVED and c["primary_code"] == "ALL_CHECKS_PASSED"]
     money = lambda cs: sum((Decimal(c["grand_total"]) for c in cs if c["grand_total"]), Decimal("0"))
     handled = [(_dt(c["decided_at"]) - _dt(c["created_at"])).total_seconds() for c in cases
@@ -35,6 +38,7 @@ def kpis(request: Request):
         series.append({"date": day.isoformat(), "cases": len(today),
                        "touchless_pct": round(100 * len(auto) / len(today), 1) if today else None})
     return J({
+        "days": days,
         "processed": len(cases),
         "total_inr": money(cases),
         "touchless": len(touchless),

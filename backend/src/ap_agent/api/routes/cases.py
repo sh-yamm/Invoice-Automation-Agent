@@ -11,6 +11,7 @@ from fastapi import APIRouter, File, Form, HTTPException, Request, UploadFile
 from fastapi.responses import FileResponse, StreamingResponse
 
 from ap_agent.api.common import J, case_json, ctx_of
+from ap_agent.api.trail import build_trail
 from ap_agent.core.config import REPO_ROOT
 from ap_agent.core.models import Outcome
 from ap_agent.pipeline.graph import ActionError
@@ -60,6 +61,15 @@ def get_case(request: Request, case_id: str):
     if not case:
         raise HTTPException(404, "No such case.")
     return J(case_json(case, deps))
+
+
+@router.get("/{case_id}/trail")
+def get_trail(request: Request, case_id: str):
+    deps = ctx_of(request).deps
+    case = deps.store.get_case(case_id)
+    if not case:
+        raise HTTPException(404, "No such case.")
+    return J(build_trail(case, deps))
 
 
 @router.get("/{case_id}/file")

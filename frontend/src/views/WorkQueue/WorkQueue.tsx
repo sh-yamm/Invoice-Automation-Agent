@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { createCase, getKpis, listCases, resetDemo } from "../../api/client";
 import type { CaseSummary, Kpis, Outcome, Pace, TxnType } from "../../api/types";
 import { StatusChip, TypeBadge } from "../../components/Chips";
-import KpiStrip from "../../components/KpiStrip";
+import KpiStrip, { type Period } from "../../components/KpiStrip";
 import SamplesDrawer from "../../components/SamplesDrawer";
 import { ago, inr, TXN } from "../../lib/format";
 
@@ -25,11 +25,12 @@ export default function WorkQueue() {
   const [drawer, setDrawer] = useState(false);
   const [pace, setPace] = useState<Pace>("normal");
   const [error, setError] = useState<string | null>(null);
+  const [period, setPeriod] = useState<Period>(7);
 
   const load = useCallback(() => {
     listCases().then(setCases).catch((e) => setError(e.message));
-    getKpis().then(setKpis).catch(() => undefined);
-  }, []);
+    getKpis(period || undefined).then(setKpis).catch(() => undefined);
+  }, [period]);
 
   useEffect(() => {
     load();
@@ -55,26 +56,28 @@ export default function WorkQueue() {
   }
 
   const headline = needs.length === 0 ? "Nothing needs you right now" : needs.length === 1 ? "1 invoice needs you" : `${needs.length} invoices need you`;
-  const auto = kpis ? `The agent finished ${kpis.touchless} of ${kpis.processed} invoices without anyone.` : "";
 
   return (
     <section>
       <div className="greet">
         <div>
-          <h1><span className="count-word">{headline}</span></h1>
+          <h1>Accounts payable</h1>
           <p className="sub">
-            {auto} Each exception below says what is wrong, who should look at it, and what to do next.
-            {running > 0 && ` ${running} still being read.`}
+            The agent checks every vendor invoice against Zentra's purchase orders, deliveries and rulebook. It pays
+            what matches and hands people only the exceptions, each with the reason and the evidence.
+            {running > 0 && ` ${running} invoice${running === 1 ? " is" : "s are"} being read right now.`}
           </p>
         </div>
         <button className="btn primary" onClick={() => setDrawer(true)}>Process an invoice</button>
       </div>
       {error && <p className="error">{error}</p>}
 
+      {kpis && <KpiStrip kpis={kpis} period={period} onPeriod={setPeriod} />}
+
       <section className="needs" aria-label="Needs a person">
         <div className="needs-h">
-          <h2>Waiting for a person</h2>
-          <span className="label">oldest first</span>
+          <h2 className="needs-title">{headline}</h2>
+          <span className="label">{needs.length ? "Oldest first. Open one to see the evidence and decide." : ""}</span>
         </div>
         {needs.length === 0 ? (
           <div className="allclear">Every processed invoice was approved, rejected or already handled. New exceptions appear here.</div>
@@ -86,7 +89,7 @@ export default function WorkQueue() {
                   <span className="edge" aria-hidden="true" />
                   <span className="who">
                     {c.vendor_name ?? c.filename}
-                    <small><span className="mono">{c.invoice_no ?? c.case_id}</span>, {ago(c.created_at)} ago</small>
+                    <small><span className="mono">{c.invoice_no ?? c.case_id}</span>, {ago(c.created_at) === "just now" ? "just now" : `${ago(c.created_at)} ago`}</small>
                   </span>
                   <span className="what"><b>{c.owner}:</b> {c.why}</span>
                   <span className="go">
@@ -99,8 +102,6 @@ export default function WorkQueue() {
           </ul>
         )}
       </section>
-
-      {kpis && <KpiStrip kpis={kpis} />}
 
       <div className="section-h">
         <h2>All invoices</h2>
