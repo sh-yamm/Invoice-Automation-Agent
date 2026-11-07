@@ -18,9 +18,9 @@ function useHash(): string {
 }
 
 const NAV = [
-  { href: "#queue", label: "Work queue", match: (h: string) => h === "" || h === "queue" },
+  { href: "#queue", label: "Invoices", match: (h: string) => h === "" || h === "queue" || h.startsWith("case-") },
   { href: "#rules", label: "Rulebook", match: (h: string) => h === "rules" },
-  { href: "#data", label: "Connected data", match: (h: string) => h === "data" },
+  { href: "#data", label: "Company records", match: (h: string) => h === "data" },
 ];
 
 export default function App() {
@@ -34,11 +34,11 @@ export default function App() {
     <>
       <header className="top">
         <div className="wrap">
-          <a className="brand" href="#queue" style={{ color: "inherit", textDecoration: "none" }}>
-            <div className="brand-mark">Z</div>
-            <div>
-              Zentra AP Desk<small>Invoice agent · India</small>
-            </div>
+          <a className="brand" href="#queue">
+            <span className="brand-mark" aria-hidden="true">Z</span>
+            <span>
+              Zentra AP Desk<small>Accounts payable, Zentra Retail</small>
+            </span>
           </a>
           <nav className="views" aria-label="Views">
             {NAV.map((n) => (

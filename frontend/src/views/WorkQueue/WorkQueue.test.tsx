@@ -46,18 +46,29 @@ beforeEach(() => {
   window.location.hash = "";
 });
 
+const table = () => within(screen.getByRole("table"));
+
 describe("WorkQueue", () => {
   it("renders rows from listCases", async () => {
     render(<WorkQueue />);
-    expect(await screen.findByText("Nimbus IT Services LLP")).toBeInTheDocument();
-    expect(screen.getByText("Shree Ganesh Office Furniture")).toBeInTheDocument();
-    expect(screen.getAllByText("₹2,84,380.00")).toHaveLength(3);
+    expect(await table().findByText("Nimbus IT Services LLP")).toBeInTheDocument();
+    expect(table().getByText("Shree Ganesh Office Furniture")).toBeInTheDocument();
+    expect(table().getAllByText("₹2,84,380.00")).toHaveLength(3);
     expect(screen.getByText("68%")).toBeInTheDocument();
+  });
+
+  it("leads with the invoices waiting for a person", async () => {
+    render(<WorkQueue />);
+    expect(await screen.findByRole("heading", { name: "2 invoices need you" })).toBeInTheDocument();
+    const needs = within(screen.getByRole("region", { name: "Needs a person" }));
+    expect(needs.getByText("Nimbus IT Services LLP")).toBeInTheDocument();
+    expect(needs.getByText("Namma Fibernet Pvt Ltd")).toBeInTheDocument();
+    expect(needs.queryByText("Shree Ganesh Office Furniture")).not.toBeInTheDocument();
   });
 
   it("type filter narrows rows", async () => {
     render(<WorkQueue />);
-    await screen.findByText("Nimbus IT Services LLP");
+    await table().findByText("Nimbus IT Services LLP");
     await userEvent.click(screen.getByRole("button", { name: /^Recurring/ }));
     const rows = screen.getAllByRole("row").slice(1);
     expect(rows).toHaveLength(1);
@@ -66,7 +77,7 @@ describe("WorkQueue", () => {
 
   it("outcome tabs narrow rows", async () => {
     render(<WorkQueue />);
-    await screen.findByText("Nimbus IT Services LLP");
+    await table().findByText("Nimbus IT Services LLP");
     await userEvent.click(screen.getByRole("tab", { name: /Awaiting sign-off/ }));
     const rows = screen.getAllByRole("row").slice(1);
     expect(rows).toHaveLength(1);
@@ -75,15 +86,23 @@ describe("WorkQueue", () => {
 
   it("clicking a sample calls createCase and navigates", async () => {
     render(<WorkQueue />);
-    await userEvent.click(await screen.findByRole("button", { name: /Demo samples/ }));
+    await userEvent.click(await screen.findByRole("button", { name: "Process an invoice" }));
     await userEvent.click(await screen.findByRole("button", { name: /Clean invoice, everything matches/ }));
     await waitFor(() => expect(client.createCase).toHaveBeenCalledWith({ sampleId: "S01", pace: "normal" }));
     expect(window.location.hash).toBe("#case-C-NEW");
   });
 
+  it("run speed chosen in the panel is sent with the case", async () => {
+    render(<WorkQueue />);
+    await userEvent.click(await screen.findByRole("button", { name: "Process an invoice" }));
+    await userEvent.click(screen.getByRole("button", { name: "Slow, for presenting" }));
+    await userEvent.click(await screen.findByRole("button", { name: /Clean invoice, everything matches/ }));
+    await waitFor(() => expect(client.createCase).toHaveBeenCalledWith({ sampleId: "S01", pace: "presenter" }));
+  });
+
   it("clicking a row opens the case", async () => {
     render(<WorkQueue />);
-    await userEvent.click(await screen.findByText("Nimbus IT Services LLP"));
+    await userEvent.click(await table().findByText("Nimbus IT Services LLP"));
     expect(window.location.hash).toBe("#case-C-2");
   });
 });

@@ -3,7 +3,7 @@ import { getData } from "../../api/client";
 import { inr } from "../../lib/format";
 
 const SETS = [
-  { key: "po_ledger", label: "PO ledger", file: "purchase_orders.csv + our ledger" },
+  { key: "po_ledger", label: "Order balances", file: "purchase_orders.csv and the approval ledger" },
   { key: "vendors", label: "Vendor master", file: "vendors.csv" },
   { key: "purchase_orders", label: "Purchase orders", file: "purchase_orders.csv" },
   { key: "goods_receipts", label: "Goods receipts", file: "goods_receipts.csv" },
@@ -16,16 +16,17 @@ const HIDE = new Set(["address", "email", "phone"]);
 function Ledger({ rows }: { rows: Record<string, any>[] }) {
   return (
     <table className="q">
-      <thead><tr><th>PO</th><th>Vendor</th><th>Type</th><th className="amt">Value</th><th className="amt">Invoiced</th><th className="amt">Remaining</th><th>Used</th></tr></thead>
+      <thead><tr><th>PO</th><th>Vendor</th><th>Type</th><th className="amt">Value</th><th className="amt">Invoiced</th><th className="amt">Remaining</th><th>Billed so far</th></tr></thead>
       <tbody>
         {rows.map((r) => (
           <tr key={r.po_number}>
             <td className="mono">{r.po_number}</td><td>{r.vendor}</td><td>{r.po_type}</td>
             <td className="amt num">{inr(r.value)}</td><td className="amt num">{inr(r.invoiced)}</td><td className="amt num">{inr(r.remaining)}</td>
-            <td>
-              <div className="minibar" role="img" aria-label={`${Math.round(r.used_pct)}% used`}>
-                <b style={{ width: `${Math.min(100, r.used_pct)}%`, background: r.used_pct >= 100 ? "var(--rej)" : "var(--accent)" }} />
+            <td style={{ whiteSpace: "nowrap" }}>
+              <div className="minibar" style={{ display: "inline-flex", verticalAlign: "middle" }} role="img" aria-label={`${Math.round(r.used_pct)}% used`}>
+                <b style={{ width: `${Math.min(100, r.used_pct)}%`, background: r.used_pct >= 100 ? "var(--rej)" : "var(--ink)" }} />
               </div>
+              <span className="pct">{Math.round(r.used_pct)}%</span>
             </td>
           </tr>
         ))}
@@ -59,11 +60,10 @@ export default function ConnectedData() {
   const meta = SETS.find((s) => s.key === set)!;
   return (
     <section>
-      <div className="view-head">
+      <div className="page-head">
         <div>
-          <div className="eyebrow">Read-only · the company's existing records</div>
-          <h1>Connected data</h1>
-          <p className="sub">The agent reads these files; it does not keep its own copy. The PO ledger moves only when an invoice is approved.</p>
+          <h1>Company records</h1>
+          <p className="sub">The agent checks invoices against these existing records and never edits them. The only thing that changes is the order ledger, and only when an invoice is approved.</p>
         </div>
       </div>
       {error && <p className="error">{error}</p>}
@@ -71,7 +71,7 @@ export default function ConnectedData() {
         <div className="tabs" role="tablist">
           {SETS.map((s) => <button key={s.key} role="tab" aria-selected={set === s.key} onClick={() => setSet(s.key)}>{s.label}</button>)}
         </div>
-        <div className="panel-h"><h2>{meta.label}</h2><span className="mono muted">{meta.file}</span></div>
+        <div className="panel-h"><h2>{meta.label}</h2><span className="source">Read from <span className="mono">{meta.file}</span></span></div>
         <div className="scroll">{set === "po_ledger" ? <Ledger rows={rows} /> : <Generic rows={rows} />}</div>
       </div>
     </section>
