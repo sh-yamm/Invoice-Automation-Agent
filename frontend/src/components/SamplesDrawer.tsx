@@ -22,26 +22,32 @@ export default function SamplesDrawer({ onClose, onPick, onUpload, pace, onPace,
   const [samples, setSamples] = useState<Sample[]>([]);
   const [over, setOver] = useState(false);
   const [reset, setReset] = useState<"idle" | "busy" | "done">("idle");
-  const closeRef = useRef<HTMLButtonElement>(null);
+  const ref = useRef<HTMLDialogElement>(null);
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
 
   useEffect(() => {
     getSamples().then(setSamples).catch(() => setSamples([]));
-    closeRef.current?.focus();
-    const esc = (e: KeyboardEvent) => e.key === "Escape" && onClose();
-    window.addEventListener("keydown", esc);
-    return () => window.removeEventListener("keydown", esc);
-  }, [onClose]);
+    const d = ref.current;
+    if (!d) return;
+    // Native modal: the browser keeps focus inside, closes on Esc (and outside click via closedby), and returns focus.
+    if (typeof d.showModal === "function") d.showModal();
+    else d.setAttribute("open", "");
+    const closed = () => onCloseRef.current();
+    d.addEventListener("close", closed);
+    return () => d.removeEventListener("close", closed);
+  }, []);
+
+  const close = () => (typeof ref.current?.close === "function" ? ref.current.close() : onCloseRef.current());
 
   return (
-    <>
-      <div className="scrim" onClick={onClose} />
-      <aside className="drawer" aria-label="Process an invoice" role="dialog" aria-modal="true">
+    <dialog ref={ref} className="drawer" aria-labelledby="drawer-title" {...{ closedby: "any" }}>
         <div className="drawer-h">
           <div>
-            <h2>Process an invoice</h2>
+            <h2 id="drawer-title">Process an invoice</h2>
             <p className="sub">Upload a PDF to run it through the agent with live models, or pick one of the prepared invoices below.</p>
           </div>
-          <button ref={closeRef} className="btn ghost small" onClick={onClose} aria-label="Close">✕</button>
+          <button className="btn ghost small" onClick={close} aria-label="Close" autoFocus>✕</button>
         </div>
         <div className="drawer-body">
           <label
@@ -92,7 +98,6 @@ export default function SamplesDrawer({ onClose, onPick, onUpload, pace, onPace,
             </button>
           </div>
         </div>
-      </aside>
-    </>
+    </dialog>
   );
 }
