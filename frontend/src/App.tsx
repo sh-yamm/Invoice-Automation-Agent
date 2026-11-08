@@ -18,9 +18,9 @@ function useHash(): string {
 }
 
 const NAV = [
-  { href: "#queue", label: "Invoices", match: (h: string) => h === "" || h === "queue" || h.startsWith("case-") },
-  { href: "#rules", label: "Rulebook", match: (h: string) => h === "rules" },
-  { href: "#data", label: "Company records", match: (h: string) => h === "data" },
+  { href: "#queue", icon: "receipt_long", label: "Invoices", match: (h: string) => h === "" || h === "queue" || h.startsWith("case-") },
+  { href: "#rules", icon: "gavel", label: "Rulebook", match: (h: string) => h === "rules" },
+  { href: "#data", icon: "inventory_2", label: "Company records", match: (h: string) => h === "data" },
 ];
 
 export default function App() {
@@ -33,21 +33,21 @@ export default function App() {
   return (
     <>
       <header className="top">
-        <div className="wrap">
-          <a className="brand" href="#queue">
-            <span className="brand-mark" aria-hidden="true">Z</span>
-            <span>
-              Zamp Invoice Agent<small>Accounts payable for Zentra Retail</small>
-            </span>
-          </a>
-          <nav className="views" aria-label="Views">
-            {NAV.map((n) => (
-              <a key={n.href} href={n.href} aria-current={n.match(hash) ? "page" : undefined}>{n.label}</a>
-            ))}
-          </nav>
-        </div>
+        <nav className="views" aria-label="Views">
+          {NAV.map((n) => (
+            <a key={n.href} href={n.href} aria-current={n.match(hash) ? "page" : undefined}>
+              <span className="ms" aria-hidden="true">{n.icon}</span>{n.label}
+            </a>
+          ))}
+        </nav>
+        <a className="brand" href="#queue">
+          <span className="brand-mark" aria-hidden="true">Z</span>Zamp Invoice Agent
+        </a>
       </header>
-      <main className="wrap">{view}</main>
+      <main className="wrap">
+        {view}
+        <footer className="foot">Zamp Invoice Agent · accounts payable for Zentra Retail · every decision traced to a rule</footer>
+      </main>
     </>
   );
 }

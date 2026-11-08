@@ -19,7 +19,7 @@ export function day(iso: string | null | undefined): string {
 /** The chain of events behind one invoice, one column per event, in three lanes by who acted. */
 export default function PaperTrail({ trail }: { trail: Trail }) {
   const steps = trail.steps;
-  const cols = `minmax(118px, 0.6fr) repeat(${steps.length}, minmax(168px, 1fr))`;
+  const cols = `minmax(96px, 0.5fr) repeat(${steps.length}, minmax(136px, 1fr))`;
   return (
     <section className="trail" aria-label="Paper trail">
       <div className="trail-h">

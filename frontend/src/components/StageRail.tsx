@@ -42,8 +42,8 @@ export default function StageRail({ events, findings, txnType, running }: Props)
         const [label, sub] = r.key === "match" && txnType ? MATCH[txnType] : [r.label, r.sub];
         return (
           <li key={r.key} className={`stage ${state}`}>
-            <span className="dot" aria-hidden="true">{state === "done" ? "✓" : state === "warn" ? "!" : state === "fail" ? "✕" : i + 1}</span>
-            <span>{label}</span>
+            <span className="dot" aria-hidden="true">{String(i + 1).padStart(2, "0")}</span>
+            <span className="nm">{label}{state && <span className="sr">{` (${state === "done" ? "done" : state === "warn" ? "needs a look" : state === "fail" ? "stopped" : "running"})`}</span>}</span>
             <span className="t">{sub}</span>
           </li>
         );
