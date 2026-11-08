@@ -144,6 +144,7 @@ export default function ConnectedData() {
     <section>
       <div className="page-head">
         <div>
+          <p className="eyebrow">What every invoice is checked against</p>
           <h1>Company records</h1>
           <p className="sub">Zentra's own records that every invoice is checked against. The agent only reads them; the one thing it updates is how much of each order has been billed, and only when an invoice is approved.</p>
         </div>

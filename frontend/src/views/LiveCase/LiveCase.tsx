@@ -79,6 +79,7 @@ export default function LiveCase({ caseId }: { caseId: string }) {
       <a href="#queue" className="back">← All invoices</a>
       <div className="case-head">
         <div>
+          <p className="eyebrow">{running ? "Live run · checking now" : "Invoice case · decided"}</p>
           <h1>{c.vendor_name ?? c.filename ?? "Reading the invoice…"}</h1>
           <div className="meta">
             <span className="mono">{c.invoice_no ?? c.case_id}</span>

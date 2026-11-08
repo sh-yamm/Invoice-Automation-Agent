@@ -61,6 +61,7 @@ export default function WorkQueue() {
     <section>
       <div className="greet">
         <div>
+          <p className="eyebrow">Zentra Retail · vendor invoices</p>
           <h1>Accounts payable</h1>
           <p className="sub">
             The agent checks every vendor invoice against Zentra's purchase orders, deliveries and rulebook. It pays

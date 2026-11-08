@@ -99,6 +99,7 @@ export default function Rulebook() {
     <section>
       <div className="page-head">
         <div>
+          <p className="eyebrow">The rules the agent follows</p>
           <h1>Rulebook</h1>
           <p className="sub">The agent reads these rules on every invoice. Change a number, give a reason and save: the next invoice follows the new rule. No code involved.</p>
           <div className="version">
