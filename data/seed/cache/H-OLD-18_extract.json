@@ -1,0 +1,149 @@
+{
+ "data": {
+  "fields": {
+   "doc_title": {
+    "value": "TAX INVOICE",
+    "confidence": 0.99,
+    "block": 2
+   },
+   "supplier_name": {
+    "value": "Mehta Electricals Pvt Ltd",
+    "confidence": 0.99,
+    "block": 1
+   },
+   "supplier_gstin": {
+    "value": "27AACCM4471B1ZR",
+    "confidence": 0.99,
+    "block": 1
+   },
+   "supplier_phone": {
+    "value": "+91 22 2386 3306",
+    "confidence": 0.99,
+    "block": 1
+   },
+   "supplier_email": {
+    "value": "ar@mehtaelectricals.in",
+    "confidence": 0.99,
+    "block": 1
+   },
+   "buyer_name": {
+    "value": "Zentra Retail Pvt Ltd",
+    "confidence": 0.99,
+    "block": 5
+   },
+   "buyer_gstin": {
+    "value": "29AABCZ5821K1ZW",
+    "confidence": 0.99,
+    "block": 6
+   },
+   "invoice_no": {
+    "value": "ME/26-27/1928",
+    "confidence": 0.99,
+    "block": 7
+   },
+   "invoice_date": {
+    "value": "08/09/2026",
+    "confidence": 0.99,
+    "block": 8
+   },
+   "po_ref": {
+    "value": "PO-4319",
+    "confidence": 0.99,
+    "block": 9
+   },
+   "place_of_supply_state": {
+    "value": "Karnataka (29)",
+    "confidence": 0.99,
+    "block": 10
+   },
+   "irn": {
+    "value": "abbed68df74967589b47bfa1f1af1bb3cfa4dd7482f885c2a9f94f9d51269cc9",
+    "confidence": 0.9,
+    "block": 3
+   },
+   "has_qr": {
+    "value": false,
+    "confidence": 0.8,
+    "block": null
+   },
+   "bank_name": {
+    "value": "Kotak Mahindra Bank",
+    "confidence": 0.99,
+    "block": 18
+   },
+   "bank_account": {
+    "value": "4512113306",
+    "confidence": 0.99,
+    "block": 18
+   },
+   "ifsc": {
+    "value": "KKBK0000654",
+    "confidence": 0.99,
+    "block": 18
+   },
+   "taxable_total": {
+    "value": 76500.0,
+    "confidence": 0.99,
+    "block": 13
+   },
+   "cgst": {
+    "value": 0.0,
+    "confidence": 0.99,
+    "block": 14
+   },
+   "sgst": {
+    "value": 0.0,
+    "confidence": 0.99,
+    "block": 14
+   },
+   "igst": {
+    "value": 13770.0,
+    "confidence": 0.99,
+    "block": 14
+   },
+   "round_off": {
+    "value": 0.0,
+    "confidence": 0.99,
+    "block": 15
+   },
+   "grand_total": {
+    "value": 90270.0,
+    "confidence": 0.99,
+    "block": 16
+   },
+   "amount_in_words": {
+    "value": "Rupees Ninety Thousand Two Hundred Seventy Only",
+    "confidence": 0.99,
+    "block": 12
+   },
+   "period_start": {
+    "value": null,
+    "confidence": 0.9,
+    "block": null
+   },
+   "period_end": {
+    "value": null,
+    "confidence": 0.9,
+    "block": null
+   },
+   "consumer_no": {
+    "value": null,
+    "confidence": 0.9,
+    "block": null
+   }
+  },
+  "lines": [
+   {
+    "description": "Distribution board 12-way",
+    "hsn_sac": "8537",
+    "qty": 12,
+    "unit": "Nos",
+    "rate": 6375.0,
+    "taxable": 76500.0,
+    "gst_rate": 18,
+    "confidence": 0.99
+   }
+  ]
+ },
+ "reasoning": "The user wants me to extract invoice data from the parsed page blocks and output JSON only. I need to carefully read each block and map to the required fields.\n\nLet me go through each block:\n\nBlock 1: Supplier info - Mehta Electricals Pvt Ltd, address, GSTIN, phone, email.\nBlock 2: Title - TAX INVOICE\nBlock 3: IRN - appears to be split across two lines: \"abbed68df74967589b47bfa1f1af1bb3\" and \"cfa4dd7482f885c2a9f94f9d51269cc9\". Might be a single IRN? Actually IRN is usually a single hash. Could be two parts? The block shows two lines. Might be the IRN is \"abbed68df74967589b47bfa1f1af1bb3cfa4dd7482f885c2a9f94f9d51269cc9\"? But typical IRN is 64 characters? Let's check: first part 32 chars, second part 32 chars, total 64. That's likely the IRN. I'll combine them.\n\nBlock 4: Section header \"Bill to\"\nBlock 5: Buyer name - Zentra Retail Pvt Ltd\nBlock 6: Buyer address and GSTIN\nBlock 7: Invoice No. ME/26-27/1928\nBlock 8: Invoice Date 08/09/2026\nBlock 9: PO Ref. PO-4319\nBlock 10: Place of Supply Karnataka (29)\nBlock 11: Table with one line item: Description, HSN/SAC, Qty, Unit, Rate, Taxable Value.\nBlock 12: Amount in words: Rupees Ninety Thousand Two Hundred Seventy Only\nBlock 13: Taxable Value 76,500.00\nBlock 14: IGST @ 18% 13,770.00\nBlock 15: Round Off 0.00\nBlock 16: Invoice Total (Rs.) 90,270.00\nBlock 17: Bank details header\nBlock 18: Bank details: Kotak Mahindra Bank A/c No.: 4512113306 IFSC: KKBK0000654\nBlock 19: For Mehta Electricals Pvt Ltd\nBlock 20: Authorised Signatory\nBlock 21: Subject to local jurisdiction...\n\nNow, I need to output JSON with fields and lines.\n\nFields:\n- doc_title: \"TAX INVOICE\" (from block 2)\n- supplier_name: \"Mehta Electricals Pvt Ltd\" (block 1)\n- supplier_gstin: \"27AACCM4471B1ZR\" (block 1)\n- supplier_phone: \"+91 22 2386 3306\" (block 1)\n- supplier_email: \"ar@mehtaelectricals.in\" (block 1)\n- buyer_name: \"Zentra Retail Pvt Ltd\" (block 5)\n- buyer_gstin: \"29AABCZ5821K1ZW\" (block 6)\n- invoice_no: \"ME/26-27/1928\" (block 7)\n- invoice_date: \"08/09/2026\" (block 8)\n- po_ref: \"PO-4319\" (block 9)\n- place_of_supply_state: \"Karnataka (29)\" (block 10)\n- irn: combine the two lines from block 3: \"abbed68df74967589b47bfa1f1af1bb3cfa4dd7482f885c2a9f94f9d51269cc9\"? But the block shows two separate lines. Might be the IRN is split across two lines. I'll concatenate without space. However, the IRN might be the first line only? Actually e-invoice IRN is a 64-character hash. The first line is 32 chars, second line 32 chars. So likely the full IRN is the concatenation. I'll use that.\n- has_qr: not mentioned, but block 3 says \"IRN: ...\" and maybe QR code is printed? Not indicated. I'll set false.\n- bank_name: \"Kotak Mahindra Bank\" (block 18)\n- bank_account: \"4512113306\" (block 18)\n- ifsc: \"KKBK0000654\" (block 18)\n- taxable_total: 76500.00 (block 13)\n- cgst: 0? Not shown. Since it's inter-state (Maharashtra to Karnataka), IGST applies. CGST and SGST are null or 0. The fields cgst, sgst, igst are separate. I'll set cgst: 0, sgst: 0, igst: 13770.00 (block 14)\n- round_off: 0.00 (block 15)\n- grand_total: 90270.00 (block 16)\n- amount_in_words: \"Rupees Ninety Thousand Two Hundred Seventy Only\" (block 12)\n- period_start: not printed, null\n- period_end: null\n- consumer_no: not printed, null\n\nLines: one line item from block 11.\nDescription: \"Distribution board 12-way\"\nHSN/SAC: \"8537\"\nQty: 12\nUnit: \"Nos\"\nRate: 6375.00 (but note the table shows \"Rate (Rs.)\" 6,375.00)\nTaxable: 76500.00\nGST rate: 18% (since IGST @ 18%)\nConfidence: high.\n\nNow, confidence values: I'll assign 0.95 for most fields, maybe 0.9 for IRN because it's split.\n\nBlock numbers: I'll reference the block numbers as given.\n\nNow produce JSON.\n\nNote: The user said \"JSON only\". So output only the JSON object.\n\nLet's construct."
+}

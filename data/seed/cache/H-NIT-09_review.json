@@ -1,0 +1,9 @@
+{
+ "data": {
+  "escalate_to": null,
+  "reason": null,
+  "cites": [],
+  "rationale": "All deterministic checks pass: the invoice matches the recurring contract CT-901 (₹1,20,000/month + 18% IGST = ₹141,600), the period is correct and not previously billed, vendor and bank details are verified, and the amount is well within the approval limit. No suspicious patterns such as round-number manipulation, urgency pressure, or vague descriptions beyond the expected recurring service line are present."
+ },
+ "reasoning": "The invoice has been approved by the deterministic rules. All checks pass. The invoice is for IT support retainer for September 2026, total ₹141,600.00 (which includes GST). The contract CT-901 is for managed IT support for Bengaluru HQ at ₹1,20,000.00 monthly. The invoice amount matches the contract (₹1,20,000 + 18% GST = ₹141,600). The PO balance is sufficient. The vendor is approved, bank details match, no duplicates, no split billing, within approval limit.\n\nI need to consider if there's any specific, concrete risk not already flagged. The description \"IT support retainer, September 2026\" is a bit generic but it's a recurring contract, so that's expected. The amount is exactly the contract amount plus GST, not suspiciously round under a limit. The approval limit is ₹5,00,000, and this is ₹1,41,600, well under. No urgency pressure indicated. The invoice date is 2026-09-02, which is plausible for September billing. The period has started (advance_billing check passed). The contract is active, period not already billed.\n\nEverything seems clean. No additional risk to escalate. So escalate_to should be null."
+}

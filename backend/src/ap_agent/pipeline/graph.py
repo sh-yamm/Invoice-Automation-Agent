@@ -127,6 +127,11 @@ class Pipeline:
         original = folder / "original.pdf"
         shutil.copyfile(pdf_path, original)
         info = inspect_pdf(original)
+        try:  # page images now, so the invoice is on screen the moment the case opens (the run re-renders)
+            from ap_agent.reading.render import render_pages
+            render_pages(original, folder / "pages")
+        except Exception:  # an unreadable file is reported by the run's own checks
+            pass
         self.deps.store.create_case(case_id, filename or Path(pdf_path).name, info["sha256"], sample_id)
 
     def run(self, case_id: str) -> dict:

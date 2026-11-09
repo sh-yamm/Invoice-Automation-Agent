@@ -1,0 +1,16 @@
+# Streamlit Community Cloud installs this (Python 3.11). The agent's code is imported from backend/src.
+streamlit>=1.50
+fastapi>=0.115
+httpx>=0.27
+python-multipart>=0.0.9
+langgraph>=0.2
+langgraph-checkpoint-sqlite>=2.0
+pydantic>=2.7
+pydantic-settings>=2.3
+jsonschema>=4.22
+pypdfium2>=4.30
+pdfplumber>=0.11
+reportlab>=4.2
+pillow>=10.3
+pyyaml>=6.0
+rapidfuzz>=3.9

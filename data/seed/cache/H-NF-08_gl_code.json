@@ -1,0 +1,13 @@
+{
+ "data": {
+  "options": [
+   {
+    "gl_code": "6120",
+    "cost_centre": "CC-IT-BLR",
+    "confidence": 0.99,
+    "why": "Internet leased line is explicitly listed under Telecom (broadband and leased lines) in the chart of accounts."
+   }
+  ]
+ },
+ "reasoning": "The user wants me to code a vendor invoice for \"Namma Fibernet Pvt Ltd\" with line item \"Internet leased line 100 Mbps, July 2026\". I need to choose up to 3 accounts from the chart of accounts, best first, and reply with JSON only.\n\nLooking at the chart of accounts:\n- 6110 Electricity: for electricity charges\n- 6120 Telecom: Phone, broadband and leased lines (category telecom, default cost centre CC-IT-BLR)\n- 6130 Rent: office and warehouse rent\n- 6140 Water: water and sewerage\n- 6150 Software subscriptions: SaaS and software licences\n- 6160 Travel: employee travel\n- 6170 Statutory fees: government fees\n- 6210 Office furniture: capex\n- 6220 IT services: managed IT and support services\n- 6310 Freight inward: inbound freight\n\nThe line item is \"Internet leased line 100 Mbps\". This clearly falls under \"Telecom: Phone, broadband and leased lines\" which is account 6120. The default cost centre is CC-IT-BLR.\n\nThis is a straightforward mapping. I should provide the best match first. Since it's a single line item, I only need one account, but I can provide up to 3. The best match is 6120 Telecom.\n\nI'll create the JSON with one option, high confidence."
+}

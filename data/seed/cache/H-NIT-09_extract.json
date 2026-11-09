@@ -1,0 +1,149 @@
+{
+ "data": {
+  "fields": {
+   "doc_title": {
+    "value": "TAX INVOICE",
+    "confidence": 1.0,
+    "block": 1
+   },
+   "supplier_name": {
+    "value": "Nimbus IT Services LLP",
+    "confidence": 1.0,
+    "block": 2
+   },
+   "supplier_gstin": {
+    "value": "27AAPFN6620Q1ZH",
+    "confidence": 1.0,
+    "block": 3
+   },
+   "supplier_phone": {
+    "value": "+91 20 6720 5512",
+    "confidence": 1.0,
+    "block": 3
+   },
+   "supplier_email": {
+    "value": "finance@nimbusit.in",
+    "confidence": 1.0,
+    "block": 3
+   },
+   "buyer_name": {
+    "value": "Zentra Retail Pvt Ltd",
+    "confidence": 1.0,
+    "block": 6
+   },
+   "buyer_gstin": {
+    "value": "29AABCZ5821K1ZW",
+    "confidence": 1.0,
+    "block": 7
+   },
+   "invoice_no": {
+    "value": "NIT/26-27/086",
+    "confidence": 1.0,
+    "block": 8
+   },
+   "invoice_date": {
+    "value": "02/09/2026",
+    "confidence": 1.0,
+    "block": 9
+   },
+   "po_ref": {
+    "value": "PO-4490",
+    "confidence": 1.0,
+    "block": 10
+   },
+   "place_of_supply_state": {
+    "value": "Karnataka (29)",
+    "confidence": 1.0,
+    "block": 11
+   },
+   "irn": {
+    "value": null,
+    "confidence": 1.0,
+    "block": null
+   },
+   "has_qr": {
+    "value": false,
+    "confidence": 1.0,
+    "block": null
+   },
+   "bank_name": {
+    "value": "HDFC Bank",
+    "confidence": 1.0,
+    "block": 15
+   },
+   "bank_account": {
+    "value": "50200045515512",
+    "confidence": 1.0,
+    "block": 15
+   },
+   "ifsc": {
+    "value": "HDFC0001234",
+    "confidence": 1.0,
+    "block": 15
+   },
+   "taxable_total": {
+    "value": "1,20,000.00",
+    "confidence": 1.0,
+    "block": 13
+   },
+   "cgst": {
+    "value": null,
+    "confidence": 1.0,
+    "block": null
+   },
+   "sgst": {
+    "value": null,
+    "confidence": 1.0,
+    "block": null
+   },
+   "igst": {
+    "value": "21,600.00",
+    "confidence": 1.0,
+    "block": 13
+   },
+   "round_off": {
+    "value": "0.00",
+    "confidence": 1.0,
+    "block": 13
+   },
+   "grand_total": {
+    "value": "1,41,600.00",
+    "confidence": 1.0,
+    "block": 13
+   },
+   "amount_in_words": {
+    "value": "Rupees One Lakh Forty One Thousand Six Hundred Only",
+    "confidence": 1.0,
+    "block": 13
+   },
+   "period_start": {
+    "value": "01/09/2026",
+    "confidence": 1.0,
+    "block": 12
+   },
+   "period_end": {
+    "value": "30/09/2026",
+    "confidence": 1.0,
+    "block": 12
+   },
+   "consumer_no": {
+    "value": null,
+    "confidence": 1.0,
+    "block": null
+   }
+  },
+  "lines": [
+   {
+    "description": "IT support retainer, September 2026",
+    "hsn_sac": "998313",
+    "qty": "1",
+    "unit": "Month",
+    "rate": "1,20,000.00",
+    "taxable": "1,20,000.00",
+    "gst_rate": "18%",
+    "confidence": 1.0
+   }
+  ]
+ },
+ "reasoning": "The user wants me to extract invoice data from the parsed page blocks and return JSON only. Let me analyze the blocks and extract the required fields.\n\nFrom the blocks:\n- Block 1: doc_title = \"TAX INVOICE\"\n- Block 2: supplier_name = \"Nimbus IT Services LLP\"\n- Block 3: supplier address, GSTIN, phone, email\n- Block 5-7: buyer info\n- Block 8: invoice_no = \"NIT/26-27/086\"\n- Block 9: invoice_date = \"02/09/2026\"\n- Block 10: po_ref = \"PO-4490\"\n- Block 11: place_of_supply_state = \"Karnataka (29)\"\n- Block 12: period_start = \"01/09/2026\", period_end = \"30/09/2026\"\n- Block 13: table with line items and totals\n- Block 15: bank details\n- Block 13 also has amount in words: \"Rupees One Lakh Forty One Thousand Six Hundred Only\"\n\nLet me extract all fields:\n\ndoc_title: \"TAX INVOICE\" (block 1)\nsupplier_name: \"Nimbus IT Services LLP\" (block 2)\nsupplier_gstin: \"27AAPFN6620Q1ZH\" (block 3)\nsupplier_phone: \"+91 20 6720 5512\" (block 3)\nsupplier_email: \"finance@nimbusit.in\" (block 3)\nbuyer_name: \"Zentra Retail Pvt Ltd\" (block 6)\nbuyer_gstin: \"29AABCZ5821K1ZW\" (block 7)\ninvoice_no: \"NIT/26-27/086\" (block 8)\ninvoice_date: \"02/09/2026\" (block 9)\npo_ref: \"PO-4490\" (block 10)\nplace_of_supply_state: \"Karnataka (29)\" (block 11)\nirn: not printed, null\nhas_qr: not mentioned, false\nbank_name: \"HDFC Bank\" (block 15)\nbank_account: \"50200045515512\" (block 15)\nifsc: \"HDFC0001234\" (block 15)\ntaxable_total: \"1,20,000.00\" (from block 13)\ncgst: not applicable (IGST invoice), null\nsgst: not applicable, null\nigst: \"21,600.00\" (block 13)\nround_off: \"0.00\" (block 13)\ngrand_total: \"1,41,600.00\" (block 13)\namount_in_words: \"Rupees One Lakh Forty One Thousand Six Hundred Only\" (block 13)\nperiod_start: \"01/09/2026\" (block 12)\nperiod_end: \"30/09/2026\" (block 12)\nconsumer_no: not printed, null\n\nLines: one line item from block 13:\nDescription: \"IT support retainer, September 2026\"\nHSN/SAC: \"998313\"\nQty: \"1\"\nUnit: \"Month\"\nRate: \"1,20,000.00\"\nTaxable: \"1,20,000.00\"\nGST rate: 18% (IGST @ 18%)\n\nConfidence: high for most fields since text is clear. I'll use 0.95 for most, 1.0 for clear ones.\n\nNow construct JSON."
+}

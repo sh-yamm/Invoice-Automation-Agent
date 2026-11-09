@@ -1,0 +1,11 @@
+{
+ "data": {
+  "escalate_to": "on_hold",
+  "reason": "Two invoices from same vendor within 7 days, each just under ₹5 lakh approval limit, totaling ₹9.79 lakh — strong indicator of deliberate invoice splitting to circumvent authority matrix.",
+  "cites": [
+   "7cde91da"
+  ],
+  "rationale": "The split_below_limit check already triggered needs_signoff, but the pattern — two invoices in one week, both ₹4.89 lakh (just below the ₹5 lakh threshold), for 'Workstation set, phase 2' — points to intentional fragmentation to avoid higher-level approval. This warrants a hold pending vendor explanation and procurement review."
+ },
+ "reasoning": "The rules outcome is \"needs_signoff\" due to the split_below_limit finding (7cde91da). The system detected that Orbit Office Systems sent 2 invoices within 7 days, each under the ₹5,00,000 limit but totaling ₹9,79,400 together. This is a classic invoice splitting pattern to bypass approval limits.\n\nThe current invoice is ₹4,89,700 (just under ₹5 lakh limit). The previous invoice would be around ₹4,89,700 as well (since total is ₹9,79,400). Both are suspiciously close to the ₹5 lakh threshold.\n\nAs a reviewing agent, I should escalate this further because:\n1. The split_below_limit check already failed, triggering needs_signoff\n2. But the pattern is highly suspicious - two invoices in 7 days, both just under the approval limit\n3. This suggests deliberate splitting to avoid higher approval authority\n4. The description \"Workstation set, phase 2\" is vague - could be same project split artificially\n\nI should escalate to \"on_hold\" or \"rejected\" given the clear circumvention pattern. Since the rules already flagged it for signoff, but the risk is more serious (deliberate policy circumvention), I'll escalate to \"on_hold\" for investigation.\n\nThe cites should include the split_below_limit finding (7cde91da)."
+}

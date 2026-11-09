@@ -1,0 +1,29 @@
+# Keeps the Streamlit Community Cloud app awake: every 30 minutes a headless browser opens it
+# (waking it if needed) and checks that the dashboard renders.
+name: Keep the app awake
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  wake:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install a headless browser
+        run: |
+          pip install playwright==1.48.0
+          python -m playwright install --with-deps chromium
+      - name: Open the app
+        env:
+          APP_URL: ${{ vars.APP_URL }}
+        run: python .github/scripts/wake.py

@@ -1,0 +1,149 @@
+{
+ "data": {
+  "fields": {
+   "doc_title": {
+    "value": "TAX INVOICE",
+    "confidence": 1.0,
+    "block": 1
+   },
+   "supplier_name": {
+    "value": "Namma Fibernet Pvt Ltd",
+    "confidence": 1.0,
+    "block": 2
+   },
+   "supplier_gstin": {
+    "value": "29AAACN7712E1ZK",
+    "confidence": 1.0,
+    "block": 3
+   },
+   "supplier_phone": {
+    "value": "+91 80 4567 0000",
+    "confidence": 1.0,
+    "block": 3
+   },
+   "supplier_email": {
+    "value": "billing@nammafibernet.in",
+    "confidence": 1.0,
+    "block": 3
+   },
+   "buyer_name": {
+    "value": "Zentra Retail Pvt Ltd",
+    "confidence": 1.0,
+    "block": 10
+   },
+   "buyer_gstin": {
+    "value": "29AABCZ5821K1ZW",
+    "confidence": 1.0,
+    "block": 11
+   },
+   "invoice_no": {
+    "value": "NF/BLR/2605-48213",
+    "confidence": 1.0,
+    "block": 5
+   },
+   "invoice_date": {
+    "value": "01/05/2026",
+    "confidence": 1.0,
+    "block": 6
+   },
+   "po_ref": {
+    "value": null,
+    "confidence": 1.0,
+    "block": null
+   },
+   "place_of_supply_state": {
+    "value": "Karnataka (29)",
+    "confidence": 1.0,
+    "block": 7
+   },
+   "irn": {
+    "value": null,
+    "confidence": 1.0,
+    "block": null
+   },
+   "has_qr": {
+    "value": false,
+    "confidence": 1.0,
+    "block": null
+   },
+   "bank_name": {
+    "value": "State Bank of India",
+    "confidence": 0.95,
+    "block": 14
+   },
+   "bank_account": {
+    "value": "30012345678",
+    "confidence": 0.95,
+    "block": 14
+   },
+   "ifsc": {
+    "value": "SBIN0040563",
+    "confidence": 0.95,
+    "block": 14
+   },
+   "taxable_total": {
+    "value": "14,576.00",
+    "confidence": 1.0,
+    "block": 12
+   },
+   "cgst": {
+    "value": "1,311.84",
+    "confidence": 1.0,
+    "block": 12
+   },
+   "sgst": {
+    "value": "1,311.84",
+    "confidence": 1.0,
+    "block": 12
+   },
+   "igst": {
+    "value": null,
+    "confidence": 1.0,
+    "block": null
+   },
+   "round_off": {
+    "value": "0.00",
+    "confidence": 1.0,
+    "block": 12
+   },
+   "grand_total": {
+    "value": "17,199.68",
+    "confidence": 1.0,
+    "block": 12
+   },
+   "amount_in_words": {
+    "value": "Rupees Seventeen Thousand One Hundred Ninety Nine and Sixty Eight Paise Only",
+    "confidence": 1.0,
+    "block": 12
+   },
+   "period_start": {
+    "value": "01/04/2026",
+    "confidence": 1.0,
+    "block": 8
+   },
+   "period_end": {
+    "value": "30/04/2026",
+    "confidence": 1.0,
+    "block": 8
+   },
+   "consumer_no": {
+    "value": "NF-BLR-0048213",
+    "confidence": 1.0,
+    "block": 9
+   }
+  },
+  "lines": [
+   {
+    "description": "Internet leased line 100 Mbps, April 2026",
+    "hsn_sac": "998422",
+    "qty": "1",
+    "unit": "Month",
+    "rate": "14,576.00",
+    "taxable": "14,576.00",
+    "gst_rate": "18",
+    "confidence": 0.95
+   }
+  ]
+ },
+ "reasoning": "The user wants me to extract invoice data from the parsed page blocks and output JSON only. I need to carefully read each block and extract the required fields.\n\nLet me go through the blocks:\n\nBlock 1: \"TAX INVOICE\" - this is the doc_title\nBlock 2: \"Namma Fibernet Pvt Ltd\" - supplier_name (from Picture)\nBlock 3: Contains supplier address, GSTIN, phone, email\nBlock 4: \"Original for recipient\" - not a field we need\nBlock 5: \"Invoice No.NF/BLR/2605-48213\" - invoice_no\nBlock 6: \"Invoice Date01/05/2026\" - invoice_date\nBlock 7: \"Place of SupplyKarnataka (29)\" - place_of_supply_state\nBlock 8: \"Billing Period01/04/2026 to 30/04/2026\" - period_start and period_end\nBlock 9: \"Account No.NF-BLR-0048213\" - consumer_no\nBlock 10: \"Bill to Zentra Retail Pvt Ltd\" - buyer_name\nBlock 11: Buyer address and GSTIN - buyer_gstin\nBlock 12: Table with line items and totals\nBlock 13: \"Bank details for payment\" - section header\nBlock 14: Bank details - bank_name, bank_account, ifsc\nBlock 15: \"For Namma Fibernet Pvt Ltd\" - not needed\nBlock 16: \"Authorised Signatory\" - not needed\nBlock 17: \"Subject to local jurisdiction...\" - not needed\n\nNow extract fields:\n\ndoc_title: \"TAX INVOICE\" (block 1)\nsupplier_name: \"Namma Fibernet Pvt Ltd\" (block 2)\nsupplier_gstin: \"29AAACN7712E1ZK\" (block 3)\nsupplier_phone: \"+91 80 4567 0000\" (block 3)\nsupplier_email: \"billing@nammafibernet.in\" (block 3)\nbuyer_name: \"Zentra Retail Pvt Ltd\" (block 10)\nbuyer_gstin: \"29AABCZ5821K1ZW\" (block 11)\ninvoice_no: \"NF/BLR/2605-48213\" (block 5)\ninvoice_date: \"01/05/2026\" (block 6)\npo_ref: not printed, null\nplace_of_supply_state: \"Karnataka (29)\" (block 7)\nirn: not printed, null\nhas_qr: not mentioned, false? The document doesn't mention QR code. I'll set false.\nbank_name: \"State Bank of India\" (block 14)\nbank_account: \"30012345678\" (block 14)\nifsc: \"SBIN0040563\" (block 14)\ntaxable_total: from table, \"14,576.00\" (block 12)\ncgst: \"1,311.84\" (block 12)\nsgst: \"1,311.84\" (block 12)\nigst: not printed, null (since CGST and SGST are present, it's intra-state)\nround_off: \"0.00\" (block 12)\ngrand_total: \"17,199.68\" (block 12)\namount_in_words: \"Rupees Seventeen Thousand One Hundred Ninety Nine and Sixty Eight Paise Only\" (block 12)\nperiod_start: \"01/04/2026\" (block 8)\nperiod_end: \"30/04/2026\" (block 8)\nconsumer_no: \"NF-BLR-0048213\" (block 9)\n\nNow lines: There's one line item in the table:\nDescription: \"Internet leased line 100 Mbps, April 2026\"\nHSN/SAC: \"998422\"\nQty: \"1\"\nUnit: \"Month\"\nRate: \"14,576.00\"\nTaxable: \"14,576.00\"\nGST rate: 18% (9% CGST + 9% SGST) but the field is gst_rate. The table shows CGST @ 9% and SGST @ 9%. The GST rate is 18%. I'll put 18.\n\nConfidence: For most fields, high confidence (0.95-1.0). For bank details, maybe 0.9. For lines, 0.95.\n\nBlock numbers: I'll assign block numbers as per the parsed blocks.\n\nNow produce JSON. Ensure all fields present, null where not printed.\n\nLet's construct."
+}

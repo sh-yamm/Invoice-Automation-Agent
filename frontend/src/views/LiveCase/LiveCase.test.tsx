@@ -1,11 +1,12 @@
-import { act, render, screen, waitFor } from "@testing-library/react";
+import { act, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import * as client from "../../api/client";
 import type { CaseDetail, CaseEvent, Finding } from "../../api/types";
 import LiveCase from "./LiveCase";
 
-vi.mock("../../api/client", () => ({ getCase: vi.fn(), streamEvents: vi.fn(), sendAction: vi.fn() }));
+vi.mock("../../api/client", () => ({
+  getTrail: vi.fn(() => Promise.resolve(null)), getCase: vi.fn(), streamEvents: vi.fn(), sendAction: vi.fn() }));
 
 let emit: (e: CaseEvent) => void = () => undefined;
 let end: () => void = () => undefined;
@@ -47,6 +48,16 @@ describe("LiveCase", () => {
     });
     const items = screen.getAllByRole("listitem").map((li) => li.textContent);
     expect(items.findIndex((t) => t?.includes("Readable PDF"))).toBeLessThan(items.findIndex((t) => t?.includes("Bank account differs")));
+  });
+
+  it("shows the invoice image as soon as the page is rendered, not at the end of the run", async () => {
+    vi.mocked(client.getCase).mockResolvedValueOnce({ ...base, status: "running", outcome: null, pages: [] })
+      .mockResolvedValue({ ...base, status: "running", outcome: null });
+    render(<LiveCase caseId="C-1" />);
+    await waitFor(() => expect(client.streamEvents).toHaveBeenCalled());
+    expect(screen.queryByAltText("Invoice page 1")).toBeNull();
+    act(() => emit({ type: "node_finished", seq: 3, payload: { node: "render" } }));
+    expect(await screen.findByAltText("Invoice page 1")).toBeInTheDocument();
   });
 
   it("hover highlights evidence box", async () => {
@@ -99,5 +110,32 @@ describe("LiveCase", () => {
     expect(await screen.findByText(/Classified as Standard PO/)).toBeInTheDocument();
     expect(screen.getByText(/Recorded model replies/)).toBeInTheDocument();
     act(() => end());
+  });
+});
+
+describe("LiveCase paper trail", () => {
+  it("shows the PO, the delivery and the invoice in order, and the 3-way match", async () => {
+    vi.mocked(client.getCase).mockResolvedValue(base);
+    vi.mocked(client.getTrail).mockResolvedValue({
+      vendor: null, grns: [], contract: null, earlier_invoices: [],
+      po: { po_number: "PO-4518", po_date: "2026-10-08", po_type: "goods", status: "open", value: "240000.00",
+            lines: [{ line_no: 1, item_code: "STL-ANG-50", description: "MS angle 50x50x5 mm", hsn_sac: "7216", qty: "4000",
+                      unit: "kg", rate: "60.00", gst_rate: "18", amount: "240000.00", received_qty: "4000",
+                      received_date: "2026-10-27", billed_before_qty: "0", billed_before_amount: "0.00" }] },
+      invoice: { invoice_no: "DST/2627/0981", invoice_date: "2026-10-30", grand_total: "291696.00",
+                 lines: [{ description: "MS angle 50x50x5 mm", hsn_sac: "7216", qty: "4000", unit: "kg", rate: "61.80",
+                           taxable: "247200.00", gst_rate: "18" }] },
+      steps: [
+        { kind: "po", date: "2026-10-08", who: "Zentra", title: "Purchase order PO-4518 issued", detail: "" },
+        { kind: "grn", date: "2026-10-27", who: "Deccan", title: "Goods received, receipt GRN-7741", detail: "" },
+        { kind: "invoice", date: "2026-10-30", who: "Deccan", title: "Invoice DST/2627/0981 sent", detail: "" },
+      ],
+    });
+    render(<LiveCase caseId="C-1" />);
+    const trail = await screen.findByRole("region", { name: "Paper trail" });
+    const titles = within(trail).getAllByText(/^(Purchase order|Goods received|Invoice )/).map((e) => e.textContent);
+    expect(titles).toEqual(["Purchase order PO-4518 issued", "Goods received, receipt GRN-7741", "Invoice DST/2627/0981 sent"]);
+    expect(screen.getByText("Ordered, received, billed")).toBeInTheDocument();
+    expect(screen.getByText(/3\.0% above the PO/)).toBeInTheDocument();
   });
 });

@@ -1,9 +1,13 @@
 import { useState } from "react";
 import type { ActionBody, CaseDetail, CaseEvent, Finding } from "../../api/types";
-import { StatusChip } from "../../components/Chips";
-import { inr } from "../../lib/format";
+import { railKeyForStage } from "../../components/StageRail";
+import { inr, OUTCOME } from "../../lib/format";
 
 const ICON = { pass: "✓", warn: "!", fail: "✕" } as const;
+const STAGE_NAME: Record<string, string> = {
+  receive: "Receiving the file", read: "Reading the invoice", classify: "Working out what it is", validate: "GST rules",
+  match: "Matching to the order", controls: "Fraud and duplicate controls", decide: "Decision",
+};
 
 export function FindingLog({ events, fallback, onHover }: {
   events: CaseEvent[]; fallback: Finding[]; onHover: (id: string | null) => void;
@@ -11,60 +15,68 @@ export function FindingLog({ events, fallback, onHover }: {
   const items = events.length
     ? events.filter((e) => ["finding", "human_action", "decision"].includes(e.type))
     : fallback.map((f, i) => ({ type: "finding", seq: i, payload: f as unknown as Record<string, unknown> }));
-  return (
-    <ul className="log" onMouseLeave={() => onHover(null)}>
-      {items.map((e) => {
-        if (e.type === "human_action") {
-          const p = e.payload as Record<string, string>;
-          return (
-            <li key={`h${e.seq}`} className="human">
-              <span className="ic" aria-label="Person">◉</span>
-              <div><div className="tt">{p.actor ?? "Person"}: {p.action?.replace(/_/g, " ")}</div>{p.note && <div className="dd">{p.note}</div>}</div>
-              <span className="stg">human</span>
-            </li>
-          );
-        }
-        if (e.type === "decision") {
-          const p = e.payload as Record<string, string>;
-          return (
-            <li key={`d${e.seq}`} className="decision-line">
-              <span className="ic" aria-hidden="true">⚖</span>
-              <div><div className="tt">Decision: {p.primary_code}</div><div className="dd">{p.why}</div></div>
-              <span className="stg">decide</span>
-            </li>
-          );
-        }
-        const f = e.payload as unknown as Finding;
-        return (
-          <li key={f.id + e.seq} className={f.status} onMouseOver={() => onHover(f.evidence.some((x) => x.box) ? f.id : null)}>
-            <span className="ic" aria-label={f.status}>{ICON[f.status]}</span>
-            <div><div className="tt">{f.title}</div>{f.detail && <div className="dd">{f.detail}</div>}</div>
-            <span className="stg">{f.code ?? f.check}</span>
-          </li>
-        );
-      })}
-    </ul>
-  );
+  let lastStage = "";
+  const out: JSX.Element[] = [];
+  for (const e of items) {
+    const stage = e.type === "finding" ? railKeyForStage((e.payload as unknown as Finding).stage) : "decide";
+    if (stage !== lastStage) {
+      out.push(<li key={`s${e.seq}-${stage}`} className="stage-h" aria-hidden="true">{STAGE_NAME[stage] ?? stage}</li>);
+      lastStage = stage;
+    }
+    if (e.type === "human_action") {
+      const p = e.payload as Record<string, string>;
+      out.push(
+        <li key={`h${e.seq}`} className="human">
+          <span className="ic" aria-label="Person">◉</span>
+          <div><div className="tt">{p.actor ?? "Person"}: {p.action?.replace(/_/g, " ")}</div>{p.note && <div className="dd">“{p.note}”</div>}</div>
+        </li>,
+      );
+      continue;
+    }
+    if (e.type === "decision") {
+      const p = e.payload as Record<string, string>;
+      out.push(
+        <li key={`d${e.seq}`} className="decision-line">
+          <span className="ic" aria-hidden="true">⚖</span>
+          <div><div className="tt">Decision recorded<span className="cd">{p.primary_code}</span></div><div className="dd">{p.next_step}</div></div>
+        </li>,
+      );
+      continue;
+    }
+    const f = e.payload as unknown as Finding;
+    out.push(
+      <li key={f.id + e.seq} className={`${f.status} ${f.outcome === 3 ? "reject" : "hold"}`}
+          onMouseOver={() => onHover(f.evidence.some((x) => x.box) ? f.id : null)}>
+        <span className="ic" aria-label={f.status}>{ICON[f.status]}</span>
+        <div>
+          <div className="tt">{f.title}{f.status !== "pass" && f.code && <span className="cd">{f.code}</span>}</div>
+          {f.detail && <div className="dd">{f.detail}</div>}
+        </div>
+      </li>,
+    );
+  }
+  return <ul className="log" onMouseLeave={() => onHover(null)}>{out}</ul>;
 }
 
 export function DecisionCard({ c }: { c: CaseDetail }) {
   if (c.outcome === null) return null;
-  const tone = ["approved", "signoff", "hold", "reject"][c.outcome];
+  const o = OUTCOME[c.outcome];
+  const waiting = c.status === "waiting" || c.status === "waiting_vendor";
   return (
-    <div className={`decision ${tone}`}>
+    <section className={`decision ${o.tone}`} aria-label="Decision">
       <div className="row-between">
-        <StatusChip outcome={c.outcome} status={c.status} />
-        <span className="code">{c.primary_code}</span>
+        <div className="verdict">{o.label}{c.status === "waiting_vendor" ? ", asked the vendor" : ""}</div>
+        <span className="code" title="Reason code from the rulebook">{c.primary_code}</span>
       </div>
       <div className="why">{c.why}</div>
-      <div className="facts">
-        <div><span>Owner</span>{c.owner}</div>
-        <div><span>Next step</span>{c.next_step}</div>
-      </div>
+      <dl className="facts">
+        <dt>{waiting ? "Who should act" : "Handled by"}</dt><dd>{c.owner}</dd>
+        <dt>Next step</dt><dd>{c.next_step}</dd>
+      </dl>
       {c.also.length > 0 && (
-        <div className="also"><span className="eyebrow">Also found</span><ul>{c.also.map((a) => <li key={a}>{a}</li>)}</ul></div>
+        <div className="also"><span className="label">Also found</span><ul>{c.also.map((a) => <li key={a}>{a}</li>)}</ul></div>
       )}
-    </div>
+    </section>
   );
 }
 
@@ -72,12 +84,13 @@ export function AgentNote({ c }: { c: CaseDetail }) {
   const review = c.llm_calls.find((l) => l.node === "agent_review");
   if (!c.agent_note && !review) return null;
   return (
-    <div className="panel pad">
-      <div className="eyebrow">Agent's review · can only make the outcome stricter</div>
+    <div className="panel pad agent">
+      <h3>The agent's second look</h3>
+      <p className="label">After the rules decide, the agent reviews the whole case. It may only make the outcome stricter, never approve.</p>
       <p>{c.agent_note}</p>
       {review?.reasoning && (
         <details>
-          <summary>Show reasoning</summary>
+          <summary>Show its full reasoning</summary>
           <pre className="reasoning">{review.reasoning}</pre>
         </details>
       )}
@@ -103,9 +116,10 @@ export function ActionBar({ c, busy, onAct }: { c: CaseDetail; busy: boolean; on
   }
   return (
     <div className="panel pad actions-panel">
-      <label htmlFor="note" className="eyebrow">Note {c.locked_codes.length ? "(required to approve: locked rule)" : "(optional)"}</label>
+      <h3>Your decision</h3>
+      <label htmlFor="note" className="label">Note {c.locked_codes.length ? "(required to approve, because a locked rule failed)" : "(optional, saved in the audit trail)"}</label>
       <textarea id="note" rows={2} value={note} onChange={(e) => setNote(e.target.value)}
-                placeholder={c.locked_codes.length ? "How was this verified? e.g. called the vendor on the number on file" : "Why?"} />
+                placeholder={c.locked_codes.length ? "How was this verified? For example: called the vendor on the number on file" : "For example: new rate agreed with the vendor by email"} />
       {msg && <p className="error">{msg}</p>}
       <div className="actions">
         {actions.map(([a, label, tone]) => (
@@ -156,13 +170,18 @@ export function LedgerBar({ findings }: { findings: Finding[] }) {
   const over = Math.max(0, billed + now - value);
   return (
     <div className="panel pad">
-      <h3>{String(f.data.po)} balance</h3>
+      <h3>{String(f.data.po)}: how much of the order is left</h3>
       <div className="ledger" role="img" aria-label={`Ordered ${inr(value)}, billed ${inr(billed)}, this invoice ${inr(now)}`}>
-        <div style={{ flex: billed / max, background: "var(--ink-2)" }}>billed {inr(billed, 0)}</div>
-        {fits > 0 && <div style={{ flex: fits / max, background: "var(--hold)" }}>fits</div>}
-        {over > 0 && <div className="over" style={{ flex: over / max }}>+{inr(over, 0)}</div>}
+        {billed > 0 && <div style={{ flex: billed / max, background: "var(--ink-2)" }} />}
+        {fits > 0 && <div style={{ flex: fits / max, background: "var(--hold)" }} />}
+        {over > 0 && <div className="over" style={{ flex: Math.max(over / max, 0.04) }} />}
       </div>
-      <p className="sub">PO value {inr(value)} · remaining before this invoice {inr(Math.max(0, value - billed))}</p>
+      <div className="ledger-key">
+        <span><i className="sw" style={{ background: "var(--ink-2)" }} />Already billed <b>{inr(billed, 0)}</b></span>
+        <span><i className="sw" style={{ background: "var(--hold)" }} />This invoice <b>{inr(now, 0)}</b></span>
+        {over > 0 && <span className="bad"><i className="sw over" />Over the order by <b>{inr(over, 0)}</b></span>}
+      </div>
+      <p className="label">Order value {inr(value, 0)}, of which {inr(Math.max(0, value - billed), 0)} was left before this invoice.</p>
     </div>
   );
 }
@@ -172,7 +191,7 @@ export function DuplicateCompare({ findings }: { findings: Finding[] }) {
   if (!f || !f.data.other_case) return null;
   return (
     <div className="panel pad">
-      <h3>Looks like an earlier invoice</h3>
+      <h3>This looks like an invoice we already have</h3>
       <p>
         <a href={`#case-${String(f.data.other_case)}`}>{String(f.data.other_no)}</a>
         {f.data.reasons ? `: ${String(f.data.reasons)}` : ""}

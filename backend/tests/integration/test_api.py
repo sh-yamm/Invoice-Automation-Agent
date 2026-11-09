@@ -154,3 +154,65 @@ def test_case_lists_locked_codes(client):
     assert case["locked_codes"] == ["BANK_DETAILS_MISMATCH"]
     r = client.post(f"/api/cases/{cid}/actions", json={"action": "approve_anyway", "action_key": "a"})
     assert r.status_code == 422 and "note" in r.json()["detail"]
+
+
+@pytest.mark.skipif(not cached("S02"), reason="S02 replies not recorded yet")
+def test_case_trail_goods_po(client):
+    cid = client.post("/api/cases", data={"sample_id": "S02", "pace": "fast"}).json()["case_id"]
+    wait_done(client, cid)
+    t = client.get(f"/api/cases/{cid}/trail").json()
+    assert t["vendor"]["name"] == "Deccan Steel Traders"
+    assert t["po"]["po_number"] == "PO-4518" and t["po"]["po_date"] == "2026-10-08"
+    line = t["po"]["lines"][0]
+    assert line["qty"] == "4000" and line["rate"] == "60.00" and line["received_qty"] == "4000"
+    assert t["grns"][0]["grn_number"] == "GRN-7741" and t["grns"][0]["received_date"] == "2026-10-27"
+    assert t["invoice"]["invoice_no"] == "DST/2627/0981"
+    kinds = [s["kind"] for s in t["steps"]]
+    assert kinds[:3] == ["po", "grn", "invoice"] and "decision" in kinds
+    assert kinds.index("decision") > kinds.index("check")
+
+
+@pytest.mark.skipif(not cached("S04"), reason="S04 replies not recorded yet")
+def test_case_trail_recurring_contract_and_earlier_invoices(client):
+    cid = client.post("/api/cases", data={"sample_id": "S04", "pace": "fast"}).json()["case_id"]
+    wait_done(client, cid)
+    t = client.get(f"/api/cases/{cid}/trail").json()
+    assert t["po"]["po_number"] == "PO-4490" and t["contract"]["contract_id"] == "CT-901"
+    assert t["grns"] == [] and len(t["earlier_invoices"]) >= 1
+    assert all(e["case_id"] != cid for e in t["earlier_invoices"])
+    assert "contract" in [s["kind"] for s in t["steps"]]
+
+
+def test_case_trail_unknown_404(client):
+    assert client.get("/api/cases/C-NOPE/trail").status_code == 404
+
+
+def test_kpis_for_last_7_days(client):
+    from datetime import datetime, timedelta
+    week = client.get("/api/kpis?days=7").json()
+    every = client.get("/api/kpis").json()
+    cutoff = datetime.now() - timedelta(days=7)
+    recent = [c for c in client.get("/api/cases").json()
+              if c["outcome"] is not None and datetime.fromisoformat(c["created_at"]) >= cutoff]
+    assert week["processed"] == len(recent) < every["processed"]
+    assert week["days"] == 7 and every["days"] is None
+
+
+def test_prepare_renders_pages_before_the_run(tmp_path):
+    """The invoice image must be on screen the moment a case opens, not after the run finishes."""
+    from ap_agent.api.common import case_json
+    from ap_agent.pipeline.graph import Pipeline
+    s = Settings()
+    store = Store(tmp_path / "runs.db")
+    deps = Deps(repo=Repository.load(s.erp_dir), store=store, aop_path=s.rulebook_path,
+                gateway=Gateway(s, store, CACHE, offline=True), files_dir=tmp_path / "files",
+                checkpoint_path=tmp_path / "cp.db", erp_dir=s.erp_dir)
+    Pipeline(deps).prepare("C-PREP01", REPO_ROOT / "samples" / "pdf" / "S01.pdf", sample_id="S01")
+    out = case_json(store.get_case("C-PREP01"), deps, full=True)
+    assert out["pages"] == ["/api/cases/C-PREP01/pages/1.png"]
+
+
+def test_page_images_are_cacheable(client):
+    cid = client.post("/api/cases", data={"sample_id": "S01", "pace": "fast"}).json()["case_id"]
+    r = client.get(f"/api/cases/{cid}/pages/1.png")
+    assert r.status_code == 200 and "max-age" in r.headers.get("cache-control", "")

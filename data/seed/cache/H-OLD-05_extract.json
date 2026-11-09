@@ -1,0 +1,149 @@
+{
+ "data": {
+  "fields": {
+   "doc_title": {
+    "value": "TAX INVOICE",
+    "confidence": 0.99,
+    "block": 3
+   },
+   "supplier_name": {
+    "value": "Shree Ganesh Office Furniture",
+    "confidence": 0.99,
+    "block": 1
+   },
+   "supplier_gstin": {
+    "value": "29AAKFS4417M1ZM",
+    "confidence": 0.99,
+    "block": 2
+   },
+   "supplier_phone": {
+    "value": "+91 80 4110 2290",
+    "confidence": 0.99,
+    "block": 2
+   },
+   "supplier_email": {
+    "value": "accounts@shreeganeshfurniture.in",
+    "confidence": 0.99,
+    "block": 2
+   },
+   "buyer_name": {
+    "value": "Zentra Retail Pvt Ltd",
+    "confidence": 0.99,
+    "block": 14
+   },
+   "buyer_gstin": {
+    "value": "29AABCZ5821K1ZW",
+    "confidence": 0.99,
+    "block": 15
+   },
+   "invoice_no": {
+    "value": "SGOF/26-27/0315",
+    "confidence": 0.99,
+    "block": 9
+   },
+   "invoice_date": {
+    "value": "13/08/2026",
+    "confidence": 0.99,
+    "block": 10
+   },
+   "po_ref": {
+    "value": "PO-4306",
+    "confidence": 0.99,
+    "block": 11
+   },
+   "place_of_supply_state": {
+    "value": "Karnataka (29)",
+    "confidence": 0.99,
+    "block": 12
+   },
+   "irn": {
+    "value": null,
+    "confidence": 0.95,
+    "block": null
+   },
+   "has_qr": {
+    "value": false,
+    "confidence": 0.95,
+    "block": null
+   },
+   "bank_name": {
+    "value": "ICICI Bank",
+    "confidence": 0.95,
+    "block": 18
+   },
+   "bank_account": {
+    "value": "000405112290",
+    "confidence": 0.95,
+    "block": 18
+   },
+   "ifsc": {
+    "value": "ICIC0000004",
+    "confidence": 0.95,
+    "block": 18
+   },
+   "taxable_total": {
+    "value": "3,77,000.00",
+    "confidence": 0.98,
+    "block": 16
+   },
+   "cgst": {
+    "value": "33,930.00",
+    "confidence": 0.98,
+    "block": 16
+   },
+   "sgst": {
+    "value": "33,930.00",
+    "confidence": 0.98,
+    "block": 16
+   },
+   "igst": {
+    "value": "0.00",
+    "confidence": 0.95,
+    "block": 16
+   },
+   "round_off": {
+    "value": "0.00",
+    "confidence": 0.98,
+    "block": 16
+   },
+   "grand_total": {
+    "value": "4,44,860.00",
+    "confidence": 0.98,
+    "block": 16
+   },
+   "amount_in_words": {
+    "value": "Rupees Four Lakh Forty Four Thousand Eight Hundred Sixty Only",
+    "confidence": 0.98,
+    "block": 16
+   },
+   "period_start": {
+    "value": null,
+    "confidence": 0.95,
+    "block": null
+   },
+   "period_end": {
+    "value": null,
+    "confidence": 0.95,
+    "block": null
+   },
+   "consumer_no": {
+    "value": null,
+    "confidence": 0.95,
+    "block": null
+   }
+  },
+  "lines": [
+   {
+    "description": "Storage locker",
+    "hsn_sac": "9403",
+    "qty": "50",
+    "unit": "Nos",
+    "rate": "7,540.00",
+    "taxable": "3,77,000.00",
+    "gst_rate": "18%",
+    "confidence": 0.98
+   }
+  ]
+ },
+ "reasoning": "The user wants me to extract invoice data from the parsed page blocks and return JSON only. Let me analyze the blocks carefully.\n\nFrom the blocks:\n- Block 1: Supplier name \"Shree Ganesh Office Furniture\"\n- Block 2: Supplier address, GSTIN, phone, email\n- Block 3: Document title \"TAX INVOICE\"\n- Block 4: \"Original for recipient\"\n- Block 5: \"Invoice No.\" label\n- Block 6: \"Invoice Date 13/08/2026\" label\n- Block 7: \"PO Ref.\" label\n- Block 8: \"Place of Supply\" label\n- Block 9: \"SGOF/26-27/0315\" - this is the invoice number\n- Block 10: \"13/08/2026\" - invoice date\n- Block 11: \"PO-4306\" - PO reference\n- Block 12: \"Karnataka (29)\" - place of supply\n- Block 13: \"Bill to\" section header\n- Block 14: \"Zentra Retail Pvt Ltd\" - buyer name\n- Block 15: Buyer address and GSTIN\n- Block 16: Table with line items and totals\n- Block 17: \"Bank details for payment\"\n- Block 18: Bank details\n- Block 19: \"For Shree Ganesh Office Furniture\"\n- Block 20: \"Authorised Signatory\"\n- Block 21: Footer text\n\nNow I need to extract all fields. Let me parse the table in block 16 carefully.\n\nThe table shows:\n| Description | HSN/SAC | Qty | Unit | Rate (Rs.) | Taxable Value (Rs.)\n1 | Storage locker | 9403 | 50 | Nos | 7,540.00 | 3,77,000.00\n\nThen summary:\nAmount in words: Rupees Four Lakh Forty Four Thousand Eight Hundred Sixty Only\nTaxable Value | | | 3,77,000.00\nCGST @ 9% | | | 33,930.00\nSGST @ 9% | | | 33,930.00\nRound Off | | | 0.00\nInvoice Total (Rs.) | | | 4,44,860.00\n\nSo:\n- taxable_total: 3,77,000.00\n- cgst: 33,930.00\n- sgst: 33,930.00\n- igst: 0 (not shown, but since CGST/SGST are present, it's intra-state)\n- round_off: 0.00\n- grand_total: 4,44,860.00\n- amount_in_words: \"Rupees Four Lakh Forty Four Thousand Eight Hundred Sixty Only\"\n\nLine items: one line - Storage locker, HSN 9403, Qty 50, Unit Nos, Rate 7,540.00, Taxable 3,77,000.00, GST rate 18% (9% CGST + 9% SGST)\n\nNow check for IRN and QR code - not mentioned in blocks, so null/false.\n\nPeriod start/end, consumer_no - not mentioned.\n\nBank details: ICICI Bank, A/c No.: 000405112290, IFSC: ICIC0000004\n\nNow assign confidence. Most fields are clear from text. The table is parsed as text, so confidence high. Block numbers: I'll use the block numbers from the parsed blocks.\n\nLet me map:\n- doc_title: block 3\n- supplier_name: block 1\n- supplier_gstin: block 2\n- supplier_phone: block 2\n- supplier_email: block 2\n- buyer_name: block 14\n- buyer_gstin: block 15\n- invoice_no: block 9\n- invoice_date: block 10\n- po_ref: block 11\n- place_of_supply_state: block 12\n- irn: not present -> null\n- has_qr: not mentioned -> false\n- bank_name: block 18 (ICICI Bank)\n- bank_account: block 18\n- ifsc: block 18\n- taxable_total: from block 16\n- cgst: from block 16\n- sgst: from block 16\n- igst: 0 (implied)\n- round_off: from block 16\n- grand_total: from block 16\n- amount_in_words: from block 16\n- period_start: null\n- period_end: null\n- consumer_no: null\n\nConfidence: 0.95 for most, maybe 0.9 for bank details since it's in block 18.\n\nLines array: one object with description, hsn_sac, qty, unit, rate, taxable, gst_rate (18%), confidence.\n\nNow produce JSON. Ensure numbers are strings as printed (with commas). The spec says copy printed figures exactly. So keep commas.\n\nLet me write JSON."
+}

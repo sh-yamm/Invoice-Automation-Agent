@@ -1,4 +1,4 @@
-import type { ActionBody, CaseDetail, CaseEvent, CaseSummary, Kpis, Pace, Sample } from "./types";
+import type { ActionBody, CaseDetail, CaseEvent, CaseSummary, Kpis, Pace, Sample, Trail } from "./types";
 
 export class ApiError extends Error {
   constructor(public status: number, message: string) {
@@ -68,6 +68,7 @@ export const getAop = () => call<Record<string, any>>("/api/aop");
 export const putAop = (changes: Record<string, unknown>, editor: string, why: string) =>
   call<Record<string, any>>("/api/aop", json({ changes, editor, why }, "PUT"));
 export const getData = (name: string) => call<Record<string, any>[]>(`/api/data/${name}`);
-export const getKpis = () => call<Kpis>("/api/kpis");
+export const getKpis = (days?: number) => call<Kpis>(`/api/kpis${days ? `?days=${days}` : ""}`);
+export const getTrail = (id: string) => call<Trail>(`/api/cases/${id}/trail`);
 export const getSamples = () => call<Sample[]>("/api/samples");
 export const resetDemo = () => call<{ cases: number }>("/api/demo/reset", { method: "POST" });

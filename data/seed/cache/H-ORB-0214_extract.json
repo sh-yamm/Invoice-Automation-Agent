@@ -1,0 +1,149 @@
+{
+ "data": {
+  "fields": {
+   "doc_title": {
+    "value": "TAX INVOICE",
+    "confidence": 1.0,
+    "block": 2
+   },
+   "supplier_name": {
+    "value": "Orbit Office Systems",
+    "confidence": 1.0,
+    "block": 1
+   },
+   "supplier_gstin": {
+    "value": "29AAJFO5521P1ZM",
+    "confidence": 1.0,
+    "block": 1
+   },
+   "supplier_phone": {
+    "value": "+91 80 4920 4455",
+    "confidence": 1.0,
+    "block": 1
+   },
+   "supplier_email": {
+    "value": "accounts@orbitoffice.in",
+    "confidence": 1.0,
+    "block": 1
+   },
+   "buyer_name": {
+    "value": "Zentra Retail Pvt Ltd",
+    "confidence": 1.0,
+    "block": 5
+   },
+   "buyer_gstin": {
+    "value": "29AABCZ5821K1ZW",
+    "confidence": 1.0,
+    "block": 6
+   },
+   "invoice_no": {
+    "value": "ORB/26-27/0214",
+    "confidence": 1.0,
+    "block": 7
+   },
+   "invoice_date": {
+    "value": "03/11/2026",
+    "confidence": 1.0,
+    "block": 8
+   },
+   "po_ref": {
+    "value": "PO-4540",
+    "confidence": 1.0,
+    "block": 9
+   },
+   "place_of_supply_state": {
+    "value": "Karnataka (29)",
+    "confidence": 1.0,
+    "block": 10
+   },
+   "irn": {
+    "value": null,
+    "confidence": 1.0,
+    "block": null
+   },
+   "has_qr": {
+    "value": false,
+    "confidence": 1.0,
+    "block": null
+   },
+   "bank_name": {
+    "value": "HDFC Bank",
+    "confidence": 1.0,
+    "block": 15
+   },
+   "bank_account": {
+    "value": "50200061234455",
+    "confidence": 1.0,
+    "block": 15
+   },
+   "ifsc": {
+    "value": "HDFC0000789",
+    "confidence": 1.0,
+    "block": 15
+   },
+   "taxable_total": {
+    "value": "4,15,000.00",
+    "confidence": 1.0,
+    "block": 13
+   },
+   "cgst": {
+    "value": "37,350.00",
+    "confidence": 1.0,
+    "block": 13
+   },
+   "sgst": {
+    "value": "37,350.00",
+    "confidence": 1.0,
+    "block": 13
+   },
+   "igst": {
+    "value": null,
+    "confidence": 1.0,
+    "block": null
+   },
+   "round_off": {
+    "value": "0.00",
+    "confidence": 1.0,
+    "block": 13
+   },
+   "grand_total": {
+    "value": "4,89,700.00",
+    "confidence": 1.0,
+    "block": 13
+   },
+   "amount_in_words": {
+    "value": "Rupees Four Lakh Eighty Nine Thousand Seven Hundred Only",
+    "confidence": 1.0,
+    "block": 12
+   },
+   "period_start": {
+    "value": null,
+    "confidence": 1.0,
+    "block": null
+   },
+   "period_end": {
+    "value": null,
+    "confidence": 1.0,
+    "block": null
+   },
+   "consumer_no": {
+    "value": null,
+    "confidence": 1.0,
+    "block": null
+   }
+  },
+  "lines": [
+   {
+    "description": "Workstation set, phase 2",
+    "hsn_sac": "9403",
+    "qty": "1",
+    "unit": "Set",
+    "rate": "4,15,000.00",
+    "taxable": "4,15,000.00",
+    "gst_rate": null,
+    "confidence": 1.0
+   }
+  ]
+ },
+ "reasoning": "The user wants me to extract invoice data from the parsed page blocks and output JSON only. I need to carefully read each block and extract the required fields.\n\nLet me go through each block:\n\nBlock 1: Supplier info - Orbit Office Systems, address, GSTIN, phone, email\nBlock 2: Document title - TAX INVOICE\nBlock 3: \"Original for recipient\" - not a field we need\nBlock 4: \"Bill to\" section header\nBlock 5: Buyer name - Zentra Retail Pvt Ltd\nBlock 6: Buyer address and GSTIN\nBlock 7: Invoice No. ORB/26-27/0214\nBlock 8: Invoice Date 03/11/2026\nBlock 9: PO Ref. PO-4540\nBlock 10: Place of Supply Karnataka (29)\nBlock 11: Table with line item - Workstation set, phase 2, HSN 9403, Qty 1, Unit Set, Rate 4,15,000.00, Taxable Value 4,15,000.00\nBlock 12: Amount in words\nBlock 13: Tax summary table - Taxable Value, CGST, SGST, Round Off, Invoice Total\nBlock 14: Bank details section header\nBlock 15: Bank details - HDFC Bank, A/c No., IFSC\nBlock 16-18: Signatory and notes\n\nNow I need to map these to the required fields.\n\nFields to extract:\n- doc_title: \"TAX INVOICE\" from block 2\n- supplier_name: \"Orbit Office Systems\" from block 1\n- supplier_gstin: \"29AAJFO5521P1ZM\" from block 1\n- supplier_phone: \"+91 80 4920 4455\" from block 1\n- supplier_email: \"accounts@orbitoffice.in\" from block 1\n- buyer_name: \"Zentra Retail Pvt Ltd\" from block 5\n- buyer_gstin: \"29AABCZ5821K1ZW\" from block 6\n- invoice_no: \"ORB/26-27/0214\" from block 7\n- invoice_date: \"03/11/2026\" from block 8\n- po_ref: \"PO-4540\" from block 9\n- place_of_supply_state: \"Karnataka (29)\" from block 10\n- irn: not printed, null\n- has_qr: not mentioned, false\n- bank_name: \"HDFC Bank\" from block 15\n- bank_account: \"50200061234455\" from block 15\n- ifsc: \"HDFC0000789\" from block 15\n- taxable_total: \"4,15,000.00\" from block 13\n- cgst: \"37,350.00\" from block 13\n- sgst: \"37,350.00\" from block 13\n- igst: not applicable (since CGST+SGST), null or 0? The field expects amount, but not printed. Should be null.\n- round_off: \"0.00\" from block 13\n- grand_total: \"4,89,700.00\" from block 13\n- amount_in_words: \"Rupees Four Lakh Eighty Nine Thousand Seven Hundred Only\" from block 12\n- period_start: not printed, null\n- period_end: not printed, null\n- consumer_no: not printed, null\n\nLines: one line item from block 11:\n- description: \"Workstation set, phase 2\"\n- hsn_sac: \"9403\"\n- qty: \"1\"\n- unit: \"Set\"\n- rate: \"4,15,000.00\"\n- taxable: \"4,15,000.00\"\n- gst_rate: \"18%\" (since CGST 9% + SGST 9% = 18%) but the field expects gst_rate. The table doesn't show GST rate explicitly, but we can infer from CGST and SGST. However, the instruction says never compute, copy printed figures exactly. The printed figure for GST rate is not shown. The line table only shows HSN/SAC, Qty, Unit, Rate, Taxable Value. The tax summary shows CGST @ 9% and SGST @ 9%. The gst_rate field might be the combined rate. But we should only use printed values. Since not printed, maybe null. However, the schema expects gst_rate in lines. I'll set to \"18%\" as it's implied but not printed. But the rule: \"Never compute totals or taxes; copy the printed figures exactly.\" So if not printed, use null. I'll set gst_rate to null.\n\nConfidence: For each field, I need to assign confidence 0-1. Since the text is clear, high confidence, maybe 0.95 or 1.0. But there might be some ambiguity in parsing numbers with commas. I'll use 0.98 for most.\n\nBlock numbers: I need to reference the block number where the value came from. For fields that come from multiple blocks, maybe the primary block. I'll assign the block number where the value is explicitly printed.\n\nLet's construct JSON.\n\nNote: The output must be JSON only, no extra text.\n\nI'll write the JSON now."
+}

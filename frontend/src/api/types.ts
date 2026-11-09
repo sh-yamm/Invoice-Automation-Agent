@@ -104,6 +104,7 @@ export interface Sample {
 }
 
 export interface Kpis {
+  days?: number | null;
   processed: number;
   total_inr: string;
   touchless: number;
@@ -130,4 +131,29 @@ export interface ActionBody {
 
 export interface CaseDetailExtras {
   locked_codes: string[];
+}
+
+export interface TrailStep {
+  kind: "contract" | "po" | "grn" | "earlier" | "invoice" | "check" | "decision" | "person";
+  date: string | null;
+  who: string;
+  title: string;
+  detail: string;
+  case_id?: string;
+}
+
+export interface TrailPoLine {
+  line_no: number; item_code: string; description: string; hsn_sac: string; qty: string; unit: string; rate: string;
+  gst_rate: string; amount: string; received_qty: string | null; received_date: string | null;
+  billed_before_qty: string; billed_before_amount: string;
+}
+
+export interface Trail {
+  vendor: { vendor_id: string; name: string; gstin: string; category: string; bank: string; payment_terms_days: number; status: string } | null;
+  po: { po_number: string; po_date: string; po_type: string; status: string; value: string; lines: TrailPoLine[] } | null;
+  grns: { grn_number: string; po_number: string; line_no: number; received_qty: string; accepted_qty: string; received_date: string }[];
+  contract: { contract_id: string; start_date: string; end_date: string; billing_cycle: string; amount_per_period: string; description: string } | null;
+  earlier_invoices: { case_id: string; invoice_no: string | null; invoice_date: string | null; amount: string; outcome: string | null }[];
+  invoice: { invoice_no: string | null; invoice_date: string | null; grand_total: string | null; lines: Line[] } | null;
+  steps: TrailStep[];
 }

@@ -17,10 +17,10 @@ export default function PdfEvidence({ pages, findings, hover, stamp, scanned }: 
   return (
     <div className="sheet-wrap">
       <div className="sheet-label">
-        <span>{scanned ? "Scanned copy · read visually" : "Original PDF"}</span>
-        <span>Hover a check to see where it came from</span>
+        <span><b>{scanned ? "Scanned copy" : "The invoice as received"}</b>{scanned ? ", read from the image" : ""}</span>
+        <span>Point at a check to see where on the page it looked</span>
       </div>
-      {pages.length === 0 && <div className="sheet empty">Rendering the invoice…</div>}
+      {pages.length === 0 && <div className="sheet-empty">Opening the PDF…</div>}
       {pages.map((src, idx) => (
         <div key={src} className="page">
           <img src={src} alt={`Invoice page ${idx + 1}`} />

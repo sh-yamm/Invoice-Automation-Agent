@@ -1,0 +1,149 @@
+{
+ "data": {
+  "fields": {
+   "doc_title": {
+    "value": "TAX INVOICE",
+    "confidence": 0.99,
+    "block": 3
+   },
+   "supplier_name": {
+    "value": "Sai Krishna Logistics",
+    "confidence": 0.99,
+    "block": 1
+   },
+   "supplier_gstin": {
+    "value": "33ABJFS2290H1Z4",
+    "confidence": 0.99,
+    "block": 2
+   },
+   "supplier_phone": {
+    "value": "+91 44 2625 6618",
+    "confidence": 0.99,
+    "block": 2
+   },
+   "supplier_email": {
+    "value": "billing@saikrishnalogistics.in",
+    "confidence": 0.99,
+    "block": 2
+   },
+   "buyer_name": {
+    "value": "Zentra Retail Pvt Ltd",
+    "confidence": 0.99,
+    "block": 10
+   },
+   "buyer_gstin": {
+    "value": "29AABCZ5821K1ZW",
+    "confidence": 0.99,
+    "block": 11
+   },
+   "invoice_no": {
+    "value": "SKL-0924",
+    "confidence": 0.99,
+    "block": 5
+   },
+   "invoice_date": {
+    "value": "31/08/2026",
+    "confidence": 0.99,
+    "block": 6
+   },
+   "po_ref": {
+    "value": "PO-4315",
+    "confidence": 0.99,
+    "block": 7
+   },
+   "place_of_supply_state": {
+    "value": "Karnataka (29)",
+    "confidence": 0.99,
+    "block": 8
+   },
+   "irn": {
+    "value": null,
+    "confidence": 0.95,
+    "block": null
+   },
+   "has_qr": {
+    "value": false,
+    "confidence": 0.95,
+    "block": null
+   },
+   "bank_name": {
+    "value": "Indian Bank",
+    "confidence": 0.99,
+    "block": 14
+   },
+   "bank_account": {
+    "value": "6012346618",
+    "confidence": 0.99,
+    "block": 14
+   },
+   "ifsc": {
+    "value": "IDIB000A012",
+    "confidence": 0.99,
+    "block": 14
+   },
+   "taxable_total": {
+    "value": "2,78,500.00",
+    "confidence": 0.99,
+    "block": 12
+   },
+   "cgst": {
+    "value": "0.00",
+    "confidence": 0.95,
+    "block": 12
+   },
+   "sgst": {
+    "value": "0.00",
+    "confidence": 0.95,
+    "block": 12
+   },
+   "igst": {
+    "value": "13,925.00",
+    "confidence": 0.99,
+    "block": 12
+   },
+   "round_off": {
+    "value": "0.00",
+    "confidence": 0.99,
+    "block": 12
+   },
+   "grand_total": {
+    "value": "2,92,425.00",
+    "confidence": 0.99,
+    "block": 12
+   },
+   "amount_in_words": {
+    "value": "Rupees Two Lakh Ninety Two Thousand Four Hundred Twenty Five Only",
+    "confidence": 0.99,
+    "block": 12
+   },
+   "period_start": {
+    "value": null,
+    "confidence": 0.95,
+    "block": null
+   },
+   "period_end": {
+    "value": null,
+    "confidence": 0.95,
+    "block": null
+   },
+   "consumer_no": {
+    "value": null,
+    "confidence": 0.95,
+    "block": null
+   }
+  },
+  "lines": [
+   {
+    "description": "Freight Bengaluru to Hyderabad, 20 ft",
+    "hsn_sac": "996511",
+    "qty": "20",
+    "unit": "Trips",
+    "rate": "13,925.00",
+    "taxable": "2,78,500.00",
+    "gst_rate": "5%",
+    "confidence": 0.99
+   }
+  ]
+ },
+ "reasoning": "The user wants me to extract invoice data from the parsed page blocks and output JSON only. I need to carefully read each block and extract the relevant fields.\n\nLet me go through the blocks:\n\nBlock 1: \"Sai Krishna Logistics\" - This appears to be the supplier name (title)\nBlock 2: Address and contact details for supplier - GSTIN, phone, email\nBlock 3: \"TAX INVOICE\" - doc_title\nBlock 4: \"Original for recipient\" - not a field we need\nBlock 5: \"Invoice No. SKL-0924\" - invoice_no\nBlock 6: \"Invoice Date 31/08/2026\" - invoice_date\nBlock 7: \"PO Ref. PO-4315\" - po_ref\nBlock 8: \"Place of Supply Karnataka (29)\" - place_of_supply_state\nBlock 9: \"Bill to\" - section header\nBlock 10: \"Zentra Retail Pvt Ltd\" - buyer_name\nBlock 11: Buyer address and GSTIN - buyer_gstin\nBlock 12: Table with line items and totals - need to extract line items and totals\nBlock 13: \"Bank details for payment\" - section header\nBlock 14: \"Indian Bank A/c No.:6012346618 IFSC: IDIB000A012\" - bank_name, bank_account, ifsc\nBlock 15: \"For Sai Krishna Logistics\" - not needed\nBlock 16: \"Authorised Signatory\" - not needed\nBlock 17: Footer - not needed\n\nNow let me extract the fields:\n\ndoc_title: \"TAX INVOICE\" (from block 3)\nsupplier_name: \"Sai Krishna Logistics\" (from block 1)\nsupplier_gstin: \"33ABJFS2290H1Z4\" (from block 2)\nsupplier_phone: \"+91 44 2625 6618\" (from block 2)\nsupplier_email: \"billing@saikrishnalogistics.in\" (from block 2)\nbuyer_name: \"Zentra Retail Pvt Ltd\" (from block 10)\nbuyer_gstin: \"29AABCZ5821K1ZW\" (from block 11)\ninvoice_no: \"SKL-0924\" (from block 5)\ninvoice_date: \"31/08/2026\" (from block 6)\npo_ref: \"PO-4315\" (from block 7)\nplace_of_supply_state: \"Karnataka (29)\" (from block 8)\nirn: not printed - null\nhas_qr: not mentioned - false (or null? The field expects boolean, but if not printed, should be false)\nbank_name: \"Indian Bank\" (from block 14)\nbank_account: \"6012346618\" (from block 14)\nifsc: \"IDIB000A012\" (from block 14)\ntaxable_total: \"2,78,500.00\" (from block 12 table)\ncgst: not shown separately, only IGST - so 0 or null? The table shows IGST @ 5% = 13,925.00, no CGST/SGST. Since it's interstate (Karnataka to Tamil Nadu?), IGST applies. So cgst = 0, sgst = 0, igst = 13,925.00\nsgst: 0\nigst: \"13,925.00\"\nround_off: \"0.00\" (from block 12)\ngrand_total: \"2,92,425.00\" (from block 12)\namount_in_words: \"Rupees Two Lakh Ninety Two Thousand Four Hundred Twenty Five Only\" (from block 12)\nperiod_start: not printed - null\nperiod_end: not printed - null\nconsumer_no: not printed - null\n\nNow lines: There's one line item in the table:\nDescription: \"Freight Bengaluru to Hyderabad, 20 ft\"\nHSN/SAC: \"996511\"\nQty: \"20\"\nUnit: \"Trips\"\nRate: \"13,925.00\"\nTaxable: \"2,78,500.00\"\nGST rate: 5% (since IGST @ 5%)\n\nBut note: The table shows Rate (Rs.) 13,925.00 and Taxable Value 2,78,500.00 (which is 20 * 13,925). The GST rate is 5% IGST.\n\nI need to output lines array with one object.\n\nConfidence: For most fields, high confidence (0.95-1.0) as text is clear. For bank details, also clear. For line items, clear.\n\nBlock numbers: I need to assign block numbers for each field. The blocks are numbered 1-17. I'll reference the block where the value appears.\n\nLet me map:\n- doc_title: block 3\n- supplier_name: block 1\n- supplier_gstin: block 2\n- supplier_phone: block 2\n- supplier_email: block 2\n- buyer_name: block 10\n- buyer_gstin: block 11\n- invoice_no: block 5\n- invoice_date: block 6\n- po_ref: block 7\n- place_of_supply_state: block 8\n- irn: null, block null\n- has_qr: false, block null (not printed)\n- bank_name: block 14\n- bank_account: block 14\n- ifsc: block 14\n- taxable_total: block 12\n- cgst: block 12 (implied 0)\n- sgst: block 12 (implied 0)\n- igst: block 12\n- round_off: block 12\n- grand_total: block 12\n- amount_in_words: block 12\n- period_start: null\n- period_end: null\n- consumer_no: null\n\nFor lines, the line comes from block 12.\n\nNow, the JSON structure: fields object with each field having value, confidence, block. Lines array with objects.\n\nI'll set confidence 0.98 for most, 0.95 for some.\n\nNote: The amount_in_words in block 12 says \"Rupees Two Lakh Ninety Two Thousand Four Hundred Twenty Five Only\" but the grand total is 2,92,425.00. That matches (2,92,425 = Two Lakh Ninety Two Thousand Four Hundred Twenty Five). Good.\n\nNow, the GST amounts: The table shows \"IGST @ 5% | 13,925.00\". No CGST/SGST. So cgst and sgst are 0. I'll set them as \"0.00\" or 0? The spec says copy printed figures exactly. Since not printed, maybe null? But the fields are expected. I'll set value as \"0.00\" with confidence 0.9 and block 12.\n\nSimilarly, round_off is printed as \"0.00\".\n\nNow, has_qr: The document doesn't mention QR code. So false.\n\nirn: not printed, null.\n\nNow, let's construct JSON."
+}

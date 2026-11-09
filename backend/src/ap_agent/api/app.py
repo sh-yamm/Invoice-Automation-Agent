@@ -23,13 +23,13 @@ from ap_agent.api.routes import cases, dashboard, data, demo, rulebook  # noqa: 
 from ap_agent.erp.repository import Repository  # noqa: E402
 from ap_agent.pipeline.graph import Deps, Pipeline  # noqa: E402
 from ap_agent.storage.cases import Store  # noqa: E402
-from ap_agent.storage.seed import seed_history  # noqa: E402
+from ap_agent.storage.seed import reset_demo  # noqa: E402
 
 
 def default_deps(s: Settings) -> Deps:
     store = Store(s.storage_dir / "runs.db")
     if not store.list_cases({}):
-        seed_history(store, s.seed_path)
+        reset_demo(store, s.seed_path, s.storage_dir / "files", s.storage_dir / "checkpoints.db")
     return Deps(repo=Repository.load(s.erp_dir), store=store, aop_path=s.rulebook_path,
                 gateway=Gateway(s, store, s.samples_dir / "cache"), files_dir=s.storage_dir / "files",
                 checkpoint_path=s.storage_dir / "checkpoints.db", erp_dir=s.erp_dir)
@@ -38,7 +38,7 @@ def default_deps(s: Settings) -> Deps:
 def create_app(deps: Deps | None = None, seed_path: Path | None = None) -> FastAPI:
     s = Settings()
     deps = deps or default_deps(s)
-    app = FastAPI(title="Invoice Automation Agent", version="0.1.0")
+    app = FastAPI(title="Zamp Invoice Agent", version="0.1.0")
     app.state.ctx = AppContext(deps=deps, pipeline=Pipeline(deps), executor=ThreadPoolExecutor(max_workers=2),
                                seed_path=seed_path or s.seed_path)
     app.add_middleware(CORSMiddleware, allow_origins=["http://localhost:5173"], allow_methods=["*"],

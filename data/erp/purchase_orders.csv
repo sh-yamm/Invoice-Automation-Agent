@@ -11,3 +11,27 @@ PO-4490,V003,blanket,2026-06-01,open,1,ITS-RET-01,"IT support retainer, Jun 2026
 PO-4540,V008,goods,2026-10-20,open,1,FUR-WKS-P1,"Workstation set, phase 1",9403,1,Set,415000,18
 PO-4540,V008,goods,2026-10-20,open,2,FUR-WKS-P2,"Workstation set, phase 2",9403,1,Set,415000,18
 PO-4540,V008,goods,2026-10-20,open,3,FUR-WKS-P3,"Workstation set, phase 3",9403,1,Set,415000,18
+PO-4301,V001,goods,2026-07-20,closed,1,FUR-VCH-02,Visitor chair,9401,97,Nos,3500.00,18
+PO-4302,V002,goods,2026-07-22,closed,1,PKG-TAP-48,Carton sealing tape,3919,3785,Rolls,100.00,18
+PO-4303,V004,goods,2026-07-24,closed,1,STL-FLT-40,MS flat bar 40x6 mm,7216,2656,kg,62.50,18
+PO-4304,V005,goods,2026-07-26,closed,1,ELE-CU-04,Copper cable 4 sq mm,8544,2125,m,100.00,18
+PO-4305,V006,services,2026-07-28,closed,1,LOG-FRT-20,"Freight Bengaluru to Hyderabad, 20 ft",996511,5,Trips,20200.00,5
+PO-4306,V001,goods,2026-07-30,open,1,FUR-LKR-06,Storage locker,9403,50,Nos,7180.95,18
+PO-4307,V002,goods,2026-08-01,closed,1,PKG-SWR-23,Shrink wrap roll,3920,100,Rolls,1430.00,18
+PO-4308,V004,goods,2026-08-03,closed,1,STL-FLT-40,MS flat bar 40x6 mm,7216,5528,kg,62.50,18
+PO-4309,V005,goods,2026-08-05,closed,1,ELE-DB-12,Distribution board 12-way,8537,6,Nos,7750.00,18
+PO-4310,V006,services,2026-08-07,closed,1,LOG-FRT-20,"Freight Bengaluru to Hyderabad, 20 ft",996511,16,Trips,13937.50,5
+PO-4311,V001,goods,2026-08-09,closed,1,FUR-VCH-02,Visitor chair,9401,40,Nos,3162.50,18
+PO-4312,V002,goods,2026-08-11,open,1,PKG-TAP-48,Carton sealing tape,3919,910,Rolls,100.00,18
+PO-4313,V004,goods,2026-08-13,closed,1,STL-FLT-40,MS flat bar 40x6 mm,7216,4880,kg,62.50,18
+PO-4314,V005,goods,2026-08-15,closed,1,ELE-CU-04,Copper cable 4 sq mm,8544,3376,m,93.75,18
+PO-4315,V006,services,2026-08-17,closed,1,LOG-FRT-20,"Freight Bengaluru to Hyderabad, 20 ft",996511,20,Trips,13925.00,5
+PO-4316,V001,goods,2026-08-19,closed,1,FUR-LKR-06,Storage locker,9403,10,Nos,7400.00,18
+PO-4317,V002,goods,2026-08-21,closed,1,PKG-SWR-23,Shrink wrap roll,3920,200,Rolls,1615.00,18
+PO-4318,V004,goods,2026-08-23,open,1,STL-FLT-40,MS flat bar 40x6 mm,7216,4480,kg,62.50,18
+PO-4319,V005,goods,2026-08-25,closed,1,ELE-DB-12,Distribution board 12-way,8537,12,Nos,6375.00,18
+PO-4320,V006,services,2026-08-27,closed,1,LOG-FRT-20,"Freight Bengaluru to Hyderabad, 20 ft",996511,25,Trips,13840.00,5
+PO-4321,V001,goods,2026-08-29,closed,1,FUR-VCH-02,Visitor chair,9401,25,Nos,3940.00,18
+PO-4322,V002,goods,2026-08-31,closed,1,PKG-TAP-48,Carton sealing tape,3919,2740,Rolls,100.00,18
+PO-4323,V004,goods,2026-09-02,closed,1,STL-FLT-40,MS flat bar 40x6 mm,7216,5408,kg,62.50,18
+PO-4324,V005,goods,2026-09-04,open,1,ELE-CU-04,Copper cable 4 sq mm,8544,1024,m,93.75,18

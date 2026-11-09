@@ -67,12 +67,27 @@ describe("Rulebook", () => {
 });
 
 describe("ConnectedData", () => {
-  it("shows the PO ledger with usage", async () => {
-    vi.mocked(client.getData).mockResolvedValue([{ po_number: "PO-4490", vendor: "Nimbus IT Services LLP",
-      po_type: "blanket", value: "660000.00", invoiced: "600000.00", remaining: "60000.00", used_pct: 90.9 }]);
+  const rows: Record<string, Record<string, unknown>[]> = {
+    po_ledger: [{ po_number: "PO-4490", vendor: "Nimbus IT Services LLP", po_type: "blanket", value: "660000.00",
+                  invoiced: "600000.00", remaining: "60000.00", used_pct: 90.9 },
+                { po_number: "PO-4518", vendor: "Deccan Steel Traders", po_type: "goods", value: "240000.00",
+                  invoiced: "0.00", remaining: "240000.00", used_pct: 0 }],
+    purchase_orders: [{ po_number: "PO-4490", line_no: 1, description: "IT support retainer", qty: "1", unit: "Lot", rate: "660000",
+                        po_date: "2026-06-01", status: "open" },
+                      { po_number: "PO-4518", line_no: 1, description: "MS angle 50x50x5 mm", qty: "4000", unit: "kg", rate: "60.00",
+                        po_date: "2026-10-08", status: "open" }],
+    goods_receipts: [{ grn_number: "GRN-7741", po_number: "PO-4518", line_no: 1, received_qty: "4000", accepted_qty: "4000",
+                       received_date: "2026-10-27" }],
+  };
+
+  it("shows each order with what was delivered and how much is billed", async () => {
+    vi.mocked(client.getData).mockImplementation((name: string) => Promise.resolve((rows[name] ?? []) as never));
     render(<ConnectedData />);
     expect(await screen.findByText("PO-4490")).toBeInTheDocument();
-    expect(screen.getByText("₹6,60,000.00")).toBeInTheDocument();
+    expect(screen.getAllByText("₹6,60,000.00").length).toBeGreaterThan(0);
     expect(screen.getByRole("img", { name: /91% used/ })).toBeInTheDocument();
+    expect(screen.getByText(/GRN-7741/)).toBeInTheDocument();
+    expect(screen.getByText("no delivery needed")).toBeInTheDocument();
+    expect(screen.getByRole("list", { name: "How buying works at Zentra" })).toBeInTheDocument();
   });
 });

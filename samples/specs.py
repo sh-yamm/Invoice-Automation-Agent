@@ -73,6 +73,7 @@ class SampleSpec:
     hidden_text: list[str] | None = None   # invisible text-layer lines (S13)
     injection: str | None = None           # visible footer note aimed at an AI (S12)
     notes: list[str] = field(default_factory=list)
+    words_below: bool = False              # print the amount in words under the totals, not beside them
 
 
 def _invoice(sup: dict, no: str, d: date, po: str | None, lines: list[tuple], *, gst: str = "18",

@@ -38,7 +38,8 @@ def test_po_lines_grouped(repo):
 
 
 def test_open_pos_for_vendor(repo):
-    assert {p.po_number for p in repo.open_pos("V001")} == {"PO-4501", "PO-4507"}
+    # PO-4306 is still open: its invoice (H-OLD-05, billed above the PO rate) is on hold in the history
+    assert {p.po_number for p in repo.open_pos("V001")} == {"PO-4501", "PO-4507", "PO-4306"}
 
 
 def test_grns(repo):

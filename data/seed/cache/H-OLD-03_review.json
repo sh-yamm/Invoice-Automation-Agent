@@ -1,0 +1,9 @@
+{
+ "data": {
+  "escalate_to": null,
+  "reason": null,
+  "cites": [],
+  "rationale": "All deterministic checks pass: GST compliance, PO matching, GRN verification, vendor validation, arithmetic accuracy, and approval limit adherence. The invoice amount of ₹250,750 is well below the ₹5,00,000 limit with no split-invoice risk. The line description 'Copper cable 4 sq mm' is sufficiently specific for an electrical procurement. No anomalous patterns or uncovered risks warrant escalation."
+ },
+ "reasoning": "The invoice has been fully validated by deterministic rules and passed all checks. The total is ₹250,750, well within the ₹5,00,000 approval limit. All GST, PO, GRN, vendor, and arithmetic checks pass. The description \"Copper cable 4 sq mm\" is specific enough for an electrical item. No suspicious patterns like round amounts near limits, urgency pressure, or vague descriptions. The rules outcome is \"approved\" and no additional risk is evident that the rules missed. Therefore, no escalation is needed."
+}
