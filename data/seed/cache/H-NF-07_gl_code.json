@@ -1,0 +1,13 @@
+{
+ "data": {
+  "options": [
+   {
+    "gl_code": "6120",
+    "cost_centre": "CC-IT-BLR",
+    "confidence": 0.99,
+    "why": "Internet leased line is a broadband/telecom service, directly matching account 6120 Telecom (Phone, broadband and leased lines) with default cost centre CC-IT-BLR."
+   }
+  ]
+ },
+ "reasoning": "The vendor is Namma Fibernet Pvt Ltd, and the line item is \"Internet leased line 100 Mbps, June 2026\". This is clearly a telecom/internet service expense. Looking at the chart of accounts, 6120 Telecom is described as \"Phone, broadband and leased lines\" with category telecom and default cost centre CC-IT-BLR. This matches perfectly.\n\nNo other accounts are relevant: 6110 Electricity, 6130 Rent, 6140 Water, 6150 Software subscriptions, 6160 Travel, 6170 Statutory fees, 6210 Office furniture, 6220 IT services (managed IT and support services, not internet connectivity), 6310 Freight inward.\n\nThus only one option is needed, but up to 3 allowed. I'll provide just the best match with high confidence."
+}

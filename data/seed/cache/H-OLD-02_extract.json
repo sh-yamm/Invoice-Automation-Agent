@@ -1,0 +1,149 @@
+{
+ "data": {
+  "fields": {
+   "doc_title": {
+    "value": "TAX INVOICE",
+    "confidence": 0.99,
+    "block": 2
+   },
+   "supplier_name": {
+    "value": "Deccan Steel Traders",
+    "confidence": 0.99,
+    "block": 1
+   },
+   "supplier_gstin": {
+    "value": "36AAHFD3381L1Z6",
+    "confidence": 0.99,
+    "block": 1
+   },
+   "supplier_phone": {
+    "value": "+91 40 2377 7781",
+    "confidence": 0.99,
+    "block": 1
+   },
+   "supplier_email": {
+    "value": "accounts@deccansteel.in",
+    "confidence": 0.99,
+    "block": 1
+   },
+   "buyer_name": {
+    "value": "Zentra Retail Pvt Ltd",
+    "confidence": 0.99,
+    "block": 5
+   },
+   "buyer_gstin": {
+    "value": "29AABCZ5821K1ZW",
+    "confidence": 0.99,
+    "block": 7
+   },
+   "invoice_no": {
+    "value": "DST/2627/0712",
+    "confidence": 0.99,
+    "block": 8
+   },
+   "invoice_date": {
+    "value": "07/08/2026",
+    "confidence": 0.99,
+    "block": 9
+   },
+   "po_ref": {
+    "value": "PO-4303",
+    "confidence": 0.99,
+    "block": 10
+   },
+   "place_of_supply_state": {
+    "value": "Karnataka (29)",
+    "confidence": 0.99,
+    "block": 11
+   },
+   "irn": {
+    "value": null,
+    "confidence": 0.95,
+    "block": null
+   },
+   "has_qr": {
+    "value": false,
+    "confidence": 0.95,
+    "block": null
+   },
+   "bank_name": {
+    "value": "Axis Bank",
+    "confidence": 0.99,
+    "block": 15
+   },
+   "bank_account": {
+    "value": "917020047781",
+    "confidence": 0.99,
+    "block": 15
+   },
+   "ifsc": {
+    "value": "UTIB0000553",
+    "confidence": 0.99,
+    "block": 15
+   },
+   "taxable_total": {
+    "value": "1,66,000.00",
+    "confidence": 0.99,
+    "block": 12
+   },
+   "cgst": {
+    "value": null,
+    "confidence": 0.95,
+    "block": null
+   },
+   "sgst": {
+    "value": null,
+    "confidence": 0.95,
+    "block": null
+   },
+   "igst": {
+    "value": "29,880.00",
+    "confidence": 0.99,
+    "block": 12
+   },
+   "round_off": {
+    "value": "0.00",
+    "confidence": 0.99,
+    "block": 12
+   },
+   "grand_total": {
+    "value": "1,95,880.00",
+    "confidence": 0.99,
+    "block": 12
+   },
+   "amount_in_words": {
+    "value": "Rupees One Lakh Ninety Five Thousand Eight Hundred Eighty Only",
+    "confidence": 0.99,
+    "block": 13
+   },
+   "period_start": {
+    "value": null,
+    "confidence": 0.95,
+    "block": null
+   },
+   "period_end": {
+    "value": null,
+    "confidence": 0.95,
+    "block": null
+   },
+   "consumer_no": {
+    "value": null,
+    "confidence": 0.95,
+    "block": null
+   }
+  },
+  "lines": [
+   {
+    "description": "MS flat bar 40x6 mm",
+    "hsn_sac": "7216",
+    "qty": "2,656",
+    "unit": "kg",
+    "rate": "62.50",
+    "taxable": "1,66,000.00",
+    "gst_rate": 18,
+    "confidence": 0.95
+   }
+  ]
+ },
+ "reasoning": "The user wants me to extract invoice data from the parsed page blocks and output JSON only. I need to carefully read each block and map to the required fields.\n\nLet me go through each block:\n\nBlock 1: Supplier info - Deccan Steel Traders, address, GSTIN, phone, email\nBlock 2: Document title - TAX INVOICE\nBlock 3: Caption - Original for recipient (not needed)\nBlock 4: \"Bill to\" label\nBlock 5: Buyer name - Zentra Retail Pvt Ltd\nBlock 6: Buyer address\nBlock 7: Buyer GSTIN - 29AABCZ5821K1ZW\nBlock 8: Invoice No. DST/2627/0712\nBlock 9: Invoice Date 07/08/2026\nBlock 10: PO Ref. PO-4303\nBlock 11: Place of Supply Karnataka (29)\nBlock 12: Table with line items and totals\nBlock 13: Amount in words\nBlock 14: Bank details header\nBlock 15: Bank details - Axis Bank A/c No.: 917020047781 IFSC: UTIB0000553\nBlock 16-18: Signatory and footer\n\nNow I need to extract fields:\n\ndoc_title: \"TAX INVOICE\" (block 2)\nsupplier_name: \"Deccan Steel Traders\" (block 1)\nsupplier_gstin: \"36AAHFD3381L1Z6\" (block 1)\nsupplier_phone: \"+91 40 2377 7781\" (block 1)\nsupplier_email: \"accounts@deccansteel.in\" (block 1)\nbuyer_name: \"Zentra Retail Pvt Ltd\" (block 5)\nbuyer_gstin: \"29AABCZ5821K1ZW\" (block 7)\ninvoice_no: \"DST/2627/0712\" (block 8)\ninvoice_date: \"07/08/2026\" (block 9)\npo_ref: \"PO-4303\" (block 10)\nplace_of_supply_state: \"Karnataka (29)\" (block 11)\nirn: not printed, null\nhas_qr: not mentioned, false\nbank_name: \"Axis Bank\" (block 15)\nbank_account: \"917020047781\" (block 15)\nifsc: \"UTIB0000553\" (block 15)\ntaxable_total: from table, \"1,66,000.00\" (block 12)\ncgst: not shown, appears to be IGST only (interstate), so cgst: 0 or null? The table shows IGST @ 18% 29,880.00. Since it's interstate (Telangana to Karnataka), IGST applies. CGST and SGST would be 0. But the instruction says copy printed figures exactly. The table doesn't show CGST or SGST lines. I should set them to null or 0? The fields are cgst, sgst, igst. Since only IGST is printed, I'll set cgst: null, sgst: null, igst: \"29,880.00\". But the instruction says \"Never compute totals or taxes; copy the printed figures exactly.\" If not printed, use null. So cgst: null, sgst: null, igst: \"29,880.00\".\nround_off: \"0.00\" (block 12)\ngrand_total: \"1,95,880.00\" (block 12, labeled Invoice Total (Rs.))\namount_in_words: \"Rupees One Lakh Ninety Five Thousand Eight Hundred Eighty Only\" (block 13)\nperiod_start: not printed, null\nperiod_end: not printed, null\nconsumer_no: not printed, null\n\nLines: from table block 12. There's one line item: MS flat bar 40x6 mm, HSN 7216, Qty 2,656 kg, Rate 62.50, Taxable 1,66,000.00. GST rate: 18% (IGST). The table shows IGST @ 18% on the total. So line should have gst_rate: 18. The line includes taxable value. The table also shows a total taxable value line and tax lines. But lines array should contain the line items. Only one product line.\n\nI need to parse the table block 12. It's a markdown-like table. The first row is header. Then data row: \"1 | MS flat bar 40x6 mm | 7216 | 2,656 | kg | 62.50 | 1,66,000.00\". Then there are summary rows. I'll extract the first data row as line item.\n\nConfidence: high for most fields, maybe 0.95. For lines, confidence 0.9.\n\nBlock numbers: assign based on block index. The blocks are numbered 1-18. I'll reference the block number where the value appears.\n\nNow produce JSON.\n\nNote: The fields require \"block\": <n or null>. I'll put the block number.\n\nFor lines, each line object includes confidence.\n\nLet's construct."
+}

@@ -1,0 +1,9 @@
+{
+ "data": {
+  "escalate_to": null,
+  "reason": null,
+  "cites": [],
+  "rationale": "All deterministic checks pass: the invoice matches the recurring contract CT-901 and PO-4490, the amount of ₹1,41,600 (including IGST) aligns with the contracted ₹1,20,000 monthly fee, the billing period (June 2026) is within contract dates and not previously billed, vendor and bank details are verified, and the total is well below the ₹5,00,000 approval limit. No additional risks such as split invoicing, duplicate submission, vague description, or urgency pressure are present."
+ },
+ "reasoning": "The invoice has been fully validated by deterministic rules and received an \"approved\" outcome. All checks pass, including contract matching, vendor validation, GST compliance, arithmetic, duplicate detection, and approval limits. The invoice is for a recurring IT support retainer (June 2026) under contract CT-901 and PO-4490, amounting to ₹1,41,600 (including IGST). The contract specifies ₹1,20,000 monthly, and the total matches with tax. The amount is well within the ₹5,00,000 approval limit. No red flags: no split billing, no duplicate, no tampering, no injection, valid GSTINs, active contract, period not previously billed, bank details match. The description \"IT support retainer, June 2026\" is specific enough for a recurring service. No pressure to pay urgently indicated. No suspicious round amount just under a limit (₹1,41,600 is not near ₹5,00,000). All risks appear covered. No need to escalate."
+}

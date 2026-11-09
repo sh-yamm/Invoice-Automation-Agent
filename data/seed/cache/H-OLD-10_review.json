@@ -1,0 +1,9 @@
+{
+ "data": {
+  "escalate_to": null,
+  "reason": null,
+  "cites": [],
+  "rationale": "All deterministic checks pass: PO match, GST compliance, vendor verification, arithmetic, and approval limit. The description 'Visitor chair' aligns with the PO line and goods receipt. No suspicious patterns such as round amounts near thresholds, urgency language, or unexplained variances exist. The rules have already covered all material risks."
+ },
+ "reasoning": "The invoice has been fully validated by deterministic rules and passed all checks. The total is ₹149,270, well within the ₹5,00,000 approval limit. All PO matching, GST compliance, vendor verification, and arithmetic checks pass. The description \"Visitor chair\" is somewhat generic but matches the PO line and GRN. No suspicious patterns like round amounts near limits, urgency pressure, or vague descriptions beyond normal procurement language. No additional risk identified that the rules missed. No escalation needed."
+}

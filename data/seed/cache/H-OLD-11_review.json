@@ -1,0 +1,11 @@
+{
+ "data": {
+  "escalate_to": null,
+  "reason": null,
+  "cites": [
+   "31d5309b"
+  ],
+  "rationale": "The only risk is the missing goods receipt for Carton sealing tape on PO-4312, which the rules already flagged with RECEIPT_MISSING. No additional red flags such as round amounts near limits, vague descriptions, or vendor anomalies are present. The on_hold outcome is appropriate pending physical verification of goods."
+ },
+ "reasoning": "The rules outcome is \"on_hold\" due to the failed finding \"grn_exists\" (RECEIPT_MISSING) - no goods receipt for Carton sealing tape on PO-4312. The invoice is for ₹107,380.00, which is within the approval limit. All other checks pass.\n\nI need to consider if there's any specific, concrete risk not already flagged by the rules that would warrant making the outcome stricter (i.e., escalating to \"needs_signoff\" or \"rejected\"). The rules already flagged the missing GRN, which is the primary risk. The invoice appears clean otherwise: valid GSTIN, matching PO, correct arithmetic, approved vendor, no duplicates, no split invoices, etc.\n\nThe description \"Carton sealing tape\" is somewhat generic but not suspiciously vague for a packaging supplier. The amount ₹107,380 is not a round number just under a limit (limit is ₹5,00,000). No urgency pressure indicated. The vendor is approved and bank details match.\n\nSince the only risk is the missing GRN, which is already captured by the failed finding, and there are no additional red flags, I should not escalate further. The outcome \"on_hold\" is appropriate pending goods receipt. I'll set escalate_to: null."
+}

@@ -1,0 +1,9 @@
+{
+ "data": {
+  "escalate_to": null,
+  "reason": null,
+  "cites": [],
+  "rationale": "All deterministic checks pass: GST compliance, PO matching, GRN verification, vendor validation, arithmetic accuracy, and approval limit adherence. The single line item 'Shrink wrap roll' is generic but matches the PO line exactly, and no suspicious patterns (round amounts near limits, urgency cues, or unexplained vagueness) are present beyond normal packaging procurement."
+ },
+ "reasoning": "The invoice has been fully validated by deterministic rules and passed all checks. The total is ₹168,740.00, well within the ₹5,00,000 approval limit. All GST, PO, GRN, vendor, and arithmetic checks pass. The description \"Shrink wrap roll\" is a bit generic but it's a single line item matching the PO, and the rules have already validated line pairing, quantities, prices, and GST rates. No suspicious patterns like round numbers near limits, urgent payment pressure, or vague descriptions beyond what's normal for packaging materials. The rules outcome is \"approved\" and I see no additional concrete risk not already covered. No escalation needed."
+}

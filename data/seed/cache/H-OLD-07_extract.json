@@ -1,0 +1,149 @@
+{
+ "data": {
+  "fields": {
+   "doc_title": {
+    "value": "TAX INVOICE",
+    "confidence": 1.0,
+    "block": 1
+   },
+   "supplier_name": {
+    "value": "Deccan Steel Traders",
+    "confidence": 1.0,
+    "block": 2
+   },
+   "supplier_gstin": {
+    "value": "36AAHFD3381L1Z6",
+    "confidence": 1.0,
+    "block": 3
+   },
+   "supplier_phone": {
+    "value": "+91 40 2377 7781",
+    "confidence": 1.0,
+    "block": 3
+   },
+   "supplier_email": {
+    "value": "accounts@deccansteel.in",
+    "confidence": 1.0,
+    "block": 3
+   },
+   "buyer_name": {
+    "value": "Zentra Retail Pvt Ltd",
+    "confidence": 1.0,
+    "block": 6
+   },
+   "buyer_gstin": {
+    "value": "29AABCZ5821K1ZW",
+    "confidence": 1.0,
+    "block": 8
+   },
+   "invoice_no": {
+    "value": "DST/2627/0717",
+    "confidence": 1.0,
+    "block": 9
+   },
+   "invoice_date": {
+    "value": "17/08/2026",
+    "confidence": 1.0,
+    "block": 10
+   },
+   "po_ref": {
+    "value": "PO-4308",
+    "confidence": 1.0,
+    "block": 11
+   },
+   "place_of_supply_state": {
+    "value": "Karnataka (29)",
+    "confidence": 1.0,
+    "block": 12
+   },
+   "irn": {
+    "value": null,
+    "confidence": 1.0,
+    "block": null
+   },
+   "has_qr": {
+    "value": false,
+    "confidence": 1.0,
+    "block": null
+   },
+   "bank_name": {
+    "value": "Axis Bank",
+    "confidence": 1.0,
+    "block": 15
+   },
+   "bank_account": {
+    "value": "917020047781",
+    "confidence": 1.0,
+    "block": 15
+   },
+   "ifsc": {
+    "value": "UTIB0000553",
+    "confidence": 1.0,
+    "block": 15
+   },
+   "taxable_total": {
+    "value": "3,45,500.00",
+    "confidence": 1.0,
+    "block": 13
+   },
+   "cgst": {
+    "value": null,
+    "confidence": 1.0,
+    "block": null
+   },
+   "sgst": {
+    "value": null,
+    "confidence": 1.0,
+    "block": null
+   },
+   "igst": {
+    "value": "62,190.00",
+    "confidence": 1.0,
+    "block": 13
+   },
+   "round_off": {
+    "value": "0.00",
+    "confidence": 1.0,
+    "block": 13
+   },
+   "grand_total": {
+    "value": "4,07,690.00",
+    "confidence": 1.0,
+    "block": 13
+   },
+   "amount_in_words": {
+    "value": "Rupees Four Lakh Seven Thousand Six Hundred Ninety Only",
+    "confidence": 1.0,
+    "block": 13
+   },
+   "period_start": {
+    "value": null,
+    "confidence": 1.0,
+    "block": null
+   },
+   "period_end": {
+    "value": null,
+    "confidence": 1.0,
+    "block": null
+   },
+   "consumer_no": {
+    "value": null,
+    "confidence": 1.0,
+    "block": null
+   }
+  },
+  "lines": [
+   {
+    "description": "MS flat bar 40x6 mm",
+    "hsn_sac": "7216",
+    "qty": "5,528",
+    "unit": "kg",
+    "rate": "62.50",
+    "taxable": "3,45,500.00",
+    "gst_rate": "18%",
+    "confidence": 1.0
+   }
+  ]
+ },
+ "reasoning": "The user wants me to extract invoice data from the parsed page blocks and output JSON only. I need to carefully read each block and extract the required fields.\n\nLet me go through the blocks:\n\nBlock 1: \"TAX INVOICE\" - this is the doc_title\nBlock 2: \"Deccan Steel Traders\" - supplier_name\nBlock 3: Address, GSTIN, State, Phone, Email - supplier details\nBlock 4: \"Original for recipient\" - not a field we need\nBlock 5: \"Bill to\" - label\nBlock 6: \"Zentra Retail Pvt Ltd\" - buyer_name\nBlock 7: Address - buyer address\nBlock 8: \"GSTIN:29AABCZ5821K1ZW\" - buyer_gstin\nBlock 9: \"Invoice No.DST/2627/0717\" - invoice_no\nBlock 10: \"Invoice Date17/08/2026\" - invoice_date (format DD/MM/YYYY)\nBlock 11: \"PO Ref.PO-4308\" - po_ref\nBlock 12: \"Place of SupplyKarnataka (29)\" - place_of_supply_state\nBlock 13: Table with line items and totals\nBlock 14: \"Bank details for payment\" - section header\nBlock 15: \"Axis Bank A/c No.: 917020047781 IFSC: UTIB0000553\" - bank details\nBlock 16: \"For Deccan Steel Traders\" - not needed\nBlock 17: \"Authorised Signatory\" - not needed\nBlock 18: \"Subject to local jurisdiction. This is a computer generated invoice.\" - not needed\n\nNow extract from block 13 (table):\n- Description: \"MS flat bar 40x6 mm\"\n- HSN/SAC: \"7216\"\n- Qty: \"5,528\" (but need to parse as number? The spec says copy printed figures exactly. Qty is printed as \"5,528\" with comma. I'll keep as string \"5,528\" or maybe as number 5528? The spec says \"copy the printed figures exactly\". For qty, it's printed with comma. I'll keep as string \"5,528\".)\n- Unit: \"kg\"\n- Rate: \"62.50\"\n- Taxable: \"3,45,500.00\"\n- GST rate: from the table, there's \"IGST @ 18%\" so gst_rate is 18% (but need to capture as printed? The field gst_rate in lines expects the rate. I'll put \"18%\".)\n- The table also shows totals: Taxable Value 3,45,500.00, IGST @ 18% 62,190.00, Round Off 0.00, Invoice Total 4,07,690.00\n- Amount in words: \"Rupees Four Lakh Seven Thousand Six Hundred Ninety Only\"\n\nAlso note: The table shows only one line item.\n\nNow fields:\n- doc_title: \"TAX INVOICE\" (block 1)\n- supplier_name: \"Deccan Steel Traders\" (block 2)\n- supplier_gstin: \"36AAHFD3381L1Z6\" (block 3)\n- supplier_phone: \"+91 40 2377 7781\" (block 3)\n- supplier_email: \"accounts@deccansteel.in\" (block 3)\n- buyer_name: \"Zentra Retail Pvt Ltd\" (block 6)\n- buyer_gstin: \"29AABCZ5821K1ZW\" (block 8)\n- invoice_no: \"DST/2627/0717\" (block 9)\n- invoice_date: \"17/08/2026\" (block 10)\n- po_ref: \"PO-4308\" (block 11)\n- place_of_supply_state: \"Karnataka (29)\" (block 12)\n- irn: not printed, null\n- has_qr: not mentioned, false? The spec says true if an e-invoice QR code is printed. Not printed, so false.\n- bank_name: \"Axis Bank\" (block 15)\n- bank_account: \"917020047781\" (block 15)\n- ifsc: \"UTIB0000553\" (block 15)\n- taxable_total: \"3,45,500.00\" (from table)\n- cgst: not applicable (IGST only), so null? The spec says cgst, sgst, igst amounts. Since it's interstate (Telangana to Karnataka), IGST applies. CGST and SGST would be 0 or null. I'll set cgst: null, sgst: null, igst: \"62,190.00\"\n- round_off: \"0.00\"\n- grand_total: \"4,07,690.00\"\n- amount_in_words: \"Rupees Four Lakh Seven Thousand Six Hundred Ninety Only\" (from table)\n- period_start: not printed, null\n- period_end: not printed, null\n- consumer_no: not printed, null\n\nConfidence: For each field, I need to assign confidence 0-1. Since the text is clear, I'll use high confidence like 0.95 or 1.0. But the spec says use low value when blurred, smudged, cut off or ambiguous. Here it's parsed text, so high confidence.\n\nBlock numbers: I'll reference the block numbers from the parsed blocks array (1-18). For fields that come from multiple blocks, I'll pick the primary block.\n\nNow lines array: one line item.\n\nLet's construct JSON.\n\nNote: The spec says \"lines\": [{\"description\": ..., \"hsn_sac\": ..., \"qty\": ..., \"unit\": ..., \"rate\": ..., \"taxable\": ..., \"gst_rate\": ..., \"confidence\": ...}]\n\nI'll include the line from block 13.\n\nAlso, the table shows \"Amount in words: Rupees Four Lakh Seven Thousand Six Hundred Ninety Only\" in the same block. That's for the whole invoice.\n\nNow produce JSON."
+}
