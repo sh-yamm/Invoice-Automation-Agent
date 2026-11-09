@@ -90,7 +90,7 @@ def einvoice_irn(ctx: CheckContext):
     if not inv.irn:
         return [ctx.fail("EINVOICE_IRN_MISSING", "No e-invoice IRN or QR code", evidence=ctx.ev("irn"),
                          data={"vendor": v.name, "tax": fmt_inr(_tax(inv))})]
-    if not _IRN.match(inv.irn.strip()):
+    if not _IRN.match("".join(inv.irn.split())):  # printed IRNs wrap across lines
         return [ctx.fail("INVALID_IRN", "IRN is not in the valid format", evidence=ctx.ev("irn"),
                          data={"irn": inv.irn})]
     return []

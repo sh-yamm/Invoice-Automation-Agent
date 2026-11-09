@@ -117,3 +117,11 @@ def test_every_check_reports_something(store):
 def test_required_checks_by_path():
     assert "rule46_fields" in framework.required_checks("standard_po")
     assert "rule46_fields" in framework.required_checks("po_less")
+
+
+def test_irn_wrapped_across_two_lines_is_valid(store):
+    """IRNs are 64 characters and usually wrap on the printed invoice; the reader returns them with a break."""
+    inv = _inter_state_v005(make_invoice("S01"))
+    inv.irn = "b2ac485dc4f9814b9592aa883689817f a117dd1c19fe6b4cd506f741fd8b9cb5"
+    findings = run_checks("validate", make_ctx(inv, store, today=TODAY))
+    assert "INVALID_IRN" not in {f.code for f in findings if f.status is Status.FAIL}

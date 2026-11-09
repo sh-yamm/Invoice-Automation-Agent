@@ -32,7 +32,7 @@ FIELDS = {
     "has_qr": "true if an e-invoice QR code is printed", "bank_name": "payee bank name",
     "bank_account": "payee bank account number", "ifsc": "payee IFSC code",
     "taxable_total": "total taxable value", "cgst": "CGST amount", "sgst": "SGST amount", "igst": "IGST amount",
-    "round_off": "round-off amount", "grand_total": "invoice total", "amount_in_words": "the amount in words, verbatim",
+    "round_off": "round-off amount", "grand_total": "the invoice total payable, including tax and round-off (labelled e.g. Invoice Total, Grand Total, Total Amount); every tax invoice prints it, often in the same block as the tax lines", "amount_in_words": "the amount in words, verbatim",
     "period_start": "billing period start date if printed", "period_end": "billing period end date if printed",
     "consumer_no": "service account / consumer number if printed",
 }
