@@ -50,6 +50,16 @@ describe("LiveCase", () => {
     expect(items.findIndex((t) => t?.includes("Readable PDF"))).toBeLessThan(items.findIndex((t) => t?.includes("Bank account differs")));
   });
 
+  it("shows the invoice image as soon as the page is rendered, not at the end of the run", async () => {
+    vi.mocked(client.getCase).mockResolvedValueOnce({ ...base, status: "running", outcome: null, pages: [] })
+      .mockResolvedValue({ ...base, status: "running", outcome: null });
+    render(<LiveCase caseId="C-1" />);
+    await waitFor(() => expect(client.streamEvents).toHaveBeenCalled());
+    expect(screen.queryByAltText("Invoice page 1")).toBeNull();
+    act(() => emit({ type: "node_finished", seq: 3, payload: { node: "render" } }));
+    expect(await screen.findByAltText("Invoice page 1")).toBeInTheDocument();
+  });
+
   it("hover highlights evidence box", async () => {
     vi.mocked(client.getCase).mockResolvedValue(base);
     render(<LiveCase caseId="C-1" />);

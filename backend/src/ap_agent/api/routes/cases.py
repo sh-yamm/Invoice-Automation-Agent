@@ -85,7 +85,7 @@ def get_page(request: Request, case_id: str, n: int):
     p = ctx_of(request).deps.files_dir / case_id / "pages" / f"page-{n}.png"
     if not p.exists():
         raise HTTPException(404, "No such page.")
-    return FileResponse(p, media_type="image/png")
+    return FileResponse(p, media_type="image/png", headers={"Cache-Control": "private, max-age=86400"})
 
 
 @router.get("/{case_id}/events")

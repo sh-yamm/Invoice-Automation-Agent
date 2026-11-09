@@ -33,6 +33,7 @@ export default function LiveCase({ caseId }: { caseId: string }) {
       (e) => {
         setEvents((prev) => (prev.some((x) => x.seq === e.seq && x.type === e.type) ? prev : [...prev, e]));
         if (e.type === "decision" || e.type === "finalised") refresh();
+        else if (e.type === "node_finished" && e.payload.node === "render") refresh(); // page image is ready
       },
       () => {
         setStreaming(false);

@@ -196,3 +196,23 @@ def test_kpis_for_last_7_days(client):
               if c["outcome"] is not None and datetime.fromisoformat(c["created_at"]) >= cutoff]
     assert week["processed"] == len(recent) < every["processed"]
     assert week["days"] == 7 and every["days"] is None
+
+
+def test_prepare_renders_pages_before_the_run(tmp_path):
+    """The invoice image must be on screen the moment a case opens, not after the run finishes."""
+    from ap_agent.api.common import case_json
+    from ap_agent.pipeline.graph import Pipeline
+    s = Settings()
+    store = Store(tmp_path / "runs.db")
+    deps = Deps(repo=Repository.load(s.erp_dir), store=store, aop_path=s.rulebook_path,
+                gateway=Gateway(s, store, CACHE, offline=True), files_dir=tmp_path / "files",
+                checkpoint_path=tmp_path / "cp.db", erp_dir=s.erp_dir)
+    Pipeline(deps).prepare("C-PREP01", REPO_ROOT / "samples" / "pdf" / "S01.pdf", sample_id="S01")
+    out = case_json(store.get_case("C-PREP01"), deps, full=True)
+    assert out["pages"] == ["/api/cases/C-PREP01/pages/1.png"]
+
+
+def test_page_images_are_cacheable(client):
+    cid = client.post("/api/cases", data={"sample_id": "S01", "pace": "fast"}).json()["case_id"]
+    r = client.get(f"/api/cases/{cid}/pages/1.png")
+    assert r.status_code == 200 and "max-age" in r.headers.get("cache-control", "")
