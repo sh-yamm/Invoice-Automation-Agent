@@ -7,6 +7,8 @@ from pathlib import Path
 
 import pypdfium2 as pdfium
 
+from ap_agent.reading._pdfium import PDFIUM_LOCK
+
 
 def _pdf_date(v: str | None) -> str | None:
     """'D:20261029120000+05'00'' → '2026-10-29'."""
@@ -26,16 +28,20 @@ def inspect_pdf(path: Path) -> dict:
     if not data.startswith(b"%PDF-"):
         info["error"] = "the file is not a PDF"
         return info
-    try:
-        doc = pdfium.PdfDocument(data)
-    except pdfium.PdfiumError as e:
-        if "password" in str(e).lower():
-            info["encrypted"] = True
-        else:
-            info["error"] = f"the PDF could not be opened ({e})"
-        return info
-    info["pages"] = len(doc)
-    meta = doc.get_metadata_dict()
+    with PDFIUM_LOCK:
+        try:
+            doc = pdfium.PdfDocument(data)
+        except pdfium.PdfiumError as e:
+            if "password" in str(e).lower():
+                info["encrypted"] = True
+            else:
+                info["error"] = f"the PDF could not be opened ({e})"
+            return info
+        try:
+            info["pages"] = len(doc)
+            meta = doc.get_metadata_dict()
+        finally:
+            doc.close()
     info.update(producer=meta.get("Producer") or None, creator=meta.get("Creator") or None,
                 created=_pdf_date(meta.get("CreationDate")), modified=_pdf_date(meta.get("ModDate")))
     if info["pages"] == 0:
