@@ -5,6 +5,7 @@ reconcile → extract → ground
 from __future__ import annotations
 
 from ap_agent.pipeline.steps._shared import *  # noqa: F401,F403  (helpers, models, checks)
+from ap_agent.reading.recover import recover_totals
 
 
 @node("reconcile", "reconcile")
@@ -42,6 +43,16 @@ def extract(state, deps):
 def ground_node(state, deps):
     aop = load_aop(deps.aop_path)
     inv, found = ground(invoice_of(state), [ParseBlock(**b) for b in state.get("parse_blocks", [])])
+    # A total or tax row the page reader dropped: take it from the PDF's own text, only if it adds up.
+    inv, recovered = recover_totals(inv, [ParseBlock(**b) for b in state.get("text_blocks", [])])
+    if recovered:
+        names = {"grand_total": "invoice total", "igst": "IGST", "cgst": "CGST", "sgst": "SGST"}
+        found.append(Finding(
+            check="recover_totals", stage="read", status=Status.WARN,
+            title="Read " + ", ".join(names[f] for f in recovered) + " from the PDF's own text",
+            detail="The page reader missed " + ", ".join(f"the {names[f]} ({fmt_inr(getattr(inv, f))})" for f in recovered)
+                   + ". The PDF's embedded text has exactly that figure, and it matches the taxable value plus tax"
+                   + (" and the amount in words." if inv.amount_in_words else ".")))
     st = {**state, "invoice": _dump(inv)}
     found += run_checks("read", make_ctx(st, deps, aop))
     _summarise(state, deps, inv)

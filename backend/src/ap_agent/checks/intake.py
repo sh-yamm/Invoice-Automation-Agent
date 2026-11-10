@@ -16,6 +16,9 @@ EDITORS = ("ilovepdf", "smallpdf", "sejda", "pdf-xchange", "phantompdf", "pdfesc
            "pdf candy", "foxit pdf editor", "adobe acrobat pro")
 INJECTION = [
     r"ignore (?:all |any )?(?:previous|prior|above) instructions",
+    r"system\s*:",                                              # "SYSTEM: ..." directives
+    r"ignore (?:all |any |the )?(?:previous |prior |above )?(?:amounts?|figures?|totals?|values?)",
+    r"set (?:the )?(?:grand[ _]?total|total|amount|tax|igst|cgst|sgst)\s*(?:=|to)\s*\d",
     r"ignore all instructions",
     r"pre-?approved",
     r"(?:note|message|instruction)s? (?:to|for) (?:the )?(?:ai|assistant|model|system|agent)",
@@ -30,6 +33,16 @@ _GSTIN = re.compile(r"\b\d{2}[A-Z]{5}\d{4}[A-Z][1-9A-Z]Z[0-9A-Z]\b")
 KEY_FIELDS = {"invoice_no": "invoice number", "invoice_date": "invoice date", "supplier_gstin": "supplier GSTIN",
               "buyer_gstin": "buyer GSTIN", "taxable_total": "taxable value", "grand_total": "invoice total",
               "po_ref": "PO number", "bank_account": "bank account", "period_start": "billing period"}
+
+
+def _invoice_amounts(inv) -> set[str]:
+    """The invoice's own figures, written the way _tokens writes amounts (no commas, two decimals)."""
+    if inv is None:
+        return set()
+    vals = [inv.taxable_total, inv.cgst, inv.sgst, inv.igst, inv.round_off, inv.grand_total]
+    for l in inv.lines:
+        vals += [l.taxable, l.rate]
+    return {f"{v:.2f}" for v in vals if v is not None}
 
 
 def _tokens(texts: list[str]) -> dict[str, set[str]]:
@@ -68,13 +81,16 @@ def encrypted(ctx: CheckContext):
 
 # ---------- reconcile ----------
 
-@check("text_layer_match", "reconcile", ALL, "Embedded text matches what the page shows")
+# Runs once the invoice is read (stage "read"), so it can tell a row the page reader dropped (a figure that is the
+# invoice's own total, tax or line amount) from a figure planted in hidden text (anything the invoice can't explain).
+@check("text_layer_match", "read", ALL, "Embedded text matches what the page shows")
 def text_layer_match(ctx: CheckContext):
     layer = ctx.scratch.get("text_blocks") or []
     if not layer:
         return [ctx.ok("No embedded text (scanned copy); nothing to compare")]
     seen = _tokens([b.text for b in ctx.scratch.get("parse_blocks") or []])
     hidden = _tokens([b.text for b in layer])
+    seen["amount"] |= _invoice_amounts(ctx.invoice)
     extra = {k: sorted(hidden[k] - seen[k]) for k in hidden if hidden[k] - seen[k]}
     if extra:
         figures = [_indian(a) for a in extra.get("amount", [])] + extra.get("account", []) + extra.get("gstin", [])

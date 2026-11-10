@@ -152,12 +152,8 @@ def _story(spec: SampleSpec):
     totals.setStyle(TableStyle([("LINEABOVE", (0, -1), (-1, -1), 1, t["accent"]),
                                 ("BOX", (0, 0), (-1, -1), 0.6, colors.grey) if t["grid"] else ("TOPPADDING", (0, 0), (0, 0), 1)]))
     words = Paragraph(f"<b>Amount in words:</b> {inv.amount_in_words}", st["body"])
-    if spec.words_below:
-        totals.hAlign = "RIGHT"
-        story += [totals, Spacer(1, 6), words, Spacer(1, 10)]
-    else:
-        story += [Table([[words, totals]], colWidths=[102 * mm, 80 * mm],
-                        style=TableStyle([("VALIGN", (0, 0), (-1, -1), "TOP")])), Spacer(1, 10)]
+    story += [Table([[words, totals]], colWidths=[102 * mm, 80 * mm],
+                    style=TableStyle([("VALIGN", (0, 0), (-1, -1), "TOP")])), Spacer(1, 10)]
 
     bank = [Paragraph("<b>Bank details for payment</b>", st["body"]),
             Paragraph(f"{inv.bank_name} &nbsp; A/c No.: <b>{inv.bank_account}</b> &nbsp; IFSC: <b>{inv.ifsc}</b>", st["body"])]

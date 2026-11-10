@@ -58,77 +58,77 @@
    },
    "irn": {
     "value": null,
-    "confidence": 0.0,
+    "confidence": 1.0,
     "block": null
    },
    "has_qr": {
     "value": false,
-    "confidence": 0.0,
+    "confidence": 1.0,
     "block": null
    },
    "bank_name": {
     "value": "ICICI Bank",
     "confidence": 1.0,
-    "block": 19
+    "block": 18
    },
    "bank_account": {
     "value": "001205019023",
     "confidence": 1.0,
-    "block": 19
+    "block": 18
    },
    "ifsc": {
     "value": "ICIC0000012",
     "confidence": 1.0,
-    "block": 19
+    "block": 18
    },
    "taxable_total": {
-    "value": "91,000.00",
+    "value": 91000.0,
     "confidence": 1.0,
     "block": 16
    },
    "cgst": {
-    "value": "8,190.00",
+    "value": 8190.0,
     "confidence": 1.0,
     "block": 16
    },
    "sgst": {
-    "value": "8,190.00",
+    "value": 8190.0,
     "confidence": 1.0,
     "block": 16
    },
    "igst": {
     "value": null,
-    "confidence": 0.0,
+    "confidence": 1.0,
     "block": null
    },
    "round_off": {
-    "value": "0.00",
+    "value": 0.0,
     "confidence": 1.0,
     "block": 16
    },
    "grand_total": {
-    "value": "1,07,380.00",
-    "confidence": 1.0,
-    "block": 16
+    "value": null,
+    "confidence": 0.0,
+    "block": null
    },
    "amount_in_words": {
     "value": "Rupees One Lakh Seven Thousand Three Hundred Eighty Only",
     "confidence": 1.0,
-    "block": 17
+    "block": 16
    },
    "period_start": {
     "value": null,
-    "confidence": 0.0,
+    "confidence": 1.0,
     "block": null
    },
    "period_end": {
     "value": null,
-    "confidence": 0.0,
+    "confidence": 1.0,
     "block": null
    },
    "consumer_no": {
     "value": null,
-    "confidence": 0.0,
+    "confidence": 1.0,
     "block": null
    }
   },
@@ -136,14 +136,14 @@
    {
     "description": "Carton sealing tape",
     "hsn_sac": "3919",
-    "qty": "910",
+    "qty": 910,
     "unit": "Rolls",
-    "rate": "100.00",
-    "taxable": "91,000.00",
+    "rate": 100.0,
+    "taxable": 91000.0,
     "gst_rate": 18,
     "confidence": 0.95
    }
   ]
  },
- "reasoning": "The user wants me to extract invoice data from the parsed page blocks and return JSON only. Let me analyze the blocks and extract the required fields.\n\nFrom the blocks:\n- Block 1: Supplier name \"Kaveri Packaging Industries\"\n- Block 2: Supplier address, GSTIN, phone, email\n- Block 3: \"Original for recipient\" - not a field we need\n- Block 4: \"Invoice No.\" label\n- Block 5: \"Invoice Date\" label\n- Block 6: \"PO Ref.\" label\n- Block 7: \"Place of Supply\" label\n- Block 8: \"TAX INVOICE\" - doc_title\n- Block 9: \"KPI/26-27/1021\" - invoice_no\n- Block 10: \"25/08/2026\" - invoice_date\n- Block 11: \"PO-4312\" - po_ref\n- Block 12: \"Karnataka (29)\" - place_of_supply_state\n- Block 13: \"Bill to\" section header\n- Block 14: \"Zentra Retail Pvt Ltd\" - buyer_name\n- Block 15: Buyer address and GSTIN\n- Block 16: Table with line items and totals\n- Block 17: Amount in words\n- Block 18: \"Bank details for payment\" section header\n- Block 19: Bank details\n- Block 20: \"For Kaveri Packaging Industries\"\n- Block 21: \"Authorised Signatory\"\n- Block 22: Footer text\n\nNow extract fields:\n\ndoc_title: \"TAX INVOICE\" (block 8)\nsupplier_name: \"Kaveri Packaging Industries\" (block 1)\nsupplier_gstin: \"29AADFK9013C1ZK\" (block 2)\nsupplier_phone: \"+91 821 240 9023\" (block 2)\nsupplier_email: \"billing@kaveripack.in\" (block 2)\nbuyer_name: \"Zentra Retail Pvt Ltd\" (block 14)\nbuyer_gstin: \"29AABCZ5821K1ZW\" (block 15)\ninvoice_no: \"KPI/26-27/1021\" (block 9)\ninvoice_date: \"25/08/2026\" (block 10)\npo_ref: \"PO-4312\" (block 11)\nplace_of_supply_state: \"Karnataka (29)\" (block 12)\nirn: not printed, null\nhas_qr: not mentioned, false\nbank_name: \"ICICI Bank\" (block 19)\nbank_account: \"001205019023\" (block 19)\nifsc: \"ICIC0000012\" (block 19)\ntaxable_total: \"91,000.00\" (from table block 16)\ncgst: \"8,190.00\" (block 16)\nsgst: \"8,190.00\" (block 16)\nigst: not printed, null (since CGST/SGST are present, it's intra-state)\nround_off: \"0.00\" (block 16)\ngrand_total: \"1,07,380.00\" (block 16, labeled \"Invoice Total (Rs.)\")\namount_in_words: \"Rupees One Lakh Seven Thousand Three Hundred Eighty Only\" (block 17)\nperiod_start: not printed, null\nperiod_end: not printed, null\nconsumer_no: not printed, null\n\nLines: From table block 16, there's one line item:\nDescription: \"Carton sealing tape\"\nHSN/SAC: \"3919\"\nQty: \"910\"\nUnit: \"Rolls\"\nRate: \"100.00\"\nTaxable: \"91,000.00\"\nGST rate: 18% (9% CGST + 9% SGST) but the field is gst_rate, probably the total GST rate. Since CGST 9% and SGST 9%, total 18%. But the table doesn't explicitly show GST rate column. However, we can infer from CGST @ 9% and SGST @ 9%. The field gst_rate expects a number. I'll put 18.\n\nConfidence: For most fields, high confidence (0.95-1.0). For lines, confidence 0.95.\n\nNow produce JSON. Ensure all fields present, use null where not printed.\n\nNote: The spec says \"gst_rate\" for lines. I'll include 18.\n\nAlso, the table shows taxable value 91,000.00, CGST 8,190.00, SGST 8,190.00, round off 0.00, invoice total 1,07,380.00.\n\nAll good.\n\nNow write JSON."
+ "reasoning": "The user wants me to extract invoice data from the parsed page blocks and return JSON only. Let me analyze the blocks carefully.\n\nFirst, identify the document title: Block 8 says \"TAX INVOICE\" - that's the doc_title.\n\nSupplier info: Block 1 is \"Kaveri Packaging Industries\" - supplier_name. Block 2 has address, GSTIN: 29AADFK9013C1ZK, State: Karnataka (29), Phone: +91 821 240 9023, Email: billing@kaveripack.in. So supplier_gstin, supplier_phone, supplier_email.\n\nBuyer info: Block 13 \"Bill to\", Block 14 \"Zentra Retail Pvt Ltd\" - buyer_name. Block 15 has address and GSTIN: 29AABCZ5821K1ZW - buyer_gstin.\n\nInvoice details: Block 4 \"Invoice No.\", Block 9 \"KPI/26-27/1021\" - invoice_no. Block 5 \"Invoice Date\", Block 10 \"25/08/2026\" - invoice_date. Block 6 \"PO Ref.\", Block 11 \"PO-4312\" - po_ref. Block 7 \"Place of Supply\", Block 12 \"Karnataka (29)\" - place_of_supply_state.\n\nIRN and QR: Not mentioned in blocks, so null and false.\n\nBank details: Block 17 \"Bank details for payment\", Block 18 \"ICICI Bank A/c No.: 001205019023 IFSC: ICIC0000012\". So bank_name \"ICICI Bank\", bank_account \"001205019023\", ifsc \"ICIC0000012\".\n\nLine items: Block 16 is a table. It shows:\nDescription: Carton sealing tape\nHSN/SAC: 3919\nQty: 910\nUnit: Rolls\nRate (Rs.): 100.00\nTaxable Value (Rs.): 91,000.00\n\nThen tax lines:\nTaxable Value: 91,000.00\nCGST @ 9%: 8,190.00\nSGST @ 9%: 8,190.00\nRound Off: 0.00\n\nAmount in words: \"Rupees One Lakh Seven Thousand Three Hundred Eighty Only\" - that's amount_in_words.\n\nGrand total: Not explicitly shown but can be computed: taxable 91,000 + CGST 8,190 + SGST 8,190 + round off 0 = 107,380. But the rule says never compute totals; copy printed figures exactly. However, the grand_total field expects the invoice total payable including tax and round-off. The amount in words says \"Rupees One Lakh Seven Thousand Three Hundred Eighty Only\" which is 107,380. But is there a printed grand total? The table shows tax lines but not a final total line. The amount in words is printed. The grand_total might be inferred from amount in words, but we should not compute. However, the field \"grand_total\" is required. The instruction: \"grand_total: the invoice total payable, including tax and round-off (labelled e.g. Invoice Total, Grand Total, Total Amount); every tax invoice prints it, often in the same block as the tax lines\". In this block, there is no explicit \"Grand Total\" line. But the amount in words is given. Perhaps the grand_total is 107380.00? But we must copy printed figures exactly. The printed figure for total might be the amount in words. However, the amount in words is a separate field. The grand_total might be null if not printed. But the instruction says every tax invoice prints it. Let's examine block 16 again: It shows lines for Taxable Value, CGST, SGST, Round Off. No total line. However, the amount in words is printed right after the first line? Actually block 16 includes \"Amount in words: Rupees One Lakh Seven Thousand Three Hundred Eighty Only\". That is printed. The grand total might be that amount. But we need to output a numeric value for grand_total. The rule: \"Never compute totals or taxes; copy the printed figures exactly.\" So if there's no printed numeric grand total, we should set null? But the schema expects a value. The example might have grand_total as a number. I'll check the amount in words: \"One Lakh Seven Thousand Three Hundred Eighty\" = 107,380. That matches 91,000 + 8,190 + 8,190 = 107,380. Since it's printed in words, we could use that as the grand total? But the field \"grand_total\" is separate from \"amount_in_words\". The instruction: \"grand_total: the invoice total payable, including tax and round-off (labelled e.g. Invoice Total, Grand Total, Total Amount); every tax invoice prints it, often in the same block as the tax lines\". In this case, it's not explicitly labelled. However, the amount in words is printed. I think we should set grand_total to 107380.00? But we must not compute. The amount in words is printed, but it's words. The numeric equivalent is not printed. However, the tax lines are printed, and the round off. The total is not printed as a number. But the instruction says \"every tax invoice prints it\". Maybe it's printed elsewhere? Not in the blocks. Block 16 ends with Round Off. No total line. Perhaps the grand total is the amount in words converted? But we must not compute. I'll set grand_total to null? But the schema might expect a number. The instruction says \"copy the printed figures exactly\". If not printed, use null. So I'll set grand_total to null. However, the amount in words is printed, so we have that.\n\nTaxable total: The table shows \"Taxable Value\" 91,000.00. That's taxable_total.\n\nCGST: 8,190.00\nSGST: 8,190.00\nIGST: not present, so null.\nRound off: 0.00\n\nPeriod start/end: not printed, null.\nConsumer no: not printed, null.\n\nIRN: not printed, null.\nHas QR: not mentioned, false.\n\nNow, lines array: each line item. There's only one product line. The tax lines are not line items; they are summary. The lines array should contain the description line. The schema for lines: description, hsn_sac, qty, unit, rate, taxable, gst_rate, confidence. The gst_rate is the GST rate for that line. The line has CGST 9% and SGST 9%, so total GST 18%. But the line might have a GST rate of 18%? The table doesn't show GST rate per line. The tax lines show CGST @ 9% and SGST @ 9%. So the line's GST rate is 18% (9+9). But we should capture the rate as printed? The line doesn't have a GST rate column. The tax lines are separate. The instruction: \"lines\": [{\"description\": ..., \"hsn_sac\": ..., \"qty\": ..., \"unit\": ..., \"rate\": ..., \"taxable\": ..., \"gst_rate\": ..., \"confidence\": ...}]. The gst_rate likely is the GST rate applicable to that line. Since the tax lines show CGST @ 9% and SGST @ 9%, the effective rate is 18%. But we need to see if the line includes GST rate. Not in the table. However, the tax lines are part of the same block. The block 16 includes the tax lines. The line item is the first row. The tax lines are separate rows in the same table. The schema expects lines for each product line, not tax lines. So we'll create one line for the product. The gst_rate could be 18 (or 9+9). But we need to decide. The instruction says \"gst_rate\": ... Probably the GST rate as a percentage. Since it's intra-state (Karnataka to Karnataka), CGST+SGST = 18%. The tax lines show CGST @ 9% and SGST @ 9%. So we can set gst_rate: 18. But is that printed? Not explicitly. However, the tax lines are printed. We could infer from the tax lines. But the rule: never compute. However, the tax lines are printed with rates. The line item itself doesn't have a GST rate column. The gst_rate field might be optional? The schema includes it. I'll set gst_rate to 18, but confidence lower because not directly on the line. Alternatively, we could set gst_rate to null. But the schema expects a value. I'll set to 18 with confidence 0.8.\n\nNow, confidence values: For each field, assign confidence based on clarity. The text seems clear. Most fields are directly from blocks. I'll assign high confidence (0.95-1.0) for clear printed text. For grand_total, since not printed numeric, confidence 0.\n\nBlock numbers: Need to reference block numbers for each field. The blocks are numbered 1-21. For each field, indicate which block the value came from.\n\nLet's map:\n\ndoc_title: block 8\nsupplier_name: block 1\nsupplier_gstin: block 2\nsupplier_phone: block 2\nsupplier_email: block 2\nbuyer_name: block 14\nbuyer_gstin: block 15\ninvoice_no: block 9\ninvoice_date: block 10\npo_ref: block 11\nplace_of_supply_state: block 12\nirn: null, block null\nhas_qr: false, block null\nbank_name: block 18 (ICICI Bank)\nbank_account: block 18\nifsc: block 18\ntaxable_total: block 16 (Taxable Value 91,000.00)\ncgst: block 16 (CGST @ 9% 8,190.00)\nsgst: block 16 (SGST @ 9% 8,190.00)\nigst: null\nround_off: block 16 (Round Off 0.00)\ngrand_total: null (not printed numeric)\namount_in_words: block 16\nperiod_start: null\nperiod_end: null\nconsumer_no: null\n\nLines: one line from block 16 first row.\n\nNow, need to parse the table row: The table shows columns: Description, HSN/SAC, Qty, Unit, Rate (Rs.), Taxable Value (Rs.). The row: \"1 | Carton sealing tape | 3919 | 910 | Rolls | 100.00 | 91,000.00\". So description: \"Carton sealing tape\", hsn_sac: \"3919\", qty: 910, unit: \"Rolls\", rate: 100.00, taxable: 91000.00. gst_rate: 18 (since CGST 9% + SGST 9%). Confidence: 0.95.\n\nNow, produce JSON.\n\nNote: The JSON must have fields object with each field having value, confidence, block. For lines, array of objects with description, hsn_sac, qty, unit, rate, taxable, gst_rate, confidence.\n\nAll values: numbers should be numbers (not strings) for numeric fields? The schema doesn't specify but likely numbers. The example shows numbers. I'll output numbers for numeric fields (taxable_total, cgst, sgst, igst, round_off, grand_total). For grand_total, null. For amount_in_words, string. For invoice_date, string as printed \"25/08/2026\". For phone, string. For GSTIN, string.\n\nNow, write JSON.\n\nLet's construct."
 }

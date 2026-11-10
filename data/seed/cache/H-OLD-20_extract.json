@@ -68,18 +68,18 @@
    },
    "bank_name": {
     "value": "ICICI Bank",
-    "confidence": 0.95,
-    "block": 15
+    "confidence": 1.0,
+    "block": 14
    },
    "bank_account": {
     "value": "000405112290",
-    "confidence": 0.95,
-    "block": 15
+    "confidence": 1.0,
+    "block": 14
    },
    "ifsc": {
     "value": "ICIC0000004",
-    "confidence": 0.95,
-    "block": 15
+    "confidence": 1.0,
+    "block": 14
    },
    "taxable_total": {
     "value": "98,500.00",
@@ -97,9 +97,9 @@
     "block": 12
    },
    "igst": {
-    "value": null,
+    "value": "0.00",
     "confidence": 1.0,
-    "block": null
+    "block": 12
    },
    "round_off": {
     "value": "0.00",
@@ -107,14 +107,14 @@
     "block": 12
    },
    "grand_total": {
-    "value": "1,16,230.00",
+    "value": "116,230.00",
     "confidence": 1.0,
     "block": 12
    },
    "amount_in_words": {
     "value": "Rupees One Lakh Sixteen Thousand Two Hundred Thirty Only",
     "confidence": 1.0,
-    "block": 13
+    "block": 12
    },
    "period_start": {
     "value": null,
@@ -140,10 +140,10 @@
     "unit": "Nos",
     "rate": "3,940.00",
     "taxable": "98,500.00",
-    "gst_rate": 18,
-    "confidence": 0.95
+    "gst_rate": "18",
+    "confidence": 1.0
    }
   ]
  },
- "reasoning": "The user wants me to extract invoice data from the parsed page blocks and return JSON only. I need to carefully read each block and extract the required fields.\n\nLet me go through the blocks:\n\nBlock 1: \"Shree Ganesh Office Furniture\" - This is the supplier name.\nBlock 2: Contains address, GSTIN, phone, email for supplier.\nBlock 3: \"TAX INVOICE\" - doc_title.\nBlock 4: \"Original for recipient\" - not a field we need.\nBlock 5: \"Invoice No. SGOF/26-27/0330\" - invoice_no.\nBlock 6: \"Invoice Date 12/09/2026\" - invoice_date.\nBlock 7: \"PO Ref. PO-4321\" - po_ref.\nBlock 8: \"Place of Supply Karnataka (29)\" - place_of_supply_state.\nBlock 9: \"Bill to\" - section header.\nBlock 10: \"Zentra Retail Pvt Ltd\" - buyer_name.\nBlock 11: Address and GSTIN for buyer.\nBlock 12: Table with line items and tax summary.\nBlock 13: Amount in words.\nBlock 14: \"Bank details for payment\" - section header.\nBlock 15: Bank details.\nBlock 16: \"For Shree Ganesh Office Furniture\" - not needed.\nBlock 17: \"Authorised Signatory\" - not needed.\nBlock 18: Disclaimer.\n\nNow extract fields:\n\n- doc_title: \"TAX INVOICE\" (block 3)\n- supplier_name: \"Shree Ganesh Office Furniture\" (block 1)\n- supplier_gstin: \"29AAKFS4417M1ZM\" (block 2)\n- supplier_phone: \"+91 80 4110 2290\" (block 2)\n- supplier_email: \"accounts@shreeganeshfurniture.in\" (block 2)\n- buyer_name: \"Zentra Retail Pvt Ltd\" (block 10)\n- buyer_gstin: \"29AABCZ5821K1ZW\" (block 11)\n- invoice_no: \"SGOF/26-27/0330\" (block 5)\n- invoice_date: \"12/09/2026\" (block 6)\n- po_ref: \"PO-4321\" (block 7)\n- place_of_supply_state: \"Karnataka (29)\" (block 8)\n- irn: not printed, null\n- has_qr: not mentioned, false? The document doesn't mention QR code. I'll set false.\n- bank_name: \"ICICI Bank\" (block 15)\n- bank_account: \"000405112290\" (block 15)\n- ifsc: \"ICIC0000004\" (block 15)\n- taxable_total: from table, \"98,500.00\" (block 12)\n- cgst: \"8,865.00\" (block 12)\n- sgst: \"8,865.00\" (block 12)\n- igst: not printed, null (since CGST and SGST are present, it's intra-state)\n- round_off: \"0.00\" (block 12)\n- grand_total: \"1,16,230.00\" (block 12)\n- amount_in_words: \"Rupees One Lakh Sixteen Thousand Two Hundred Thirty Only\" (block 13)\n- period_start: not printed, null\n- period_end: not printed, null\n- consumer_no: not printed, null\n\nNow lines: The table has one line item: Visitor chair, HSN 9401, Qty 25, Unit Nos, Rate 3,940.00, Taxable 98,500.00, GST rate? The tax is CGST 9% and SGST 9%, so total GST rate 18%. But the field gst_rate likely expects the rate applied (maybe 18). However the table shows CGST @ 9% and SGST @ 9%. The line item doesn't show GST rate per line. Usually the GST rate is 18% (9+9). I'll set gst_rate as 18. But need to see if the table includes GST rate column. The table header: Description, HSN/SAC, Qty, Unit, Rate (Rs.), Taxable Value (Rs.). No GST rate column. The tax summary shows CGST @ 9% and SGST @ 9%. So for the line, the GST rate is 18%. I'll include gst_rate: 18.\n\nConfidence: For most fields, high confidence (0.95-1.0). For bank details, maybe 0.95. For lines, confidence 0.95.\n\nBlock numbers: I'll assign block numbers as per the parsed blocks.\n\nNow produce JSON.\n\nNote: The user wants JSON only, no extra text.\n\nLet's construct."
+ "reasoning": "The user wants me to extract invoice data from the parsed page blocks and return JSON only. Let me analyze the blocks carefully.\n\nFrom the blocks:\n- Block 1: Supplier name \"Shree Ganesh Office Furniture\"\n- Block 2: Supplier address, GSTIN, phone, email\n- Block 3: Document title \"TAX INVOICE\"\n- Block 4: \"Original for recipient\"\n- Block 5: Invoice No. \"SGOF/26-27/0330\"\n- Block 6: Invoice Date \"12/09/2026\"\n- Block 7: PO Ref. \"PO-4321\"\n- Block 8: Place of Supply \"Karnataka (29)\"\n- Block 9: Section header \"Bill to\"\n- Block 10: Buyer name \"Zentra Retail Pvt Ltd\"\n- Block 11: Buyer address and GSTIN\n- Block 12: Table with line items and tax summary\n- Block 13: Section header \"Bank details for payment\"\n- Block 14: Bank details\n- Block 15: \"For Shree Ganesh Office Furniture\"\n- Block 16: \"Authorised Signatory\"\n- Block 17: Footer\n\nNow I need to extract all fields. Let me parse the table in block 12 carefully.\n\nThe table shows:\n| Description | HSN/SAC | Qty | Unit | Rate (Rs.) | Taxable Value (Rs.)\n1 | Visitor chair | 9401 | 25 | Nos | 3,940.00 | 98,500.00\n\nThen tax summary:\nTaxable Value: 98,500.00\nCGST @ 9%: 8,865.00\nSGST @ 9%: 8,865.00\nRound Off: 0.00\n\nAmount in words: \"Rupees One Lakh Sixteen Thousand Two Hundred Thirty Only\"\n\nGrand total would be: 98,500 + 8,865 + 8,865 + 0 = 116,230.00 which matches \"One Lakh Sixteen Thousand Two Hundred Thirty\"\n\nNow I need to check for IRN and QR code - not mentioned in blocks, so null/false.\n\nPeriod start/end, consumer_no - not mentioned.\n\nBank details: ICICI Bank, A/c No.: 000405112290, IFSC: ICIC0000004\n\nNow I'll construct the JSON. Confidence values: most are clear text, so high confidence (0.95-1.0). The table parsing is clear.\n\nFor lines array: one line item with description, hsn_sac, qty, unit, rate, taxable, gst_rate (18% total, but CGST 9% + SGST 9%). The gst_rate field likely expects the total GST rate (18) or the breakdown? The schema says \"gst_rate\": ... probably the rate percentage. Since it's CGST 9% + SGST 9%, total 18%. I'll put 18.\n\nNow produce JSON."
 }

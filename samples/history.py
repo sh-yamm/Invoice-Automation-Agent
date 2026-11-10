@@ -99,9 +99,6 @@ def _created(cid: str) -> datetime:
     return datetime.fromisoformat(_OLD[cid]["created_at"])
 
 
-WORDS_BELOW = {"H-OLD-20", "H-OLD-02", "H-OLD-08", "H-OLD-17", "H-OLD-11"}
-
-
 def build() -> tuple[list[HistoryCase], list[PoLine], list[Grn]]:
     cases: list[HistoryCase] = []
     pos: list[PoLine] = []
@@ -193,16 +190,6 @@ def build() -> tuple[list[HistoryCase], list[PoLine], list[Grn]]:
         cases.append(HistoryCase(cid, _created(cid), SampleSpec(cid, "", "", layout, sup, inv, outcome, primary),
                                  "closed" if settled else "open"))
 
-    # These pages print a long amount in words beside the totals; the page parser then drops the last totals row
-    # ("Invoice Total"), and the agent rightly refuses an invoice whose total it cannot see. Their printed layout
-    # puts the words under the totals instead, as many real invoices do.
-    for c in cases:
-        if c.case_id in WORDS_BELOW:
-            c.spec.words_below = True
-        if c.case_id == "H-OLD-02":  # the compact layout's IGST totals also trip the parser
-            c.spec.layout = "modern"
-        if c.case_id == "H-OLD-08":
-            c.spec.layout, c.spec.words_below = "classic", False
     cases.sort(key=lambda c: c.created_at)
     return cases, pos, grns
 
