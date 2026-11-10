@@ -23,7 +23,7 @@ def _tax(inv) -> Decimal:
 
 
 # The buyer check runs first: if the reader swapped the two GSTINs, fix that before anything else uses them.
-@check("buyer_gstin", STAGE, {"all"}, "Billed to Zentra Retail's GSTIN")
+@check("buyer_gstin", STAGE, {"all"}, "Billed to Sample Client's GSTIN")
 def buyer_gstin(ctx: CheckContext):
     inv = ctx.invoice
     if inv.supplier_gstin == BUYER_GSTIN and inv.buyer_gstin and inv.buyer_gstin != BUYER_GSTIN:

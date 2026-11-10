@@ -1,5 +1,5 @@
 """The four views: the invoice list and dashboard (with each invoice's live run view), the rulebook, and
-Zentra's records. All data comes from the agent's own API, called in-process (ui/engine.py)."""
+Sample Client's records. All data comes from the agent's own API, called in-process (ui/engine.py)."""
 from __future__ import annotations
 
 import io
@@ -13,7 +13,7 @@ from ui import engine
 from ui.parts import (OUTCOME, TXN, ago, check_log, chip, day, hero, inr, lakh, match_table, num, paper_trail,
                       stage_tiles)
 
-FOOT = '<div class="foot">Zamp Invoice Agent · accounts payable for Zentra Retail · every decision traced to a rule</div>'
+FOOT = '<div class="foot">Zamp Invoice Agent · accounts payable for Sample Client · every decision traced to a rule</div>'
 
 
 def html(s: str) -> None:
@@ -110,8 +110,8 @@ def invoice_table(cases: list[dict]) -> str:
 
 
 def dashboard():
-    html(hero("Zentra Retail · vendor invoices", "Accounts payable",
-              "The agent checks every vendor invoice against Zentra's purchase orders, deliveries and rulebook. "
+    html(hero("Sample Client · vendor invoices", "Accounts payable",
+              "The agent checks every vendor invoice against Sample Client's purchase orders, deliveries and rulebook. "
               "It pays what matches and hands people only the exceptions, each with the reason and the evidence."))
     if st.button("Process an invoice", type="primary", icon=":material/play_arrow:"):
         process_dialog()
@@ -404,11 +404,11 @@ def rules_page():
 
 def records_page():
     html(hero("What every invoice is checked against", "Company records",
-              "Zentra's own records. The agent only reads them; the one thing it updates is how much of each order "
+              "Sample Client's own records. The agent only reads them; the one thing it updates is how much of each order "
               "has been billed, and only when an invoice is approved."))
     html('<ol class="howbuy">' + "".join(
         f'<li><span class="n">{i:02d}</span><b>{t}</b><span>{d}</span></li>' for i, (t, d) in enumerate([
-            ("Zentra issues a purchase order", "What it wants, how many, at what price."),
+            ("Sample Client issues a purchase order", "What it wants, how many, at what price."),
             ("The vendor delivers", "The warehouse records a goods receipt for what arrived."),
             ("The vendor sends an invoice", "The agent matches it to the order and the receipt."),
             ("Approved invoices are paid", "The order's balance goes down by the amount billed.")], start=1)) + "</ol>")
@@ -416,7 +416,7 @@ def records_page():
             ("po_ledger", "purchase_orders", "goods_receipts", "vendors", "contracts", "chart_of_accounts")}
     t1, t2, t3, t4 = st.tabs(["Orders and deliveries", "Vendors", "Contracts", "Expense accounts"])
     with t1:
-        st.caption("Every purchase order Zentra has issued, what has arrived against it, and how much has been billed.")
+        st.caption("Every purchase order Sample Client has issued, what has arrived against it, and how much has been billed.")
         cards = []
         for b in data["po_ledger"]:
             lines = [l for l in data["purchase_orders"] if l["po_number"] == b["po_number"]]
@@ -439,7 +439,7 @@ def records_page():
                          f'Billed <b>{inr(b.get("invoiced"), 0)}</b> of <b>{inr(b.get("value"))}</b>, {inr(b.get("remaining"), 0)} left ({round(used)}% used)</footer></article>')
         html(f'<div class="orders">{"".join(cards)}</div>')
     with t2:
-        st.caption("Who Zentra buys from. The agent checks each invoice's GSTIN and bank account against this list.")
+        st.caption("Who Sample Client buys from. The agent checks each invoice's GSTIN and bank account against this list.")
         html('<table class="tbl"><tr><th>Vendor</th><th>GSTIN</th><th>Buys</th><th>Bank account on file</th><th>Pays in</th><th>E-invoice</th><th>Status</th></tr>' + "".join(
             f'<tr><td><b>{h(v["name"])}</b><div class="sub">{h(v["address"])}</div></td><td class="mono">{h(v["gstin"])}</td>'
             f'<td>{h(str(v["category"]).replace("_", " "))}</td><td>{h(v["bank_name"])} <span class="mono">····{h(str(v["bank_account"])[-4:])}</span></td>'

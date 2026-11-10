@@ -3,7 +3,7 @@
     py -3.11 scripts/build_history.py            # live models the first time; replays data/seed/cache after
     py -3.11 scripts/build_history.py --fresh H-OLD-05   # drop one case's recorded replies first
 
-It writes Zentra's records for those invoices into data/erp (their POs and goods receipts), prints each PDF,
+It writes Sample Client's records for those invoices into data/erp (their POs and goods receipts), prints each PDF,
 runs every invoice in date order (one vendor at a time, vendors in parallel), and saves:
     data/seed/history.db      cases, findings, events, model calls, ledgers
     data/seed/checkpoints.db  paused runs, so a person can still act on the held ones
@@ -57,7 +57,7 @@ def _write(path: Path, cols: list[str], rows: list[dict]) -> None:
 
 
 def write_erp(erp_dir: Path, *, open_all: bool) -> None:
-    """Zentra's records plus the history POs and receipts. During the build every history PO is open (as it was
+    """Sample Client's records plus the history POs and receipts. During the build every history PO is open (as it was
     when its invoice arrived); in the saved records a settled PO is closed."""
     settled = {c.spec.invoice.po_ref: c.po_status_after for c in HISTORY if c.case_id.startswith("H-OLD")}
     ours = {p.po_number for p in HISTORY_POS}

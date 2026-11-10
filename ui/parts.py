@@ -117,7 +117,7 @@ def stage_tiles(events: list[dict], findings: list[dict], txn_type, running: boo
 
 # ---------- paper trail ----------
 
-LANES = [("Zentra Retail", "the buyer", {"contract", "po", "grn"}), ("Vendor", "the seller", {"earlier", "invoice"}),
+LANES = [("Sample Client", "the buyer", {"contract", "po", "grn"}), ("Vendor", "the seller", {"earlier", "invoice"}),
          ("Agent and people", "accounts payable", {"check", "decision", "person"})]
 ICON = {"contract": "✍", "po": "▤", "grn": "⬇", "earlier": "↺", "invoice": "₹", "check": "✓", "decision": "⚖", "person": "◉"}
 
@@ -145,7 +145,7 @@ def paper_trail(trail: dict) -> str:
                          f'<span class="ic">{ICON[s["kind"]]}</span><div><div class="st">{title}</div>'
                          f'<div class="sd">{h(s.get("detail") or "")}</div></div></div>')
     return (f'<section class="trail" aria-label="Paper trail"><div class="h3">How this invoice got here</div>'
-            f'<div class="note">Every document in the chain, in date order: what Zentra ordered, what the vendor '
+            f'<div class="note">Every document in the chain, in date order: what Sample Client ordered, what the vendor '
             f'delivered and billed, and what happened next.</div>'
             f'<div class="tgrid" style="grid-template-columns:{cols}">{"".join(cells)}</div></section>')
 

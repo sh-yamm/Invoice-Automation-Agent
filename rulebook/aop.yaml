@@ -1,4 +1,4 @@
-# Agent Operating Procedure: Zentra Retail Pvt Ltd, accounts payable
+# Agent Operating Procedure: Sample Client Retail Pvt Ltd (demo company), accounts payable
 #
 # The agent reads this file on every invoice. Change a number here (or on the Rulebook page)
 # and the next run follows it. Each case records the version it ran under.
@@ -81,7 +81,7 @@ reasons:
   - code: WRONG_BUYER_GSTIN
     outcome: reject
     owner: Vendor
-    explain: "The invoice is billed to GSTIN {found}, not to Zentra Retail ({expected})."
+    explain: "The invoice is billed to GSTIN {found}, not to Sample Client ({expected})."
     next: "Returned to the vendor: please reissue to the correct company and GSTIN."
   - code: INVALID_GSTIN
     outcome: reject
@@ -294,7 +294,7 @@ reasons:
     outcome: hold
     owner: Facilities
     explain: "Service account {consumer_no} is not registered for {vendor}."
-    next: "Confirm the account belongs to Zentra and register it."
+    next: "Confirm the account belongs to Sample Client and register it."
   - code: GL_CODING_UNCERTAIN
     outcome: hold
     owner: Budget owner

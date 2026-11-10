@@ -1,6 +1,6 @@
 """Fixed facts about the buying company and India."""
 
-BUYER_NAME = "Zentra Retail Pvt Ltd"
+BUYER_NAME = "Sample Client Retail Pvt Ltd (demo company)"  # a made-up demo company
 BUYER_STATE = "29"
 BUYER_ADDRESS = "No. 14, Outer Ring Road, Bellandur, Bengaluru 560103, Karnataka"
 # Base 29AABCZ5821K1Z + mod-36 check digit "W" (verified in tests/unit/rules/test_india.py).
