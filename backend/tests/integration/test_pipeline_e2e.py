@@ -158,8 +158,9 @@ def test_ai_outage_holds_never_approves(tmp_path):
     assert (case["outcome"], case["primary_code"]) == (Outcome.ON_HOLD, "AI_UNAVAILABLE")
 
 
-class FlakyParse:
-    """The parse service is down for the first call, then recovers."""
+class FlakyExtract:
+    """The model that reads the invoice's fields is down for the first call, then recovers.
+    (A parser outage alone no longer holds a digital invoice: it falls back to the PDF's own text.)"""
 
     def __init__(self, inner):
         self.inner, self.models, self.down = inner, inner.models, True
@@ -167,11 +168,11 @@ class FlakyParse:
     def __getattr__(self, name):
         return getattr(self.inner, name)
 
-    def parse_page(self, png, **kw):
-        if self.down:
+    def chat_json(self, slot, messages, schema, **kw):
+        if self.down and kw.get("node") == "extract":
             self.down = False
-            raise AiUnavailable("parse service down")
-        return self.inner.parse_page(png, **kw)
+            raise AiUnavailable("every model failed")
+        return self.inner.chat_json(slot, messages, schema, **kw)
 
 
 def test_recheck_recovers_after_an_ai_outage(tmp_path):
@@ -180,7 +181,7 @@ def test_recheck_recovers_after_an_ai_outage(tmp_path):
     store = Store(tmp_path / "runs.db")
     reset_demo(store, s.seed_path)
     deps = Deps(repo=Repository.load(s.erp_dir), store=store, aop_path=s.rulebook_path,
-                gateway=FlakyParse(Gateway(s, store, CACHE, offline=True)), files_dir=tmp_path / "files",
+                gateway=FlakyExtract(Gateway(s, store, CACHE, offline=True)), files_dir=tmp_path / "files",
                 checkpoint_path=tmp_path / "cp.db", pace_ms=0)
     p = Pipeline(deps)
     case = p.start("flaky", PDF / "S01.pdf", sample_id="S01")
@@ -198,3 +199,32 @@ def test_a_crash_outside_the_nodes_never_leaves_a_case_running(tmp_path, monkeyp
     monkeypatch.setattr(p.app, "invoke", boom)
     case = p.start("crash", PDF / "S01.pdf")
     assert case["status"] == "waiting" and case["outcome"] is Outcome.ON_HOLD and case["primary_code"] == "TOOL_ERROR"
+
+
+class _ParserDown(Gateway):
+    """Recorded replies for everything except the page parser, which is unreachable."""
+
+    def parse_page(self, png, *, case_id=None, cache_key=None):
+        raise AiUnavailable("parser down")
+
+
+def test_digital_invoice_is_read_from_its_own_text_when_the_page_parser_is_down(tmp_path):
+    require_cache("S01")
+    s = Settings()
+    p, store = make_pipeline(tmp_path)
+    p.deps.gateway = _ParserDown(s, store, CACHE, offline=True)
+    p = Pipeline(p.deps)
+    case = p.start("C-PD1", REPO_ROOT / "samples" / "pdf" / "S01.pdf", sample_id="S01")
+    assert case["outcome"] is Outcome.APPROVED
+    parse = next(f for f in case["findings"] if f.check == "parse_pages")
+    assert parse.status.value == "warn" and "text" in parse.title.lower()
+
+
+def test_scan_still_holds_when_the_page_parser_is_down(tmp_path):
+    require_cache("S08")
+    s = Settings()
+    p, store = make_pipeline(tmp_path)
+    p.deps.gateway = _ParserDown(s, store, CACHE, offline=True)
+    p = Pipeline(p.deps)
+    case = p.start("C-PD2", REPO_ROOT / "samples" / "pdf" / "S08.pdf", sample_id="S08")
+    assert case["outcome"] is Outcome.ON_HOLD and case["primary_code"] == "AI_UNAVAILABLE"

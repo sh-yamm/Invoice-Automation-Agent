@@ -16,6 +16,7 @@ from ap_agent.ai.helpers import RealAi
 from ap_agent.core.models import Outcome, Status
 from ap_agent.erp.repository import Repository
 from ap_agent.pipeline import nodes as n
+from ap_agent.pipeline.steps._shared import _finding
 from ap_agent.pipeline.events import EventBus
 from ap_agent.pipeline.state import CaseState
 from ap_agent.reading.pdfinfo import inspect_pdf
@@ -147,7 +148,7 @@ class Pipeline:
 
     def _hold_on_crash(self, case_id: str, error: Exception) -> None:
         aop = load_aop(self.deps.aop_path)
-        f = n._finding(aop, "TOOL_ERROR", "The pipeline stopped unexpectedly", "pipeline", "decide",
+        f = _finding(aop, "TOOL_ERROR", "The pipeline stopped unexpectedly", "pipeline", "decide",
                        {"check": "pipeline", "error": f"{type(error).__name__}: {error}"}, stop=True)
         self.deps.store.add_finding(case_id, f)
         why, nxt = f.detail, "Re-check the case. Report it if the error repeats."
