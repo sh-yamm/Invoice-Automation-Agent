@@ -30,14 +30,15 @@ def open_case(case_id: str) -> None:
 
 @st.dialog("Process an invoice", width="large")
 def process_dialog():
-    pace = st.segmented_control("Run speed", ["fast", "normal", "presenter"], default="normal", key="pace",
-                                format_func=lambda p: {"fast": "Fast", "normal": "Normal", "presenter": "Slow, for presenting"}[p],
-                                help="How quickly the stages appear. The checks are the same at every speed.")
+    demo = st.toggle("Demo mode", key="demo_mode",
+                     help="Slows the stages down so you can follow each check as it runs. Without it, demo invoices "
+                          "finish in about a second, because their model replies are recorded.")
+    pace = "demo" if demo else "normal"
     up = st.file_uploader("Upload a vendor invoice (PDF)", type=["pdf"])
     if up is not None and st.button("Process this invoice", type="primary"):
         try:
             r = engine.post("/api/cases", files={"file": (up.name, up.getvalue(), "application/pdf")},
-                            data={"pace": pace or "normal"})
+                            data={"pace": pace})
             open_case(r["case_id"])
         except engine.ApiError as e:
             st.error(str(e))
@@ -48,7 +49,7 @@ def process_dialog():
         c1.html(f'<div><b>{h(s["id"])} · {h(s["title"])}</b><div class="note">{h(s["blurb"])} · {h(s["vendor"])}, '
                 f'{inr(s["total"], 0)} · expected <span class="st-chip {cls}">{label}</span></div></div>')
         if c2.button("Run", key=f"run-{s['id']}", use_container_width=True):
-            r = engine.post("/api/cases", data={"sample_id": s["id"], "pace": pace or "normal"})
+            r = engine.post("/api/cases", data={"sample_id": s["id"], "pace": pace})
             open_case(r["case_id"])
     st.divider()
     if st.button("Reset demo data", help="Restore the 38 past invoices and remove every invoice run since."):

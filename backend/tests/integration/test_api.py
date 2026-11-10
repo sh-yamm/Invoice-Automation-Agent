@@ -63,7 +63,7 @@ def test_samples_listing(client):
 
 @pytest.mark.skipif(not cached("S01"), reason="S01 replies not recorded yet")
 def test_create_sample_case_and_stream(client):
-    r = client.post("/api/cases", data={"sample_id": "S01", "pace": "fast"})
+    r = client.post("/api/cases", data={"sample_id": "S01", "pace": "normal"})
     assert r.status_code == 201
     cid = r.json()["case_id"]
     case = wait_done(client, cid)
@@ -79,7 +79,7 @@ def test_create_sample_case_and_stream(client):
 
 @pytest.mark.skipif(not cached("S02"), reason="S02 replies not recorded yet")
 def test_action_idempotent(client):
-    cid = client.post("/api/cases", data={"sample_id": "S02", "pace": "fast"}).json()["case_id"]
+    cid = client.post("/api/cases", data={"sample_id": "S02", "pace": "normal"}).json()["case_id"]
     assert wait_done(client, cid)["status"] == "waiting"
     body = {"action": "approve_anyway", "actor": "Buyer", "note": "New rate agreed by email", "action_key": "dbl-1"}
     first = client.post(f"/api/cases/{cid}/actions", json=body)
@@ -149,7 +149,7 @@ def test_upload_non_pdf_400(client):
 
 @pytest.mark.skipif(not cached("S03"), reason="S03 replies not recorded yet")
 def test_case_lists_locked_codes(client):
-    cid = client.post("/api/cases", data={"sample_id": "S03", "pace": "fast"}).json()["case_id"]
+    cid = client.post("/api/cases", data={"sample_id": "S03", "pace": "normal"}).json()["case_id"]
     case = wait_done(client, cid)
     assert case["locked_codes"] == ["BANK_DETAILS_MISMATCH"]
     r = client.post(f"/api/cases/{cid}/actions", json={"action": "approve_anyway", "action_key": "a"})
@@ -158,7 +158,7 @@ def test_case_lists_locked_codes(client):
 
 @pytest.mark.skipif(not cached("S02"), reason="S02 replies not recorded yet")
 def test_case_trail_goods_po(client):
-    cid = client.post("/api/cases", data={"sample_id": "S02", "pace": "fast"}).json()["case_id"]
+    cid = client.post("/api/cases", data={"sample_id": "S02", "pace": "normal"}).json()["case_id"]
     wait_done(client, cid)
     t = client.get(f"/api/cases/{cid}/trail").json()
     assert t["vendor"]["name"] == "Deccan Steel Traders"
@@ -174,7 +174,7 @@ def test_case_trail_goods_po(client):
 
 @pytest.mark.skipif(not cached("S04"), reason="S04 replies not recorded yet")
 def test_case_trail_recurring_contract_and_earlier_invoices(client):
-    cid = client.post("/api/cases", data={"sample_id": "S04", "pace": "fast"}).json()["case_id"]
+    cid = client.post("/api/cases", data={"sample_id": "S04", "pace": "normal"}).json()["case_id"]
     wait_done(client, cid)
     t = client.get(f"/api/cases/{cid}/trail").json()
     assert t["po"]["po_number"] == "PO-4490" and t["contract"]["contract_id"] == "CT-901"
@@ -213,6 +213,16 @@ def test_prepare_renders_pages_before_the_run(tmp_path):
 
 
 def test_page_images_are_cacheable(client):
-    cid = client.post("/api/cases", data={"sample_id": "S01", "pace": "fast"}).json()["case_id"]
+    cid = client.post("/api/cases", data={"sample_id": "S01", "pace": "normal"}).json()["case_id"]
     r = client.get(f"/api/cases/{cid}/pages/1.png")
     assert r.status_code == 200 and "max-age" in r.headers.get("cache-control", "")
+
+
+def test_normal_runs_at_full_speed_and_demo_mode_paces_the_stages(client):
+    from ap_agent.api.common import AppContext  # noqa: F401
+    bus = client.app.state.ctx.deps.bus
+    normal = client.post("/api/cases", data={"sample_id": "S01", "pace": "normal"}).json()["case_id"]
+    demo = client.post("/api/cases", data={"sample_id": "S01", "pace": "demo"}).json()["case_id"]
+    default = client.post("/api/cases", data={"sample_id": "S01"}).json()["case_id"]
+    assert bus.pace_by_case[normal] == 0 and bus.pace_by_case[default] == 0
+    assert bus.pace_by_case[demo] > 0

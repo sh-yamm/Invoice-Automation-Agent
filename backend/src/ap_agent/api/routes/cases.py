@@ -18,7 +18,9 @@ from ap_agent.pipeline.graph import ActionError
 from samples.specs import SPECS
 
 router = APIRouter(prefix="/api/cases")
-PACE = {"fast": 0, "normal": 280, "presenter": 900}
+# Delay per finding, in ms. "normal" runs at full speed. "demo" paces a run so each stage can be followed on
+# screen; it matters for demo invoices, whose recorded model replies otherwise finish in about a second.
+PACE = {"normal": 0, "demo": 450}
 
 
 @router.post("")
@@ -40,7 +42,7 @@ async def create_case(request: Request, file: UploadFile | None = File(None), sa
         tmp.write_bytes(data)
         path, name = tmp, file.filename or "invoice.pdf"
     ctx.pipeline.prepare(case_id, path, sample_id=sample_id, filename=name)
-    ctx.deps.bus.pace_by_case[case_id] = PACE.get(pace, PACE["normal"])
+    ctx.deps.bus.pace_by_case[case_id] = PACE.get(pace, 0)
     ctx.executor.submit(ctx.pipeline.run, case_id)
     return J({"case_id": case_id}, 201)
 
