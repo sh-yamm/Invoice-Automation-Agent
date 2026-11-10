@@ -15,7 +15,12 @@ CREATE TABLE IF NOT EXISTS cases (
   doc_type TEXT, txn_type TEXT, txn_confidence REAL, txn_why TEXT,
   outcome INTEGER, primary_code TEXT, why TEXT, owner TEXT, next_step TEXT,
   also TEXT, agent_note TEXT, aop_version INTEGER,
-  decided_at TEXT, invoice_json TEXT, is_seed INTEGER NOT NULL DEFAULT 0
+  decided_at TEXT, invoice_json TEXT, is_seed INTEGER NOT NULL DEFAULT 0,
+  assigned_po TEXT
+);
+CREATE TABLE IF NOT EXISTS record_changes (
+  seq INTEGER PRIMARY KEY AUTOINCREMENT, at TEXT NOT NULL, kind TEXT NOT NULL, ref TEXT,
+  actor TEXT, why TEXT, payload TEXT
 );
 CREATE TABLE IF NOT EXISTS findings (
   case_id TEXT NOT NULL, seq INTEGER NOT NULL, id TEXT NOT NULL, json TEXT NOT NULL,
@@ -50,7 +55,11 @@ CREATE TABLE IF NOT EXISTS period_ledger (
 );
 """
 
-TABLES = ("cases", "findings", "events", "tool_calls", "llm_calls", "human_actions", "po_ledger", "period_ledger")
+TABLES = ("cases", "findings", "events", "tool_calls", "llm_calls", "human_actions", "po_ledger", "period_ledger",
+          "record_changes")
+
+# Columns added after a database may already exist: added in place on open.
+ADDED_COLUMNS = {"cases": {"assigned_po": "TEXT"}}
 
 
 class Db:
@@ -64,6 +73,11 @@ class Db:
         self.conn.row_factory = sqlite3.Row
         self.conn.execute("PRAGMA journal_mode=WAL")
         self.conn.executescript(SCHEMA)
+        for table, cols in ADDED_COLUMNS.items():
+            have = {r[1] for r in self.conn.execute(f"PRAGMA table_info({table})")}
+            for col, kind in cols.items():
+                if col not in have:
+                    self.conn.execute(f"ALTER TABLE {table} ADD COLUMN {col} {kind}")
 
     def execute(self, sql: str, params=()):
         with self.lock:

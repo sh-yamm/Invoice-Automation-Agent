@@ -91,3 +91,22 @@ def test_reset_demo_restores_seed(store):
 def test_seeded_retainers_carry_their_billing_period(store):
     hist = {h.case_id: h for h in store.history.cases_for_vendor("V003", exclude_case="none")}
     assert hist["H-NIT-10"].period_start == date(2026, 10, 1)
+
+
+def test_case_keeps_the_po_it_was_uploaded_to(store):
+    store.create_case("c-ap", "f.pdf", "h1", None, assigned_po="PO-4518")
+    assert store.get_case("c-ap")["assigned_po"] == "PO-4518"
+    store.set_assigned_po("c-ap", "PO-4501")
+    assert store.get_case("c-ap")["assigned_po"] == "PO-4501"
+    store.create_case("c-none", "g.pdf", "h2", None)
+    assert store.get_case("c-none")["assigned_po"] is None
+
+
+def test_record_changes_newest_first(store):
+    store.add_record_change("vendor_added", "V009", "AP lead", "new supplier", {"name": "A"})
+    store.add_record_change("bank_changed", "V009", "AP lead", "letter from vendor", {"ifsc": "X"})
+    store.add_record_change("po_raised", "PO-4601", "Buyer", "monthly stock", {})
+    v = store.record_changes("V009")
+    assert [r["kind"] for r in v] == ["bank_changed", "vendor_added"]
+    assert v[0]["actor"] == "AP lead" and v[0]["why"] == "letter from vendor" and v[0]["payload"] == {"ifsc": "X"}
+    assert len(store.record_changes()) == 3

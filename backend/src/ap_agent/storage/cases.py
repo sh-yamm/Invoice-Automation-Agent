@@ -35,10 +35,24 @@ class Store:
 
     # ---------- cases ----------
     def create_case(self, case_id: str, filename: str | None, sha256: str | None, sample_id: str | None,
-                    created_at: str | None = None, is_seed: bool = False) -> None:
+                    created_at: str | None = None, is_seed: bool = False, assigned_po: str | None = None) -> None:
         self.db.execute(
-            "INSERT INTO cases (case_id, created_at, filename, sha256, sample_id, is_seed) VALUES (?,?,?,?,?,?)",
-            (case_id, created_at or _now(), filename, sha256, sample_id, int(is_seed)))
+            "INSERT INTO cases (case_id, created_at, filename, sha256, sample_id, is_seed, assigned_po) "
+            "VALUES (?,?,?,?,?,?,?)",
+            (case_id, created_at or _now(), filename, sha256, sample_id, int(is_seed), assigned_po))
+
+    def set_assigned_po(self, case_id: str, po: str | None) -> None:
+        """The purchase order a person said this invoice is for (None: let the agent find it)."""
+        self.db.execute("UPDATE cases SET assigned_po = ? WHERE case_id = ?", (po, case_id))
+
+    # ---------- changes people make to the company records ----------
+    def add_record_change(self, kind: str, ref: str | None, actor: str, why: str, payload: dict) -> None:
+        self.db.execute("INSERT INTO record_changes (at, kind, ref, actor, why, payload) VALUES (?,?,?,?,?,?)",
+                        (_now(), kind, ref, actor, why, _dumps(payload)))
+
+    def record_changes(self, ref: str | None = None) -> list[dict]:
+        sql = "SELECT * FROM record_changes" + (" WHERE ref = ?" if ref else "") + " ORDER BY seq DESC"
+        return [{**dict(r), "payload": json.loads(r["payload"] or "{}")} for r in self.db.query(sql, (ref,) if ref else ())]
 
     def set_status(self, case_id: str, status: str) -> None:
         self.db.execute("UPDATE cases SET status = ? WHERE case_id = ?", (status, case_id))

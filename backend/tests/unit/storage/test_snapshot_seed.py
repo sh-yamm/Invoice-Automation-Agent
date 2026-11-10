@@ -47,3 +47,19 @@ def test_reset_restores_the_processed_history(tmp_path):
     assert not (files / "C-NEW").exists()
     rows = sqlite3.connect(cp_path).execute("SELECT thread_id FROM checkpoints").fetchall()
     assert rows == [("H-1",)]
+
+
+def test_old_snapshot_without_new_columns_still_loads(tmp_path):
+    """A history snapshot written before a column or table was added must still restore."""
+    seed = tmp_path / "seed"
+    seed.mkdir()
+    old = sqlite3.connect(seed / "history.db")
+    old.execute("CREATE TABLE cases (case_id TEXT PRIMARY KEY, created_at TEXT NOT NULL, filename TEXT, "
+                "status TEXT NOT NULL DEFAULT 'running', is_seed INTEGER NOT NULL DEFAULT 0)")
+    old.execute("INSERT INTO cases (case_id, created_at, filename, is_seed) VALUES ('H-OLD', '2026-08-01T10:00:00', 'a.pdf', 1)")
+    old.commit()
+    old.close()
+    store = Store(tmp_path / "runs.db")
+    assert reset_demo(store, seed) == 1
+    case = store.get_case("H-OLD")
+    assert case["filename"] == "a.pdf" and case["assigned_po"] is None

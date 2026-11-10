@@ -66,8 +66,13 @@ def load_snapshot(store: Store, seed: Path, files_dir: Path | None = None, check
         store.db.execute("ATTACH DATABASE ? AS snap", (str(seed / "history.db"),))
         try:
             store.db.execute("BEGIN")
-            for t in TABLES:
-                store.db.execute(f"INSERT INTO main.{t} SELECT * FROM snap.{t}")
+            for t in TABLES:  # by column name, so a snapshot made before a column or table was added still loads
+                snap_cols = [r[1] for r in store.db.query(f"PRAGMA snap.table_info({t})")]
+                if not snap_cols:
+                    continue
+                main_cols = {r[1] for r in store.db.query(f"PRAGMA main.table_info({t})")}
+                cols = ", ".join(c for c in snap_cols if c in main_cols)
+                store.db.execute(f"INSERT INTO main.{t} ({cols}) SELECT {cols} FROM snap.{t}")
             store.db.execute("COMMIT")
         except Exception:
             store.db.execute("ROLLBACK")
