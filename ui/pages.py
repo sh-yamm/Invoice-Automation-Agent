@@ -17,7 +17,9 @@ FOOT = '<div class="foot">Zamp Invoice Agent · accounts payable for Zentra Reta
 
 
 def html(s: str) -> None:
-    st.html(s)
+    """Render an HTML piece; a panel with nothing to show returns "" and is skipped (st.html refuses empty bodies)."""
+    if s and s.strip():
+        st.html(s)
 
 
 def open_case(case_id: str) -> None:
@@ -48,7 +50,7 @@ def process_dialog():
         c1, c2 = st.columns([5, 1.3], vertical_alignment="center")
         c1.html(f'<div><b>{h(s["id"])} · {h(s["title"])}</b><div class="note">{h(s["blurb"])} · {h(s["vendor"])}, '
                 f'{inr(s["total"], 0)} · expected <span class="st-chip {cls}">{label}</span></div></div>')
-        if c2.button("Run", key=f"run-{s['id']}", use_container_width=True):
+        if c2.button("Run", key=f"run-{s['id']}", width="stretch"):
             r = engine.post("/api/cases", data={"sample_id": s["id"], "pace": pace})
             open_case(r["case_id"])
     st.divider()
@@ -118,6 +120,8 @@ def dashboard():
 
 @st.fragment(run_every=4)
 def live_lists():
+    if st.query_params.get("id"):  # an invoice is open: this auto-refreshing list must not draw under it
+        return
     cases = engine.get("/api/cases")
     a, b = st.columns([3, 1.4], vertical_alignment="bottom")
     period = b.segmented_control("Period", ["This week", "All time"], default="This week", key="period",
@@ -219,7 +223,7 @@ def actions(c: dict) -> None:
         buttons += [("reject", "Reject", "secondary"), ("ask_vendor", "Ask vendor", "secondary"), ("recheck", "Re-check", "secondary")]
         cols = st.columns(len(buttons))
         for col, (act, label, kind) in zip(cols, buttons):
-            if col.button(label, key=f"{act}-{cid}", type=kind, use_container_width=True):
+            if col.button(label, key=f"{act}-{cid}", type=kind, width="stretch"):
                 body = {"action": act, "note": note or None, "actor": "AP clerk", "action_key": uuid.uuid4().hex}
                 if act == "confirm_field":
                     body.update(field=field, value=value)
@@ -285,7 +289,7 @@ def render_case(cid: str, c: dict, running: bool) -> None:
                     'a problem was found.</span></div>' if img else
                     '<div class="note">Opening the PDF…</div>')
             if img:
-                st.image(img, use_container_width=True)
+                st.image(img, width="stretch")
     with right:
         html(decision_card(c))
         actions(c)
@@ -374,7 +378,7 @@ def rules_page():
     why = st.text_input("Why are you changing the rulebook?", placeholder="For example: steel prices are volatile this quarter")
     a, b = st.columns([1, 1])
     if a.button(f"Save {len(changes)} change{'s' if len(changes) != 1 else ''}" if changes else "Save changes",
-                type="primary", disabled=not changes, use_container_width=True):
+                type="primary", disabled=not changes, width="stretch"):
         if not why.strip():
             st.error("Say why you are changing the rulebook; it is kept with the version.")
         else:
@@ -384,7 +388,7 @@ def rules_page():
                 st.rerun()
             except engine.ApiError as e:
                 st.error(str(e))
-    if b.button("Re-check held invoices under these rules", use_container_width=True):
+    if b.button("Re-check held invoices under these rules", width="stretch"):
         held = [c for c in engine.get("/api/cases", outcome=2, status="waiting") if not c.get("is_seed")]
         for c in held:
             try:
