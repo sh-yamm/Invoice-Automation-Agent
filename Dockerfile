@@ -1,25 +1,18 @@
-# Stage 1: build the web UI
-FROM node:22-alpine AS ui
-WORKDIR /app/frontend
-COPY frontend/package.json frontend/package-lock.json ./
-RUN npm ci --no-audit --no-fund
-COPY frontend/ ./
-RUN npm run build
-
-# Stage 2: the API, the agent and the built UI in one container
+# The agent and its Streamlit UI in one container (the same app Streamlit Community Cloud runs)
 FROM python:3.11-slim
 WORKDIR /app
-ENV PYTHONUNBUFFERED=1 PORT=8000
-COPY backend/pyproject.toml backend/pyproject.toml
+ENV PYTHONUNBUFFERED=1 PORT=8501
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 COPY backend/src backend/src
-# editable install keeps the package next to rulebook/, data/ and samples/ (paths resolve from the repo root)
-RUN pip install --no-cache-dir -e ./backend
+COPY streamlit_app.py .
+COPY ui ui
+COPY .streamlit .streamlit
 COPY rulebook rulebook
 COPY data data
 COPY samples samples
-COPY --from=ui /app/frontend/dist frontend/dist
 # runtime data (case records, uploads, page images); mount a persistent disk here
 RUN mkdir -p storage
-EXPOSE 8000
-# NVIDIA_API_KEY and the MODEL_* settings come from the host's environment, never from the image
-CMD ["sh", "-c", "uvicorn ap_agent.api.app:app --host 0.0.0.0 --port ${PORT}"]
+EXPOSE 8501
+# NVIDIA_API_KEY comes from the host's environment, never from the image
+CMD ["sh", "-c", "streamlit run streamlit_app.py --server.port ${PORT} --server.address 0.0.0.0 --server.headless true"]

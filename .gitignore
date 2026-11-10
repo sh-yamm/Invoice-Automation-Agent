@@ -15,8 +15,6 @@ venv/
 .coverage
 htmlcov/
 
-# Node / frontend
-node_modules/
 dist/
 .vite/
 
@@ -38,9 +36,6 @@ Thumbs.db
 PROJECT_GUIDE.md
 docs/superpowers/
 
-# Frontend
-frontend/node_modules/
-frontend/dist/
 
 # The demo history snapshot ships with the repo (scripts/build_history.py builds it)
 !data/seed/history.db

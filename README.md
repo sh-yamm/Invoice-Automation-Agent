@@ -2,7 +2,7 @@
 
 An AI agent that does the work of an accounts-payable clerk for an Indian company. It reads a vendor invoice PDF, works out what kind of transaction it is, checks it against the company's purchase orders, goods receipts, contracts and vendor master, and applies an editable rulebook. Then it either **approves the invoice on its own** or **hands it to the right person with the exact reason and the evidence**.
 
-> **Status:** the full pipeline, API and web UI are built and tested (271 backend tests, 14 frontend tests; all 16 demo samples reach their expected outcome end to end). A visual redesign of the UI is planned.
+> **Status:** live at https://invoice-automation-agent.streamlit.app. The full pipeline, API and Streamlit UI are built and tested (282 backend tests; all 16 demo samples and all 38 history invoices reach their expected outcome end to end).
 
 ---
 
@@ -27,7 +27,7 @@ An AI agent that does the work of an accounts-payable clerk for an Indian compan
 
 ## What it does
 
-- **Input:** a vendor invoice PDF, digital or scanned, uploaded in the web UI or picked from a set of demo samples.
+- **Input:** a vendor invoice PDF, digital or scanned, uploaded in the Streamlit app or picked from a set of demo samples.
 - **Output:** one of four outcomes, with every check that ran, the evidence on the page, the rule applied, who owns the next step, and what that step is.
 
 | Outcome | Meaning | Goes to |
@@ -540,15 +540,15 @@ backend/
     rules/                pure rule functions (normalisation; india/ rule pack)
     checks/               3–5 · one file per stage: intake, validation, standard_po, recurring, po_less, controls
     decision/             6 · rules floor, agent review guard, verdict
-    pipeline/             LangGraph state, nodes, graph, event bus
+    pipeline/             LangGraph wiring (graph.py), the event bus, and the steps in run order:
+      nodes.py            index of the 17 steps
+      steps/s1_receive.py … s7_decide.py   one file per stage: receive, read, classify, validate,
+                                            match, controls, decide
     api/                  FastAPI app and routes
   tests/                  unit/ (mirrors src) · integration/ · live/ (real model calls, off by default)
-frontend/src/
-  api/                    API client and types
-  views/                  WorkQueue · LiveCase · Rulebook · ConnectedData
-  components/             shared UI pieces
-  styles/                 theme tokens
-scripts/                  helper scripts (GSTIN generator, smoke test)
+streamlit_app.py          the Streamlit app's entry point (Streamlit Community Cloud runs this)
+ui/                       Streamlit pages, HTML pieces, theme; calls the API in-process (ui/engine.py)
+scripts/                  data-building scripts, numbered by run order in scripts/README.md
 docs/                     architecture diagram
 storage/                  runtime data, not committed
 ```
@@ -557,29 +557,26 @@ storage/                  runtime data, not committed
 
 ## Setup
 
-Requirements: Python 3.11+, Node 20+, an NVIDIA API key from [build.nvidia.com](https://build.nvidia.com) (free endpoints).
+Requirements: Python 3.11, an NVIDIA API key from [build.nvidia.com](https://build.nvidia.com) (free endpoints).
 
 ```bash
 cp .env.example .env                      # add NVIDIA_API_KEY
 
-# backend
+# tests
 cd backend
 python -m pip install -e ".[dev]"
 python -m pytest                          # unit + end-to-end tests (no network: model replies are replayed)
 
-# frontend
-cd ../frontend
-npm ci
-npm test
-npm run build                             # the backend serves frontend/dist
-
 # run it
-cd ../backend
-python -m uvicorn ap_agent.api.app:app --app-dir src --port 8000
-# open http://localhost:8000
+cd ..
+python -m pip install -r requirements.txt
+python -m streamlit run streamlit_app.py
+# open http://localhost:8501
 ```
 
-For frontend development with hot reload, run `npm run dev` in `frontend/` (it proxies `/api` to port 8000).
+The JSON API is also available on its own: `python -m uvicorn ap_agent.api.app:app --app-dir backend/src --port 8000`.
+
+**Hosting.** Streamlit Community Cloud runs `streamlit_app.py` from `main`, with `NVIDIA_API_KEY` in the app's secrets. `.github/workflows/keep-alive.yml` opens the app in a headless browser every 30 minutes so it does not fall asleep.
 
 **Demo samples and recorded replies.** The 16 demo invoices in `samples/pdf/` replay recorded model replies from `samples/cache/`, so the demo does not depend on a live model call. Uploaded PDFs always call the models live. To re-record: `python samples/seed_cache.py` (or `--fresh S08` for one sample). To regenerate the PDFs: `python samples/generate.py`.
 
@@ -589,8 +586,8 @@ For frontend development with hot reload, run `npm run dev` in `frontend/` (it p
 
 ```bash
 docker build -t ap-agent .
-docker run -p 8000:8000 --env-file .env -v ap-agent-storage:/app/storage ap-agent
-scripts/smoke.sh http://localhost:8000    # resets the demo data, runs sample S01, expects APPROVED
+docker run -p 8501:8501 --env-file .env -v ap-agent-storage:/app/storage ap-agent
+# open http://localhost:8501
 ```
 
-The image holds no secrets: `NVIDIA_API_KEY` and the `MODEL_*` settings come from the environment. Mount a persistent volume at `/app/storage` (case records, uploads, page images).
+The image holds no secrets: `NVIDIA_API_KEY` comes from the environment. Mount a persistent volume at `/app/storage` (case records, uploads, page images).

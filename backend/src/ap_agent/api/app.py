@@ -9,8 +9,6 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
 
 from ap_agent.core.config import REPO_ROOT, Settings
 
@@ -41,18 +39,12 @@ def create_app(deps: Deps | None = None, seed_path: Path | None = None) -> FastA
     app = FastAPI(title="Zamp Invoice Agent", version="0.1.0")
     app.state.ctx = AppContext(deps=deps, pipeline=Pipeline(deps), executor=ThreadPoolExecutor(max_workers=2),
                                seed_path=seed_path or s.seed_path)
-    app.add_middleware(CORSMiddleware, allow_origins=["http://localhost:5173"], allow_methods=["*"],
-                       allow_headers=["*"])
     for r in (cases.router, rulebook.router, data.router, dashboard.router, demo.router):
         app.include_router(r)
 
     @app.get("/api/health")
     def health():
         return {"ok": True}
-
-    dist = REPO_ROOT / "frontend" / "dist"
-    if dist.exists():
-        app.mount("/", StaticFiles(directory=dist, html=True), name="ui")
     return app
 
 
