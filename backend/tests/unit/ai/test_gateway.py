@@ -219,3 +219,24 @@ def test_each_kind_of_call_has_a_different_backup_model(gw):
     for slot in ("extract", "extract_text", "fast", "agent"):
         chain = gw.chain(slot)
         assert len(chain) >= 2 and len(set(chain)) == len(chain), slot
+
+
+@respx.mock
+def test_a_model_that_times_out_is_not_retried_while_a_backup_is_left(gw):
+    chain = gw.chain("extract")
+    route = respx.post(f"{BASE}/chat/completions").mock(side_effect=_by_model(
+        {chain[0]: httpx.ReadTimeout("slow"), chain[1]: chat_reply('{"total": 5}')}))
+    data, _ = gw.chat_json("extract", [{"role": "user", "content": "x"}], SCHEMA, case_id="c1", node="n")
+    assert data == {"total": 5}
+    assert [json.loads(c.request.content)["model"] for c in route.calls] == chain[:2]
+
+
+@respx.mock
+def test_the_last_model_in_a_chain_keeps_its_retries(gw):
+    chain = gw.chain("extract")
+    route = respx.post(f"{BASE}/chat/completions").mock(side_effect=_by_model(
+        {m: httpx.ReadTimeout("slow") for m in chain}))
+    with pytest.raises(AiUnavailable):
+        gw.chat_json("extract", [{"role": "user", "content": "x"}], SCHEMA, case_id="c1", node="n")
+    tried = [json.loads(c.request.content)["model"] for c in route.calls]
+    assert tried == chain[:-1] + [chain[-1]] * 3

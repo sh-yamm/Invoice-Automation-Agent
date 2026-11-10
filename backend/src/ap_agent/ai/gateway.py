@@ -1,7 +1,8 @@
 """The LLM gateway: the only way any part of the agent talks to a model.
 
 Every call is throttled to the free tier's rate limit and retried with backoff on transient errors
-(3 tries per model). If a model stays down, the call moves to the next model in its fallback chain
+(3 tries per model; a timeout moves on at once while a backup is left). If a model stays down, the call
+moves to the next model in its fallback chain
 (settings.fallback_vision / fallback_text). Replies can be served from a file cache (so demo samples
 never need a live call), and every call is logged to the case record with the model that answered
 and its reasoning trace. If every model fails, it raises AiUnavailable and the pipeline turns that
@@ -79,7 +80,9 @@ class Gateway:
         if wait > 0:
             self.sleep(wait)
 
-    def _post(self, url: str, **kwargs) -> dict:
+    def _post(self, url: str, *, next_on_timeout: bool = False, **kwargs) -> dict:
+        """POST with retries. With next_on_timeout, a timeout gives up at once (the caller has another model to try:
+        a model that has just taken 120 s rarely answers on the next try)."""
         if self.offline:
             raise AiUnavailable("offline mode: no cached response for this call")
         headers = {"Authorization": f"Bearer {self.s.nvidia_api_key}", "Accept": "application/json"}
@@ -96,7 +99,11 @@ class Gateway:
                     raise AiUnavailable(f"HTTP {r.status_code}: {r.text[:200]}")
                 else:
                     return r.json()
-            except (httpx.TimeoutException, httpx.TransportError) as e:
+            except httpx.TimeoutException as e:
+                last = f"{type(e).__name__}: {e}"
+                if next_on_timeout:
+                    raise AiUnavailable(f"timed out ({last})") from e
+            except httpx.TransportError as e:
                 last = f"{type(e).__name__}: {e}"
             if attempt < len(BACKOFF):
                 self.sleep(BACKOFF[attempt])
@@ -129,10 +136,12 @@ class Gateway:
         """One chat completion: each model in the chain gets its retries before the next one is tried.
         Returns the reply and the model that gave it."""
         failures = []
-        for model in self.chain(slot):
+        chain = self.chain(slot)
+        for i, model in enumerate(chain):
             body = {"model": model, "messages": messages, "temperature": 0, "max_tokens": 8192, **extra}
             try:
-                return self._post(f"{self.s.nvidia_base_url}/chat/completions", json=body), model
+                return self._post(f"{self.s.nvidia_base_url}/chat/completions", json=body,
+                                  next_on_timeout=i < len(chain) - 1), model
             except RequestRejected:
                 raise
             except AiUnavailable as e:
