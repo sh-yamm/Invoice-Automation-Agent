@@ -104,7 +104,13 @@ def human_gate(state, deps):
             inv.confidence[field] = 1.0
         if kind == "recheck":
             deps.reload()
-        kept = [f for f in findings_of(state) if f.stage in REVALIDATE_KEEP and f.check != "field_confidence"]
+        new_po = kind == "confirm_field" and action.get("field") == "po_ref"
+        keep = REVALIDATE_KEEP - {"classify"} if new_po else REVALIDATE_KEEP  # a new PO: classify again
+        kept = [f for f in findings_of(state) if f.stage in keep and f.check not in ("field_confidence", "po_assignment")]
+        if new_po:
+            deps.store.set_assigned_po(cid, inv.po_ref)
+            kept.append(_ok(f"{inv.po_ref} assigned by {action.get('actor') or 'a person'}", "po_assignment", "read",
+                            "A reviewer moved this invoice to this PO; it is checked against it again."))
         st = {**state, "invoice": _dump(inv)}
         kept += run_checks("read", make_ctx(st, deps, aop))
         if state.get("aop_version") and state["aop_version"] != aop.version:
@@ -116,7 +122,8 @@ def human_gate(state, deps):
         _summarise(state, deps, inv)
         deps.store.set_status(cid, "running")
         return {"invoice": _dump(inv), "findings": [f.model_dump(mode="json") for f in kept], "action": action,
-                "aop_version": aop.version, "stopped": False}
+                "aop_version": aop.version, "stopped": False,
+                **({"assigned_po": inv.po_ref, "match": {}, "txn_type": None} if new_po else {})}
     if kind == "ask_vendor":
         deps.store.set_status(cid, "waiting_vendor")
         return {"action": action}

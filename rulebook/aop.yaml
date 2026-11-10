@@ -210,6 +210,11 @@ reasons:
     owner: AP team
     explain: "The invoice is dated {date}, which is in the future."
     next: "Check the date with the vendor."
+  - code: PO_ASSIGNMENT_MISMATCH
+    outcome: hold
+    owner: AP team
+    explain: "This invoice was uploaded to {assigned}, but it says {printed}."
+    next: "Move it to the right PO with Assign to a PO, or ask the vendor."
   - code: PO_NOT_FOUND
     outcome: hold
     owner: Procurement

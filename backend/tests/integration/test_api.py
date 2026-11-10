@@ -226,3 +226,8 @@ def test_normal_runs_at_full_speed_and_demo_mode_paces_the_stages(client):
     default = client.post("/api/cases", data={"sample_id": "S01"}).json()["case_id"]
     assert bus.pace_by_case[normal] == 0 and bus.pace_by_case[default] == 0
     assert bus.pace_by_case[demo] > 0
+
+
+def test_create_case_records_the_po_it_was_uploaded_to(client):
+    cid = client.post("/api/cases", data={"sample_id": "S02", "assigned_po": "PO-4518"}).json()["case_id"]
+    assert client.get(f"/api/cases/{cid}").json()["assigned_po"] == "PO-4518"

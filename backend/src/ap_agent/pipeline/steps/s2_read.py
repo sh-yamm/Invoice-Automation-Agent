@@ -6,6 +6,7 @@ from __future__ import annotations
 
 from ap_agent.pipeline.steps._shared import *  # noqa: F401,F403  (helpers, models, checks)
 from ap_agent.reading.recover import recover_totals
+from ap_agent.rules.po_assignment import apply_assigned_po
 
 
 @node("reconcile", "reconcile")
@@ -53,6 +54,14 @@ def ground_node(state, deps):
             detail="The page reader missed " + ", ".join(f"the {names[f]} ({fmt_inr(getattr(inv, f))})" for f in recovered)
                    + ". The PDF's embedded text has exactly that figure, and it matches the taxable value plus tax"
                    + (" and the amount in words." if inv.amount_in_words else ".")))
+    # The PO the person uploaded it to: used when none is printed, a hold when the invoice names another.
+    inv, how = apply_assigned_po(inv, state.get("assigned_po"))
+    if how == "assigned":
+        found.append(_ok(f"{inv.po_ref} assigned by the person who uploaded it", "po_assignment", "read",
+                         "No PO number is printed on the invoice, so it is checked against the PO it was uploaded to."))
+    elif how == "mismatch":
+        found.append(_finding(aop, "PO_ASSIGNMENT_MISMATCH", "Uploaded to a different PO", "po_assignment", "read",
+                              {"assigned": state["assigned_po"], "printed": inv.po_ref}))
     st = {**state, "invoice": _dump(inv)}
     found += run_checks("read", make_ctx(st, deps, aop))
     _summarise(state, deps, inv)

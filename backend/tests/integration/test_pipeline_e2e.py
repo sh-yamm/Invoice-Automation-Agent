@@ -228,3 +228,26 @@ def test_scan_still_holds_when_the_page_parser_is_down(tmp_path):
     p = Pipeline(p.deps)
     case = p.start("C-PD2", REPO_ROOT / "samples" / "pdf" / "S08.pdf", sample_id="S08")
     assert case["outcome"] is Outcome.ON_HOLD and case["primary_code"] == "AI_UNAVAILABLE"
+
+
+def test_invoice_without_a_po_number_uses_the_po_it_was_uploaded_to(tmp_path):
+    require_cache("S08")
+    p, _ = make_pipeline(tmp_path)
+    case = p.start("C-AS1", PDF / "S08.pdf", sample_id="S08", assigned_po="PO-4507")
+    checks = {f.check: f for f in case["findings"]}
+    assert "PO_INFERRED" not in {f.code for f in case["findings"]}
+    assert checks["po_assignment"].status.value == "pass" and "PO-4507" in checks["po_assignment"].title
+    assert checks["po_resolve"].status.value == "pass" and checks["po_resolve"].data["po"] == "PO-4507"
+
+
+def test_invoice_naming_another_po_is_held_and_can_be_assigned_to_the_right_one(tmp_path):
+    require_cache("S01")
+    p, store = make_pipeline(tmp_path)
+    case = p.start("C-AS2", PDF / "S01.pdf", sample_id="S01", assigned_po="PO-4518")
+    assert case["outcome"] is Outcome.ON_HOLD
+    assert "PO_ASSIGNMENT_MISMATCH" in {f.code for f in case["findings"]}
+    case = p.resume("C-AS2", {"action": "confirm_field", "field": "po_ref", "value": "PO-4501",
+                              "actor": "AP clerk", "action_key": "as1"})
+    assert case["outcome"] is Outcome.APPROVED
+    assert "PO_ASSIGNMENT_MISMATCH" not in {f.code for f in case["findings"]}
+    assert store.get_case("C-AS2")["assigned_po"] == "PO-4501"
