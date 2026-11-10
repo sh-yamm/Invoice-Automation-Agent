@@ -18,6 +18,9 @@ class Settings(BaseSettings):
     model_fast: str = "nvidia/nemotron-3-ultra-550b-a55b"
     model_agent: str = "nvidia/nemotron-3-ultra-550b-a55b"
     model_embed: str = "nvidia/nemotron-3.5-embed-1b"
+    # Backups, tried in order when a model stays down after its retries (each checked live on 2026-11-11).
+    fallback_vision: list[str] = ["nvidia/nemotron-3.5-super-vl-120b-a12b", "google/gemma-4-31b-it"]
+    fallback_text: list[str] = ["mistralai/mistral-large-4-1t-a52b", "deepseek-ai/deepseek-v4.1-flash"]
     llm_max_rpm: int = 35
 
     rulebook_path: Path = REPO_ROOT / "rulebook" / "aop.yaml"

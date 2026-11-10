@@ -1,9 +1,11 @@
 """The LLM gateway: the only way any part of the agent talks to a model.
 
-Every call is throttled to the free tier's rate limit, retried with backoff on transient errors,
-optionally served from a file cache (so demo samples never need a live call), and logged to the
-case record together with the model's reasoning trace. If a model can't be reached, it raises
-AiUnavailable, and the pipeline turns that into a hold. It never approves on failure.
+Every call is throttled to the free tier's rate limit and retried with backoff on transient errors
+(3 tries per model). If a model stays down, the call moves to the next model in its fallback chain
+(settings.fallback_vision / fallback_text). Replies can be served from a file cache (so demo samples
+never need a live call), and every call is logged to the case record with the model that answered
+and its reasoning trace. If every model fails, it raises AiUnavailable and the pipeline turns that
+into a hold. It never approves on failure.
 """
 from __future__ import annotations
 
@@ -17,13 +19,17 @@ from pathlib import Path
 import httpx
 import jsonschema
 
-BACKOFF = (1, 2, 4, 8)
+BACKOFF = (1, 2)  # 3 tries per model, then the next model in the chain
 TIMEOUT = 120.0
 RETRY_STATUS = {429, 500, 502, 503, 504}
 
 
 class AiUnavailable(RuntimeError):
     """A model could not be reached after retries (or rejected the request)."""
+
+
+class RequestRejected(AiUnavailable):
+    """The service refused the request itself (HTTP 400): another model would refuse it too."""
 
 
 class InvalidModelOutput(ValueError):
@@ -84,7 +90,9 @@ class Gateway:
                 r = self.client.post(url, headers=headers, **kwargs)
                 if r.status_code in RETRY_STATUS:
                     last = f"HTTP {r.status_code}"
-                elif r.status_code >= 400:
+                elif r.status_code == 400:
+                    raise RequestRejected(f"HTTP 400: {r.text[:200]}")
+                elif r.status_code >= 400:  # e.g. 404: this model is not deployed; the next one may be
                     raise AiUnavailable(f"HTTP {r.status_code}: {r.text[:200]}")
                 else:
                     return r.json()
@@ -112,9 +120,24 @@ class Gateway:
             self.store.add_llm_call(case_id, node, model + (" (cached)" if cached else ""), prompt, response,
                                     reasoning, int((self.clock() - started) * 1000), tokens)
 
-    def _chat(self, slot: str, messages: list, extra: dict) -> dict:
-        body = {"model": self.models[slot], "messages": messages, "temperature": 0, "max_tokens": 8192, **extra}
-        return self._post(f"{self.s.nvidia_base_url}/chat/completions", json=body)
+    def chain(self, slot: str) -> list[str]:
+        """The model for this kind of call, then its backups, in the order they are tried."""
+        backups = self.s.fallback_vision if slot == "extract" else self.s.fallback_text
+        return list(dict.fromkeys([self.models[slot], *backups]))
+
+    def _chat(self, slot: str, messages: list, extra: dict) -> tuple[dict, str]:
+        """One chat completion: each model in the chain gets its retries before the next one is tried.
+        Returns the reply and the model that gave it."""
+        failures = []
+        for model in self.chain(slot):
+            body = {"model": model, "messages": messages, "temperature": 0, "max_tokens": 8192, **extra}
+            try:
+                return self._post(f"{self.s.nvidia_base_url}/chat/completions", json=body), model
+            except RequestRejected:
+                raise
+            except AiUnavailable as e:
+                failures.append(f"{model}: {e}")
+        raise AiUnavailable("every model failed (" + "; ".join(failures) + ")")
 
     # ---------- public calls ----------
     def parse_page(self, png: Path, *, case_id: str | None, cache_key: str | None = None) -> str:
@@ -143,7 +166,7 @@ class Gateway:
         convo = list(messages)
         reasoning_parts = []
         for attempt in range(2):
-            reply = self._chat(slot, convo, {})
+            reply, model = self._chat(slot, convo, {})
             msg = reply["choices"][0]["message"]
             reasoning = msg.get("reasoning_content") or msg.get("reasoning")
             if reasoning:
@@ -154,7 +177,7 @@ class Gateway:
                 jsonschema.validate(data, schema)
             except (ValueError, jsonschema.ValidationError) as e:
                 err = e.message if isinstance(e, jsonschema.ValidationError) else str(e)
-                self._log(case_id, node, self.models[slot], convo, {"invalid": content[:2000], "error": err},
+                self._log(case_id, node, model, convo, {"invalid": content[:2000], "error": err},
                           reasoning, started, (reply.get("usage") or {}).get("total_tokens"))
                 if attempt == 0:
                     convo = convo + [{"role": "assistant", "content": content},
@@ -164,7 +187,7 @@ class Gateway:
                     continue
                 raise InvalidModelOutput(err) from e
             joined = "\n\n".join(reasoning_parts) or None
-            self._log(case_id, node, self.models[slot], convo, data, joined, started,
+            self._log(case_id, node, model, convo, data, joined, started,
                       (reply.get("usage") or {}).get("total_tokens"))
             self._save(cache_key, {"data": data, "reasoning": joined})
             return data, joined
@@ -179,10 +202,10 @@ class Gateway:
             self._log(case_id, node, self.models[slot], messages, cached, cached.get("reasoning_content"), started,
                       cached=True)
             return cached
-        reply = self._chat(slot, messages, {"tools": tools, "tool_choice": "auto"})
+        reply, model = self._chat(slot, messages, {"tools": tools, "tool_choice": "auto"})
         msg = reply["choices"][0]["message"]
         self._save(cache_key, msg)
-        self._log(case_id, node, self.models[slot], messages, msg,
+        self._log(case_id, node, model, messages, msg,
                   msg.get("reasoning_content") or msg.get("reasoning"), started,
                   (reply.get("usage") or {}).get("total_tokens"))
         return msg

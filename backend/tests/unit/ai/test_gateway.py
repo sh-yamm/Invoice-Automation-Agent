@@ -94,7 +94,7 @@ def test_ai_unavailable_after_retries(gw):
     route = respx.post(f"{BASE}/chat/completions").mock(return_value=httpx.Response(503))
     with pytest.raises(AiUnavailable):
         gw.chat_json("fast", [{"role": "user", "content": "x"}], SCHEMA, case_id="c1", node="n")
-    assert route.call_count == 5  # first attempt + 4 retries
+    assert route.call_count == 3 * len(gw.chain("fast"))  # 3 tries on each model in the fallback chain
 
 
 @respx.mock
@@ -174,3 +174,48 @@ def test_offline_mode_never_calls_the_network(tmp_path, store, clock):
     with pytest.raises(AiUnavailable, match="offline"):
         g.chat_json("fast", [{"role": "user", "content": "x"}], SCHEMA, case_id=None, node="n", cache_key="miss")
     assert route.call_count == 0
+
+
+def _by_model(responses):
+    """A respx side effect that answers per model: responses maps model name -> Response (or exception)."""
+    def handler(request):
+        model = json.loads(request.content)["model"]
+        r = responses.get(model, httpx.Response(503))
+        if isinstance(r, Exception):
+            raise r
+        return r
+    return handler
+
+
+@respx.mock
+def test_falls_back_to_the_next_model_when_the_primary_stays_down(gw, store):
+    primary, backup = gw.chain("fast")[:2]
+    route = respx.post(f"{BASE}/chat/completions").mock(side_effect=_by_model({backup: chat_reply('{"total": 9}')}))
+    data, _ = gw.chat_json("fast", [{"role": "user", "content": "x"}], SCHEMA, case_id="c1", node="n")
+    assert data == {"total": 9}
+    tried = [json.loads(c.request.content)["model"] for c in route.calls]
+    assert tried == [primary] * 3 + [backup]
+    assert store.get_case("c1")["llm_calls"][-1]["model"] == backup
+
+
+@respx.mock
+def test_timeouts_on_the_vision_model_fall_back_too(gw):
+    primary, backup = gw.chain("extract")[:2]
+    respx.post(f"{BASE}/chat/completions").mock(side_effect=_by_model(
+        {primary: httpx.ReadTimeout("slow"), backup: chat_reply('{"total": 3}')}))
+    data, _ = gw.chat_json("extract", [{"role": "user", "content": "x"}], SCHEMA, case_id="c1", node="n")
+    assert data == {"total": 3}
+
+
+@respx.mock
+def test_a_rejected_request_does_not_fall_back(gw):
+    route = respx.post(f"{BASE}/chat/completions").mock(return_value=httpx.Response(400, json={"error": "bad"}))
+    with pytest.raises(AiUnavailable):
+        gw.chat_json("fast", [{"role": "user", "content": "x"}], SCHEMA, case_id="c1", node="n")
+    assert route.call_count == 1
+
+
+def test_each_kind_of_call_has_a_different_backup_model(gw):
+    for slot in ("extract", "extract_text", "fast", "agent"):
+        chain = gw.chain(slot)
+        assert len(chain) >= 2 and len(set(chain)) == len(chain), slot
