@@ -13,13 +13,13 @@ class Settings(BaseSettings):
     nvidia_base_url: str = "https://integrate.api.nvidia.com/v1"
     parse_url: str = "https://ai.api.nvidia.com/v1/retrieval/nvidia/nemotron-3.5-parse/parse"
     model_parse: str = "nvidia/nemotron-3.5-parse"
-    model_extract: str = "mistralai/mistral-large-4-1t-a52b"        # vision: scanned invoices
+    model_extract: str = "nvidia/nemotron-3.5-super-vl-120b-a12b"  # vision: scanned invoices (Mistral timed out)
     model_extract_text: str = "nvidia/nemotron-3-ultra-550b-a55b"  # text: digital invoices (much faster)
     model_fast: str = "nvidia/nemotron-3-ultra-550b-a55b"
     model_agent: str = "nvidia/nemotron-3-ultra-550b-a55b"
     model_embed: str = "nvidia/nemotron-3.5-embed-1b"
     # Backups, tried in order when a model stays down after its retries (each checked live on 2026-11-11).
-    fallback_vision: list[str] = ["nvidia/nemotron-3.5-super-vl-120b-a12b", "google/gemma-4-31b-it"]
+    fallback_vision: list[str] = ["mistralai/mistral-large-4-1t-a52b", "google/gemma-4-31b-it"]
     fallback_text: list[str] = ["mistralai/mistral-large-4-1t-a52b", "deepseek-ai/deepseek-v4.1-flash"]
     llm_max_rpm: int = 35
 
