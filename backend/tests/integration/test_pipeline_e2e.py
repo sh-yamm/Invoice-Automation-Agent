@@ -251,3 +251,13 @@ def test_invoice_naming_another_po_is_held_and_can_be_assigned_to_the_right_one(
     assert case["outcome"] is Outcome.APPROVED
     assert "PO_ASSIGNMENT_MISMATCH" not in {f.code for f in case["findings"]}
     assert store.get_case("C-AS2")["assigned_po"] == "PO-4501"
+
+
+def test_a_persons_decision_names_the_reason_in_words_not_its_code(tmp_path):
+    require_cache("S03")
+    p, store = make_pipeline(tmp_path)
+    p.start("e2e-S03w", PDF / "S03.pdf", sample_id="S03")
+    case = p.resume("e2e-S03w", {"action": "approve_anyway", "actor": "AP clerk", "action_key": "k1",
+                                 "note": "Called the vendor on the number on file."})
+    assert "BANK_DETAILS_MISMATCH" not in case["why"]
+    assert "Bank account differs from the vendor record" in case["why"]

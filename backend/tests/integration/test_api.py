@@ -287,3 +287,13 @@ def test_documents_for_the_trail(client):
     assert r.status_code == 200 and r.headers["content-type"] == "image/png"
     assert client.get("/api/documents/grn/GRN-7741.png").status_code == 200
     assert client.get("/api/documents/po/PO-0000.png").status_code == 404
+
+
+def test_edge_cases_listing(client):
+    r = client.get("/api/edge-cases").json()
+    assert [c["sample"] for c in r["cases"]] == ["S04", "S03", "S06", "S14"]
+    for c in r["cases"]:
+        assert c["scenario"] and c["why_hard"] and c["agent_does"] and c["outcome_title"]
+        assert "_" not in c["outcome_title"]  # a plain name, not a code
+        assert c["trail"].startswith("PO-") and c["po"] == c["trail"]
+    assert {a["sample"] for a in r["also"]} >= {"S05", "S07", "S08", "S12", "S13", "S15"}

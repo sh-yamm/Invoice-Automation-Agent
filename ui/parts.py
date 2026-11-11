@@ -211,8 +211,7 @@ def check_log(findings: list[dict]) -> str:
             last = idx
         held = " held" if f.get("outcome") == 2 else ""
         icon = {"pass": "✓", "warn": "!", "fail": "✕"}[f["status"]]
-        code = f'<span class="cd">{h(f["code"])}</span>' if f.get("code") and f["status"] != "pass" else ""
         detail = f'<div class="dd">{h(f["detail"])}</div>' if f.get("detail") and f["status"] != "pass" else ""
         out.append(f'<li class="{f["status"]}{held}"><span class="ic">{icon}</span><div><span class="tt">{h(f["title"])}</span>'
-                   f'{code}{detail}</div></li>')
+                   f'{detail}</div></li>')
     return f'<ul class="log">{"".join(out)}</ul>'

@@ -99,3 +99,12 @@ def test_priority_order(aop):
 
 def test_period_already_billed_outranks_probable_duplicate(aop):
     assert aop.reasons["PERIOD_ALREADY_BILLED"].priority < aop.reasons["DUPLICATE_PROBABLE"].priority
+
+
+def test_every_reason_has_a_plain_title():
+    """The app shows a reason's plain name, never its code."""
+    from ap_agent.core.config import Settings
+    aop = load_aop(Settings().rulebook_path)
+    missing = [c for c, r in aop.reasons.items() if not r.title or "_" in r.title]
+    assert missing == []
+    assert aop.reasons["PRICE_VARIANCE"].title == "Price above the agreed PO rate"

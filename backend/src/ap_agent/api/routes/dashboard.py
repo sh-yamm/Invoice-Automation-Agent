@@ -59,3 +59,24 @@ def samples(request: Request):
                "vendor": s.supplier["name"], "total": s.invoice.grand_total, "po": s.invoice.po_ref,
                "expected_outcome": int(s.expected_outcome), "expected_code": s.expected_code}
               for s in SPECS.values()])
+
+
+@router.get("/edge-cases")
+def edge_cases(request: Request):
+    """The edge cases we built, each with its demo invoice, the PO it bills and the outcome in plain words."""
+    from ap_agent.core.constants import OUTCOME_LABELS
+    from ap_agent.rulebook.loader import load_aop
+    from samples.edge_cases import ALSO_HANDLED, EDGE_CASES
+
+    aop = load_aop(ctx_of(request).deps.aop_path)
+
+    def info(sid: str) -> dict:
+        s = SPECS[sid]
+        r = aop.reasons.get(s.expected_code)
+        return {"po": s.invoice.po_ref, "vendor": s.supplier["name"], "expected_outcome": int(s.expected_outcome),
+                "outcome_label": OUTCOME_LABELS[int(s.expected_outcome)],
+                "outcome_title": r.title if r and r.title else s.expected_code}
+
+    cases = [{**c, **info(c["sample"]), "trail": SPECS[c["sample"]].invoice.po_ref} for c in EDGE_CASES]
+    also = [{**a, **info(a["sample"])} for a in ALSO_HANDLED]
+    return J({"cases": cases, "also": also})

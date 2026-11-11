@@ -140,7 +140,8 @@ def human_gate(state, deps):
             if inv.invoice_date else "the next payment run"
         label = "Signed off" if kind == "sign_off" else "Approved"
         primary = (state.get("verdict") or {}).get("primary_code")
-        why = f"{label} by {actor} after review of {primary}." + (f" Note: {note}" if note else "")
+        reason = aop.reasons[primary].title if primary in aop.reasons and aop.reasons[primary].title else primary
+        why = f"{label} by {actor} after review. Flagged for: {reason}." + (f" Note: {note}" if note else "")
         nxt, owner = f"Ready for payment on {pay}.", "No one"
     deps.store.set_outcome(cid, outcome, HUMAN_CODES[kind], why, owner, nxt, state.get("agent_note"),
                            state.get("txn_type"), state.get("doc_type"),

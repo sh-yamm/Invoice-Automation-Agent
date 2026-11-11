@@ -88,3 +88,45 @@ def test_records_page_refuses_an_invalid_gstin():
     at.text_input(key="nv_why").input("trying it")
     next(b for b in at.button if b.label == "Add and approve vendor").click().run()
     assert any("GSTIN" in e.value for e in at.error)
+
+
+# ---------- plain words, never reason codes ----------
+
+def test_decision_card_names_the_reason_not_its_code():
+    case = {"outcome": 2, "primary_code": "PRICE_VARIANCE", "why": "Billed 5% more.", "owner": "Procurement",
+            "next_step": "Confirm the rate.", "also": [], "human_actions": []}
+    out = invoice_view.decision_card(case)
+    assert "Price above the agreed PO rate" in out and "PRICE_VARIANCE" not in out
+
+
+def test_a_persons_decision_has_a_plain_label():
+    case = {"outcome": 0, "primary_code": "SIGNED_OFF", "why": "Signed off.", "owner": "No one", "next_step": "Pay.",
+            "also": [], "human_actions": [{"actor": "Finance controller", "action": "sign_off"}]}
+    out = invoice_view.decision_card(case)
+    assert "SIGNED_OFF" not in out and "Signed off by a person" in out
+
+
+def test_check_list_shows_no_reason_codes():
+    from ui.parts import check_log
+    f = {"stage": "match", "status": "fail", "code": "PRICE_VARIANCE", "title": "Price above tolerance", "detail": "5% more",
+         "outcome": 2}
+    assert "PRICE_VARIANCE" not in check_log([f])
+
+
+def _edge_app():
+    from ui import style
+    from ui.edge_cases import edge_cases_page
+    style.apply()
+    edge_cases_page()
+
+
+def test_edge_cases_page_lists_the_four_cases_with_run_buttons():
+    at = AppTest.from_function(_edge_app, default_timeout=120).run()
+    assert not at.exception
+    import html as htmlmod
+    body = htmlmod.unescape(" ".join(e.body for e in at.get("html")))
+    for t in ("A split PO runs out of balance", "The vendor's bank account has changed",
+              "The same invoice, sent again with a new number", "One purchase, split to stay under the approval limit"):
+        assert t in body
+    assert "SPLIT_BELOW_LIMIT" not in body and "Invoices split to stay under the approval limit" in body
+    assert sum(b.label == "Run this invoice" for b in at.button) == 4
