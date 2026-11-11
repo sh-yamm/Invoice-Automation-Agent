@@ -3,132 +3,132 @@
   "fields": {
    "doc_title": {
     "value": "TAX INVOICE",
-    "confidence": 0.95,
+    "confidence": 1.0,
     "block": 4
    },
    "supplier_name": {
     "value": "Deccan Steel Traders",
-    "confidence": 0.95,
+    "confidence": 1.0,
     "block": 1
    },
    "supplier_gstin": {
     "value": "36AAHFD3381L1Z6",
-    "confidence": 0.95,
+    "confidence": 1.0,
     "block": 2
    },
    "supplier_phone": {
     "value": "+91 40 2377 7781",
-    "confidence": 0.95,
+    "confidence": 1.0,
     "block": 2
    },
    "supplier_email": {
     "value": "accounts@deccansteel.in",
-    "confidence": 0.95,
+    "confidence": 1.0,
     "block": 2
    },
    "buyer_name": {
-    "value": "Zentra Retail Pvt Ltd",
-    "confidence": 0.95,
+    "value": "Sample Client Retail Pvt Ltd (demo company)",
+    "confidence": 1.0,
     "block": 6
    },
    "buyer_gstin": {
     "value": "29AABCZ5821K1ZW",
-    "confidence": 0.95,
+    "confidence": 1.0,
     "block": 8
    },
    "invoice_no": {
     "value": "DST/2627/0732",
-    "confidence": 0.95,
+    "confidence": 1.0,
     "block": 9
    },
    "invoice_date": {
     "value": "16/09/2026",
-    "confidence": 0.95,
+    "confidence": 1.0,
     "block": 10
    },
    "po_ref": {
     "value": "PO-4323",
-    "confidence": 0.95,
+    "confidence": 1.0,
     "block": 11
    },
    "place_of_supply_state": {
     "value": "Karnataka (29)",
-    "confidence": 0.95,
+    "confidence": 1.0,
     "block": 12
    },
    "irn": {
     "value": null,
-    "confidence": 0,
+    "confidence": 1.0,
     "block": null
    },
    "has_qr": {
     "value": false,
-    "confidence": 0,
+    "confidence": 1.0,
     "block": null
    },
    "bank_name": {
     "value": "Axis Bank",
-    "confidence": 0.95,
+    "confidence": 1.0,
     "block": 15
    },
    "bank_account": {
     "value": "917020047781",
-    "confidence": 0.95,
+    "confidence": 1.0,
     "block": 15
    },
    "ifsc": {
     "value": "UTIB0000553",
-    "confidence": 0.95,
+    "confidence": 1.0,
     "block": 15
    },
    "taxable_total": {
     "value": "3,38,000.00",
-    "confidence": 0.95,
+    "confidence": 1.0,
     "block": 13
    },
    "cgst": {
     "value": null,
-    "confidence": 0,
+    "confidence": 1.0,
     "block": null
    },
    "sgst": {
     "value": null,
-    "confidence": 0,
+    "confidence": 1.0,
     "block": null
    },
    "igst": {
     "value": "60,840.00",
-    "confidence": 0.95,
+    "confidence": 1.0,
     "block": 13
    },
    "round_off": {
     "value": "0.00",
-    "confidence": 0.95,
+    "confidence": 1.0,
     "block": 13
    },
    "grand_total": {
     "value": "3,98,840.00",
-    "confidence": 0.95,
+    "confidence": 1.0,
     "block": 13
    },
    "amount_in_words": {
     "value": "Rupees Three Lakh Ninety Eight Thousand Eight Hundred Forty Only",
-    "confidence": 0.95,
+    "confidence": 1.0,
     "block": 13
    },
    "period_start": {
     "value": null,
-    "confidence": 0,
+    "confidence": 1.0,
     "block": null
    },
    "period_end": {
     "value": null,
-    "confidence": 0,
+    "confidence": 1.0,
     "block": null
    },
    "consumer_no": {
     "value": null,
-    "confidence": 0,
+    "confidence": 1.0,
     "block": null
    }
   },
@@ -141,9 +141,9 @@
     "rate": "62.50",
     "taxable": "3,38,000.00",
     "gst_rate": "18%",
-    "confidence": 0.95
+    "confidence": 1.0
    }
   ]
  },
- "reasoning": "The user wants me to extract invoice data from the parsed page blocks and output JSON only. I need to carefully read each block and extract the required fields.\n\nLet me go through the blocks:\n\nBlock 1: \"Deccan Steel Traders\" - This is the supplier name.\nBlock 2: Contains supplier address, GSTIN, state, phone, email.\nBlock 3: \"Original for recipient\" - This is a caption, not a field.\nBlock 4: \"TAX INVOICE\" - This is the doc_title.\nBlock 5: \"Bill to\" - Section header.\nBlock 6: \"Zentra Retail Pvt Ltd\" - Buyer name.\nBlock 7: Buyer address.\nBlock 8: Buyer GSTIN.\nBlock 9: Invoice No.\nBlock 10: Invoice Date.\nBlock 11: PO Ref.\nBlock 12: Place of Supply.\nBlock 13: Table with line items and totals.\nBlock 14: \"Bank details for payment\" - Section header.\nBlock 15: Bank details.\nBlock 16: \"For Deccan Steel Traders\"\nBlock 17: \"Authorised Signatory\"\nBlock 18: Footer text.\n\nNow I need to extract all fields as per the schema.\n\nLet me parse each field:\n\n- doc_title: \"TAX INVOICE\" (from block 4)\n- supplier_name: \"Deccan Steel Traders\" (block 1)\n- supplier_gstin: \"36AAHFD3381L1Z6\" (block 2)\n- supplier_phone: \"+91 40 2377 7781\" (block 2)\n- supplier_email: \"accounts@deccansteel.in\" (block 2)\n- buyer_name: \"Zentra Retail Pvt Ltd\" (block 6)\n- buyer_gstin: \"29AABCZ5821K1ZW\" (block 8)\n- invoice_no: \"DST/2627/0732\" (block 9)\n- invoice_date: \"16/09/2026\" (block 10)\n- po_ref: \"PO-4323\" (block 11)\n- place_of_supply_state: \"Karnataka (29)\" (block 12)\n- irn: Not printed, so null\n- has_qr: Not mentioned, so false? The schema says true if e-invoice QR code is printed. Not mentioned, so false.\n- bank_name: \"Axis Bank\" (block 15)\n- bank_account: \"917020047781\" (block 15)\n- ifsc: \"UTIB0000553\" (block 15)\n- taxable_total: From table, \"3,38,000.00\" (block 13)\n- cgst: Not shown separately; only IGST @ 18% is shown. Since place of supply is Karnataka (different state from Telangana), it's inter-state, so IGST applies. CGST and SGST would be null or 0. The schema expects values; if not printed, use null. The table shows IGST @ 18%: 60,840.00. No CGST or SGST lines. So cgst: null, sgst: null, igst: 60,840.00.\n- round_off: \"0.00\" (block 13)\n- grand_total: \"3,98,840.00\" (block 13)\n- amount_in_words: \"Rupees Three Lakh Ninety Eight Thousand Eight Hundred Forty Only\" (block 13)\n- period_start: Not printed, null\n- period_end: Not printed, null\n- consumer_no: Not printed, null\n\nNow lines: The table shows one line item:\nDescription: \"MS flat bar 40x6 mm\"\nHSN/SAC: \"7216\"\nQty: \"5,408\" (but note it's written as \"5,408\" with comma; should we keep as string? The schema expects qty as string? It says qty: ... probably string. I'll keep as \"5,408\")\nUnit: \"kg\"\nRate: \"62.50\"\nTaxable: \"3,38,000.00\"\nGST rate: 18% (from IGST @ 18%)\nConfidence: high, say 0.95.\n\nBut note: The table also includes summary rows (Taxable Value, IGST, Round Off, Invoice Total). Those are not line items. Only the first row is a line item.\n\nThus lines array with one object.\n\nNow confidence for each field: I'll assign high confidence (0.95) for clear printed text. For fields not printed, confidence is not applicable but we can set 0? The schema says confidence 0-1 for each field. For null values, we can set confidence 0? But the instruction: \"Confidence is 0 to 1: how sure you are that you read the printed value correctly. Use a low value when the text is blurred, smudged, cut off or ambiguous.\" For fields not printed, we set value null and confidence maybe 0? But the schema expects confidence for each field. I'll set confidence 0 for null fields.\n\nBlock numbers: For each field, indicate which block it came from. For supplier_name: block 1. supplier_gstin: block 2. supplier_phone: block 2. supplier_email: block 2. buyer_name: block 6. buyer_gstin: block 8. invoice_no: block 9. invoice_date: block 10. po_ref: block 11. place_of_supply_state: block 12. irn: null, block null. has_qr: false, block null. bank_name: block 15. bank_account: block 15. ifsc: block 15. taxable_total: block 13. cgst: null, block null. sgst: null, block null. igst: block 13. round_off: block 13. grand_total: block 13. amount_in_words: block 13. period_start: null, block null. period_end: null, block null. consumer_no: null, block null.\n\nNow lines: each line should have confidence and block. The line comes from block 13.\n\nNow produce JSON.\n\nI need to ensure the JSON is valid. Use double quotes. No trailing commas.\n\nLet me construct."
+ "reasoning": "The user wants me to extract invoice data from the parsed page blocks and return JSON only. Let me analyze the blocks carefully.\n\nFirst, identify the document title: Block 4 says \"TAX INVOICE\". So doc_title = \"TAX INVOICE\".\n\nSupplier name: Block 1 \"Deccan Steel Traders\". Supplier address in block 2. Supplier GSTIN: block 2 \"36AAHFD3381L1Z6\". Supplier phone: block 2 \"+91 40 2377 7781\". Supplier email: block 2 \"accounts@deccansteel.in\".\n\nBuyer name: Block 6 \"Sample Client Retail Pvt Ltd (demo company)\". Buyer address block 7. Buyer GSTIN: block 8 \"29AABCZ5821K1ZW\".\n\nInvoice no: block 9 \"DST/2627/0732\". Invoice date: block 10 \"16/09/2026\". PO Ref: block 11 \"PO-4323\". Place of supply: block 12 \"Karnataka (29)\".\n\nIRN: not printed. has_qr: not mentioned, assume false.\n\nBank details: block 15 \"Axis Bank A/c No.: 917020047781 IFSC: UTIB0000553\". So bank_name = \"Axis Bank\", bank_account = \"917020047781\", ifsc = \"UTIB0000553\".\n\nNow the table in block 13. It's a bit messy. Let's parse:\n\nThe table shows:\n| Description | HSN/SAC | Qty | Unit | Rate (Rs.) Taxable Value (Rs.)\n1 | MS flat bar 40x6 mm | 7216 | 5,408 | kg | 62.50 | 3,38,000.00\n\nThen there are lines for taxable value, IGST, round off, invoice total.\n\nThe table seems to have one line item: description \"MS flat bar 40x6 mm\", HSN/SAC 7216, Qty 5,408 kg, Rate 62.50, Taxable Value 3,38,000.00.\n\nThen tax lines: Taxable Value 3,38,000.00 (maybe repeated), IGST @ 18% 60,840.00, Round Off 0.00, Invoice Total 3,98,840.00.\n\nAmount in words: \"Rupees Three Lakh Ninety Eight Thousand Eight Hundred Forty Only\" (from block 13).\n\nTaxable total: 3,38,000.00 (the taxable value). CGST: 0 (since IGST). SGST: 0. IGST: 60,840.00. Round off: 0.00. Grand total: 3,98,840.00.\n\nPeriod start/end: not printed. Consumer no: not printed.\n\nNow confidence: For each field, I need to assign confidence based on clarity. The text seems clear. I'll assign high confidence (0.95-1.0). For block numbers, I'll reference the block where the value appears.\n\nLet's map each field to block numbers:\n\n- doc_title: block 4\n- supplier_name: block 1\n- supplier_gstin: block 2\n- supplier_phone: block 2\n- supplier_email: block 2\n- buyer_name: block 6\n- buyer_gstin: block 8\n- invoice_no: block 9\n- invoice_date: block 10\n- po_ref: block 11\n- place_of_supply_state: block 12\n- irn: null (not printed)\n- has_qr: false (not printed)\n- bank_name: block 15\n- bank_account: block 15\n- ifsc: block 15\n- taxable_total: block 13 (the taxable value line)\n- cgst: 0 (not printed, but we can infer 0; but rule: never compute, copy printed figures. The printed figures show IGST only, no CGST/SGST. So cgst = 0? Actually the invoice shows IGST @ 18% 60,840.00. No CGST or SGST lines. So cgst = 0, sgst = 0. But are they printed? Not explicitly. The rule: \"Return only what is printed on the document. If a field is not printed, use null.\" So for cgst and sgst, they are not printed, so null. However, the schema expects numbers? The fields are defined as numbers? The example doesn't specify. But we can set null. But the instruction says \"Never compute totals or taxes; copy the printed figures exactly.\" So if CGST not printed, use null. Similarly for SGST. IGST is printed: 60,840.00. Round off printed: 0.00. Grand total printed: 3,98,840.00. Amount in words printed: block 13.\n\nPeriod start/end: null. Consumer no: null.\n\nLines: need to extract line items. There's one line item: description \"MS flat bar 40x6 mm\", hsn_sac \"7216\", qty \"5,408\", unit \"kg\", rate \"62.50\", taxable \"3,38,000.00\", gst_rate \"18%\" (since IGST @ 18%). But the line item doesn't explicitly show GST rate; the tax line shows IGST @ 18%. The line item might have GST rate implied. The schema for lines includes gst_rate. I'll include 18% for the line. Confidence high.\n\nNow, the table block 13 includes the line item and tax summary. I'll parse the line item from the first row.\n\nLet's construct JSON.\n\nNote: The values should be strings? The schema doesn't specify type. I'll keep as strings for numbers to preserve formatting (commas). But confidence is number.\n\nBlock numbers: For each field, I'll put the block number where the value appears. For lines, each line can have block number 13.\n\nNow, write JSON."
 }

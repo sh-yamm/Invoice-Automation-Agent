@@ -4,7 +4,8 @@ from __future__ import annotations
 from fastapi import APIRouter, Request
 
 from ap_agent.api.common import J, ctx_of
-from ap_agent.storage.seed import reset_demo
+from ap_agent.core.config import Settings
+from ap_agent.storage.seed import reset_demo, restore_records
 
 router = APIRouter(prefix="/api/demo")
 
@@ -13,6 +14,8 @@ router = APIRouter(prefix="/api/demo")
 def reset(request: Request):
     ctx = ctx_of(request)
     n = reset_demo(ctx.deps.store, ctx.seed_path, ctx.deps.files_dir, ctx.deps.checkpoint_path)
+    if ctx.deps.erp_dir:  # people's changes to vendors and POs go too
+        restore_records(Settings().erp_dir, ctx.deps.erp_dir)
     ctx.deps._ai.clear()
     ctx.deps.reload()
     return J({"cases": n})

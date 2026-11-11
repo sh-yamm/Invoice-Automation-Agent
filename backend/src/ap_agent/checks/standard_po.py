@@ -250,7 +250,9 @@ def balance_findings(ctx: CheckContext, po):
     if invoiced + this > value * (1 + ctx.aop.tolerance.po_balance_over_pct / 100):
         return [ctx.fail("AMOUNT_EXCEEDS_PO_BALANCE", "Invoice exceeds the PO balance", evidence=ctx.ev("taxable_total"),
                          data=data)]
-    return [ctx.ok("Within the PO's remaining balance", f"{data['remaining']} remaining before this invoice",
+    return [ctx.ok("Within the PO's remaining balance",
+                   f"{data['remaining']} was left on {po.po_number} before GST, and this invoice bills "
+                   f"{data['this_amount']} before GST. GST is paid on top and does not count against the PO.",
                    data=data)]
 
 

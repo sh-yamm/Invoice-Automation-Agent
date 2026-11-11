@@ -8,6 +8,7 @@ class CaseState(TypedDict, total=False):
     case_id: str
     pdf_path: str
     sample_id: str | None
+    assigned_po: str | None  # the PO a person uploaded the invoice to (None: let the agent find it)
     pdf_info: dict
     same_file_case: dict | None
     pages: list[str]

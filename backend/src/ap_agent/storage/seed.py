@@ -66,8 +66,13 @@ def load_snapshot(store: Store, seed: Path, files_dir: Path | None = None, check
         store.db.execute("ATTACH DATABASE ? AS snap", (str(seed / "history.db"),))
         try:
             store.db.execute("BEGIN")
-            for t in TABLES:
-                store.db.execute(f"INSERT INTO main.{t} SELECT * FROM snap.{t}")
+            for t in TABLES:  # by column name, so a snapshot made before a column or table was added still loads
+                snap_cols = [r[1] for r in store.db.query(f"PRAGMA snap.table_info({t})")]
+                if not snap_cols:
+                    continue
+                main_cols = {r[1] for r in store.db.query(f"PRAGMA main.table_info({t})")}
+                cols = ", ".join(c for c in snap_cols if c in main_cols)
+                store.db.execute(f"INSERT INTO main.{t} ({cols}) SELECT {cols} FROM snap.{t}")
             store.db.execute("COMMIT")
         except Exception:
             store.db.execute("ROLLBACK")
@@ -94,6 +99,16 @@ def _restore_checkpoints(src: Path, dst: Path) -> None:
         con.execute("DETACH DATABASE snap")
     finally:
         con.close()
+
+
+def restore_records(seed_erp: Path, work_erp: Path) -> None:
+    """Put the company records back as shipped (vendors, POs, receipts, contracts, accounts)."""
+    seed_erp, work_erp = Path(seed_erp), Path(work_erp)
+    if seed_erp.resolve() == work_erp.resolve():
+        return
+    work_erp.mkdir(parents=True, exist_ok=True)
+    for f in seed_erp.glob("*.csv"):
+        shutil.copyfile(f, work_erp / f.name)
 
 
 def reset_demo(store: Store, path: Path, files_dir: Path | None = None, checkpoint_path: Path | None = None) -> int:

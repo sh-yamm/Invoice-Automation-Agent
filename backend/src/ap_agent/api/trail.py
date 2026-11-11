@@ -1,4 +1,4 @@
-"""The paper trail behind one invoice: the PO Zentra issued, what the vendor delivered, earlier invoices on
+"""The paper trail behind one invoice: the PO Sample Client issued, what the vendor delivered, earlier invoices on
 the same order, this invoice, and what the agent and people did with it, in date order."""
 from __future__ import annotations
 
@@ -72,12 +72,12 @@ def build_trail(case: dict, deps) -> dict:
 
     steps = []
     if contract:
-        steps.append({"kind": "contract", "date": contract.start_date.isoformat(), "who": "Zentra",
+        steps.append({"kind": "contract", "date": contract.start_date.isoformat(), "who": "Sample Client",
                       "title": f"Contract {contract.contract_id} signed",
                       "detail": f"{contract.description}: {fmt_inr(contract.amount_per_period)} per {contract.billing_cycle.replace('ly', '')}, "
                                 f"{contract.start_date:%d %b %Y} to {contract.end_date:%d %b %Y}"})
     if po:
-        steps.append({"kind": "po", "date": po.po_date.isoformat(), "who": "Zentra",
+        steps.append({"kind": "po", "date": po.po_date.isoformat(), "who": "Sample Client",
                       "title": f"Purchase order {po.po_number} issued",
                       "detail": (f"{_qty(po.lines[0].qty, po.lines[0].unit)} of {po.lines[0].description} at {fmt_inr(po.lines[0].rate)}"
                                  if len(po.lines) == 1 else f"{len(po.lines)} lines") + f", {fmt_inr(po.value)} before GST"})

@@ -1,7 +1,7 @@
 """The 38 past invoices behind the demo: real documents, run through the real agent once.
 
 Each one is a printed invoice (same generator as the demo samples) tied to a real purchase order and goods
-receipt in Zentra's records, so every past case has the full paper trail: PO -> receipt -> invoice -> checks ->
+receipt in Sample Client's records, so every past case has the full paper trail: PO -> receipt -> invoice -> checks ->
 decision. scripts/build_history.py runs them through the pipeline in date order and saves the result as the
 starting history (data/seed/history.db + data/seed/files).
 

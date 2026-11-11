@@ -93,6 +93,8 @@ def build_graph(deps: Deps, checkpointer):
         kind = (s.get("action") or {}).get("action")
         if s.get("restart"):
             return "ingest"
+        if kind == "confirm_field" and (s.get("action") or {}).get("field") == "po_ref":
+            return "classify_transaction"  # a different PO can change the path: classify again
         if kind in ("confirm_field", "recheck"):
             return "validate" if s.get("txn_type") else "classify_transaction"
         if kind == "ask_vendor":
@@ -121,7 +123,8 @@ class Pipeline:
     def _config(self, case_id):
         return {"configurable": {"thread_id": case_id}, "recursion_limit": 60}
 
-    def prepare(self, case_id: str, pdf_path: Path, sample_id: str | None = None, filename: str | None = None) -> None:
+    def prepare(self, case_id: str, pdf_path: Path, sample_id: str | None = None, filename: str | None = None,
+                assigned_po: str | None = None) -> None:
         """Store the file and create the case record (so the UI can open it before the run starts)."""
         folder = self.deps.files_dir / case_id
         folder.mkdir(parents=True, exist_ok=True)
@@ -133,7 +136,8 @@ class Pipeline:
             render_pages(original, folder / "pages")
         except Exception:  # an unreadable file is reported by the run's own checks
             pass
-        self.deps.store.create_case(case_id, filename or Path(pdf_path).name, info["sha256"], sample_id)
+        self.deps.store.create_case(case_id, filename or Path(pdf_path).name, info["sha256"], sample_id,
+                                    assigned_po=assigned_po)
 
     def run(self, case_id: str) -> dict:
         case = self.deps.store.get_case(case_id)
@@ -141,7 +145,8 @@ class Pipeline:
         with self._locks[case_id]:
             try:
                 self.app.invoke({"case_id": case_id, "pdf_path": str(original), "sample_id": case["sample_id"],
-                                 "findings": [], "stopped": False}, self._config(case_id))
+                                 "assigned_po": case.get("assigned_po"), "findings": [], "stopped": False},
+                                self._config(case_id))
             except Exception as e:  # fail closed: a crash outside the nodes must not leave the case "running"
                 self._hold_on_crash(case_id, e)
         return self.deps.store.get_case(case_id)
@@ -158,8 +163,9 @@ class Pipeline:
                                                     "why": why, "owner": aop.reasons["TOOL_ERROR"].owner,
                                                     "next_step": nxt, "also": []})
 
-    def start(self, case_id: str, pdf_path: Path, sample_id: str | None = None, filename: str | None = None) -> dict:
-        self.prepare(case_id, pdf_path, sample_id, filename)
+    def start(self, case_id: str, pdf_path: Path, sample_id: str | None = None, filename: str | None = None,
+              assigned_po: str | None = None) -> dict:
+        self.prepare(case_id, pdf_path, sample_id, filename, assigned_po)
         return self.run(case_id)
 
     def check_action(self, case: dict, action: dict) -> None:

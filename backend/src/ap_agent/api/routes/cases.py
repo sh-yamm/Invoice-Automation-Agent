@@ -25,7 +25,7 @@ PACE = {"normal": 0, "demo": 450}
 
 @router.post("")
 async def create_case(request: Request, file: UploadFile | None = File(None), sample_id: str | None = Form(None),
-                      pace: str = Form("normal")):
+                      pace: str = Form("normal"), assigned_po: str | None = Form(None)):
     ctx = ctx_of(request)
     if file is None and not sample_id:
         raise HTTPException(400, "Upload a PDF invoice or choose a demo sample.")
@@ -41,7 +41,7 @@ async def create_case(request: Request, file: UploadFile | None = File(None), sa
         tmp = Path(tempfile.mkdtemp()) / "upload.pdf"
         tmp.write_bytes(data)
         path, name = tmp, file.filename or "invoice.pdf"
-    ctx.pipeline.prepare(case_id, path, sample_id=sample_id, filename=name)
+    ctx.pipeline.prepare(case_id, path, sample_id=sample_id, filename=name, assigned_po=assigned_po or None)
     ctx.deps.bus.pace_by_case[case_id] = PACE.get(pace, 0)
     ctx.executor.submit(ctx.pipeline.run, case_id)
     return J({"case_id": case_id}, 201)

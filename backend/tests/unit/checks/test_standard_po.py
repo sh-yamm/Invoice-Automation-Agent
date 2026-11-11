@@ -175,3 +175,10 @@ def test_single_line_matching_one_po_line_is_paired_not_header(store):
     ctx, f = run(inv, store)
     assert [(p.po_line_no, p.method) for p in ctx.pairs] == [(3, "hsn")]
     assert "HEADER_LEVEL_MATCH_ONLY" not in codes(f)
+
+
+def test_po_balance_pass_says_amounts_are_before_gst(store):
+    """The agent review read "remaining" against the GST-inclusive total; the pass note must say both are before GST."""
+    _, f = run(make_invoice("S01"), store)
+    ok = next(x for x in f if x.check == "po_balance")
+    assert ok.status is Status.PASS and "before GST" in ok.detail and ok.data["this_amount"] in ok.detail

@@ -3,132 +3,132 @@
   "fields": {
    "doc_title": {
     "value": "TAX INVOICE",
-    "confidence": 1.0,
+    "confidence": 0.99,
     "block": 3
    },
    "supplier_name": {
     "value": "Mehta Electricals Pvt Ltd",
-    "confidence": 1.0,
+    "confidence": 0.99,
     "block": 1
    },
    "supplier_gstin": {
     "value": "27AACCM4471B1ZR",
-    "confidence": 1.0,
+    "confidence": 0.99,
     "block": 2
    },
    "supplier_phone": {
     "value": "+91 22 2386 3306",
-    "confidence": 1.0,
+    "confidence": 0.99,
     "block": 2
    },
    "supplier_email": {
     "value": "ar@mehtaelectricals.in",
-    "confidence": 1.0,
+    "confidence": 0.99,
     "block": 2
    },
    "buyer_name": {
-    "value": "Zentra Retail Pvt Ltd",
-    "confidence": 1.0,
+    "value": "Sample Client Retail Pvt Ltd (demo company)",
+    "confidence": 0.99,
     "block": 6
    },
    "buyer_gstin": {
     "value": "29AABCZ5821K1ZW",
-    "confidence": 1.0,
-    "block": 7
+    "confidence": 0.99,
+    "block": 8
    },
    "invoice_no": {
     "value": "ME/26-27/1913",
-    "confidence": 1.0,
-    "block": 8
+    "confidence": 0.99,
+    "block": 13
    },
    "invoice_date": {
     "value": "09/08/2026",
-    "confidence": 1.0,
-    "block": 9
+    "confidence": 0.99,
+    "block": 14
    },
    "po_ref": {
     "value": "PO-4304",
-    "confidence": 1.0,
-    "block": 10
+    "confidence": 0.99,
+    "block": 15
    },
    "place_of_supply_state": {
     "value": "Karnataka (29)",
-    "confidence": 1.0,
-    "block": 11
+    "confidence": 0.99,
+    "block": 16
    },
    "irn": {
     "value": "b2ac485dc4f9814b9592aa883689817fa117dd1c19fe6b4cd506f741fd8b9cb5",
-    "confidence": 0.9,
+    "confidence": 0.95,
     "block": 4
    },
    "has_qr": {
     "value": false,
     "confidence": 0.8,
-    "block": null
+    "block": 4
    },
    "bank_name": {
     "value": "Kotak Mahindra Bank",
-    "confidence": 1.0,
-    "block": 19
+    "confidence": 0.99,
+    "block": 21
    },
    "bank_account": {
     "value": "4512113306",
-    "confidence": 1.0,
-    "block": 19
+    "confidence": 0.99,
+    "block": 21
    },
    "ifsc": {
     "value": "KKBK0000654",
-    "confidence": 1.0,
-    "block": 19
+    "confidence": 0.99,
+    "block": 21
    },
    "taxable_total": {
     "value": "2,12,500.00",
-    "confidence": 1.0,
-    "block": 14
+    "confidence": 0.99,
+    "block": 19
    },
    "cgst": {
     "value": null,
-    "confidence": 1.0,
-    "block": null
+    "confidence": 0.99,
+    "block": 19
    },
    "sgst": {
     "value": null,
-    "confidence": 1.0,
-    "block": null
+    "confidence": 0.99,
+    "block": 19
    },
    "igst": {
     "value": "38,250.00",
-    "confidence": 1.0,
-    "block": 15
+    "confidence": 0.99,
+    "block": 19
    },
    "round_off": {
     "value": "0.00",
-    "confidence": 1.0,
-    "block": 16
+    "confidence": 0.99,
+    "block": 19
    },
    "grand_total": {
     "value": "2,50,750.00",
-    "confidence": 1.0,
-    "block": 17
+    "confidence": 0.99,
+    "block": 19
    },
    "amount_in_words": {
     "value": "Rupees Two Lakh Fifty Thousand Seven Hundred Fifty Only",
-    "confidence": 1.0,
-    "block": 13
+    "confidence": 0.99,
+    "block": 18
    },
    "period_start": {
     "value": null,
-    "confidence": 1.0,
+    "confidence": 0.99,
     "block": null
    },
    "period_end": {
     "value": null,
-    "confidence": 1.0,
+    "confidence": 0.99,
     "block": null
    },
    "consumer_no": {
     "value": null,
-    "confidence": 1.0,
+    "confidence": 0.99,
     "block": null
    }
   },
@@ -141,9 +141,9 @@
     "rate": "100.00",
     "taxable": "2,12,500.00",
     "gst_rate": 18,
-    "confidence": 1.0
+    "confidence": 0.95
    }
   ]
  },
- "reasoning": "The user wants me to extract invoice data from the parsed page blocks and return JSON only. I need to carefully read each block and map to the required fields.\n\nLet me go through each block:\n\nBlock 1: \"Mehta Electricals Pvt Ltd\" - This is supplier_name\nBlock 2: Address and GSTIN, phone, email - supplier_gstin, supplier_phone, supplier_email\nBlock 3: \"TAX INVOICE\" - doc_title\nBlock 4: \"Original for recipient\" and IRN - irn (the IRN appears to be split across two lines: \"b2ac485dc4f9814b9592aa883689817f\" and \"a117dd1c19fe6b4cd506f741fd8b9cb5\". Probably the full IRN is the concatenation? Actually typical IRN is 64 characters? Let's see: first part 32 chars, second part 32 chars, total 64. Might be the IRN split. I'll combine them: \"b2ac485dc4f9814b9592aa883689817fa117dd1c19fe6b4cd506f741fd8b9cb5\". But the instruction: \"Return only what is printed on the document.\" The IRN is printed across two lines. I'll include the full IRN as printed? The block shows two lines. I'll combine without space. Also has_qr: not mentioned, but e-invoice QR code might be present? Not in blocks. So has_qr: false.\nBlock 5: \"Bill to\" - section header\nBlock 6: \"Zentra Retail Pvt Ltd\" - buyer_name\nBlock 7: Address and GSTIN - buyer_gstin\nBlock 8: \"Invoice No. ME/26-27/1913\" - invoice_no\nBlock 9: \"Invoice Date 09/08/2026\" - invoice_date\nBlock 10: \"PO Ref. PO-4304\" - po_ref\nBlock 11: \"Place of Supply Karnataka (29)\" - place_of_supply_state\nBlock 12: Table with line item. Need to extract line: description, hsn_sac, qty, unit, rate, taxable, gst_rate. The table shows: Description: Copper cable 4 sq mm, HSN/SAC: 8544, Qty: 2,125, Unit: m, Rate (Rs.): 100.00, Taxable Value (Rs.): 2,12,500.00. GST rate not shown in table but from tax lines: IGST @ 18%. So gst_rate: 18.\nBlock 13: \"Amount in words: Rupees Two Lakh Fifty Thousand Seven Hundred Fifty Only\" - amount_in_words\nBlock 14: \"Taxable Value 2,12,500.00\" - taxable_total\nBlock 15: \"IGST @ 18% 38,250.00\" - igst (since place of supply is Karnataka (29) and supplier is Maharashtra (27), interstate, so IGST applies). cgst and sgst should be null or 0? The fields cgst, sgst, igst are amounts. Since only IGST is printed, cgst and sgst are null.\nBlock 16: \"Round Off 0.00\" - round_off\nBlock 17: \"Invoice Total (Rs.) 2,50,750.00\" - grand_total\nBlock 18: \"Bank details for payment\"\nBlock 19: \"Kotak Mahindra Bank A/c No.: 4512113306 IFSC: KKBK0000654\" - bank_name, bank_account, ifsc\nBlock 20: \"For Mehta Electricals Pvt Ltd\"\nBlock 21: \"Authorised Signatory\"\nBlock 22: \"Subject to local jurisdiction. This is a computer generated invoice.\"\n\nPeriod_start, period_end, consumer_no not printed.\n\nNow confidence: For each field, I need to assign confidence 0-1 based on clarity. The text seems clear. I'll assign high confidence (0.95-1.0). For IRN, it's split across two lines, but still clear. I'll give 0.9.\n\nBlock numbers: I need to reference the block number where the value came from. For fields that come from multiple blocks, maybe use the primary block. I'll assign block numbers as per the parsed blocks list (1-22). For example, supplier_name from block 1, supplier_gstin from block 2, etc.\n\nLines array: one line item from block 12. Need to include description, hsn_sac, qty, unit, rate, taxable, gst_rate, confidence.\n\nNow produce JSON.\n\nLet's construct.\n\nNote: The numbers are formatted with commas (Indian numbering). Should keep as printed? The instruction: \"copy the printed figures exactly.\" So keep as strings with commas? The fields like taxable_total, cgst, etc. are numbers? The schema doesn't specify type. I'll keep as strings as printed.\n\nBut the example in the instruction shows numbers? Not sure. I'll keep as strings.\n\nNow JSON."
+ "reasoning": "The user wants me to extract invoice data from the parsed page blocks and return JSON only. I need to carefully read each block and map to the required fields.\n\nLet me go through the blocks:\n\nBlock 1: \"Mehta Electricals Pvt Ltd\" - This is supplier_name\nBlock 2: Address and contact details - supplier_gstin, supplier_phone, supplier_email\nBlock 3: \"TAX INVOICE\" - doc_title\nBlock 4: \"Original for recipient\" and IRN - has_qr? It mentions IRN but not explicitly QR code. The IRN is printed. has_qr: true if e-invoice QR code is printed. The block says \"IRN: b2ac485dc4f9814b9592aa883689817f a117dd1c19fe6b4cd506f741fd8b9cb5\". That's the IRN. It doesn't mention QR code explicitly, but typically e-invoice includes QR. However, the rule: \"has_qr: true if an e-invoice QR code is printed\". The block doesn't say QR code printed. It only shows IRN. I'll set has_qr: false unless there's indication. But many e-invoices have QR code printed. The block is caption \"Original for recipient\" and IRN. Might be that QR code is printed but not captured in text. Since the parsed blocks are text, and no mention of QR, I'll set has_qr: false. But confidence low.\n\nBlock 5: \"Bill to\" - section header\nBlock 6: \"Sample Client Retail Pvt Ltd (demo company)\" - buyer_name\nBlock 7: Address - buyer address but not needed directly.\nBlock 8: \"GSTIN: 29AABCZ5821K1ZW\" - buyer_gstin\nBlock 9: \"Invoice No.\" - header\nBlock 10: \"Invoice Date\" - header\nBlock 11: \"PO Ref.\" - header\nBlock 12: \"Place of Supply\" - header\nBlock 13: \"ME/26-27/1913\" - invoice_no\nBlock 14: \"09/08/2026\" - invoice_date\nBlock 15: \"PO-4304\" - po_ref\nBlock 16: \"Karnataka (29)\" - place_of_supply_state\nBlock 17: Table with line item: Description, HSN/SAC, Qty, Unit, Rate, Taxable Value. Need to extract line.\nBlock 18: \"Amount in words: Rupees Two Lakh Fifty Thousand Seven Hundred Fifty Only\" - amount_in_words\nBlock 19: Table with tax summary: Taxable Value, IGST @ 18%, Round Off, Invoice Total. This gives taxable_total, igst, round_off, grand_total. Also cgst and sgst are null (since IGST only).\nBlock 20: \"Bank details for payment\" - header\nBlock 21: \"Kotak Mahindra Bank A/c No.: 4512113306 IFSC: KKBK0000654\" - bank_name, bank_account, ifsc\nBlock 22: \"For Mehta Electricals Pvt Ltd\" - not needed\nBlock 23: \"Authorised Signatory\" - not needed\nBlock 24: \"Subject to local jurisdiction. This is a computer generated invoice.\" - not needed\n\nNow, need to compute confidence for each field based on clarity. The text seems clear.\n\nLet's map:\n\ndoc_title: \"TAX INVOICE\" from block 3. Confidence high, 0.99, block 3.\n\nsupplier_name: \"Mehta Electricals Pvt Ltd\" from block 1. Confidence 0.99, block 1.\n\nsupplier_gstin: \"27AACCM4471B1ZR\" from block 2. Confidence 0.99, block 2.\n\nsupplier_phone: \"+91 22 2386 3306\" from block 2. Confidence 0.99, block 2.\n\nsupplier_email: \"ar@mehtaelectricals.in\" from block 2. Confidence 0.99, block 2.\n\nbuyer_name: \"Sample Client Retail Pvt Ltd (demo company)\" from block 6. Confidence 0.99, block 6.\n\nbuyer_gstin: \"29AABCZ5821K1ZW\" from block 8. Confidence 0.99, block 8.\n\ninvoice_no: \"ME/26-27/1913\" from block 13. Confidence 0.99, block 13.\n\ninvoice_date: \"09/08/2026\" from block 14. Confidence 0.99, block 14.\n\npo_ref: \"PO-4304\" from block 15. Confidence 0.99, block 15.\n\nplace_of_supply_state: \"Karnataka (29)\" from block 16. Confidence 0.99, block 16.\n\nirn: \"b2ac485dc4f9814b9592aa883689817fa117dd1c19fe6b4cd506f741fd8b9cb5\"? Wait block 4 shows two lines: \"IRN: b2ac485dc4f9814b9592aa883689817f a117dd1c19fe6b4cd506f741fd8b9cb5\". Actually it's split across two lines. The IRN is a single 64-character hash? Typically IRN is 64 characters. The first part \"b2ac485dc4f9814b9592aa883689817f\" (32 chars) and second \"a117dd1c19fe6b4cd506f741fd8b9cb5\" (32 chars). Combined: \"b2ac485dc4f9814b9592aa883689817fa117dd1c19fe6b4cd506f741fd8b9cb5\". I'll combine them. Confidence 0.95 because split across lines. Block 4.\n\nhas_qr: false (no mention of QR code). Confidence 0.8 (since not explicitly stated). Block 4.\n\nbank_name: \"Kotak Mahindra Bank\" from block 21. Confidence 0.99, block 21.\n\nbank_account: \"4512113306\" from block 21. Confidence 0.99, block 21.\n\nifsc: \"KKBK0000654\" from block 21. Confidence 0.99, block 21.\n\ntaxable_total: \"2,12,500.00\" from block 19 (Taxable Value). Confidence 0.99, block 19.\n\ncgst: null (not printed). Confidence 0.99, block 19 shows only IGST.\n\nsgst: null. Confidence 0.99.\n\nigst: \"38,250.00\" from block 19. Confidence 0.99, block 19.\n\nround_off: \"0.00\" from block 19. Confidence 0.99, block 19.\n\ngrand_total: \"2,50,750.00\" from block 19 (Invoice Total). Confidence 0.99, block 19.\n\namount_in_words: \"Rupees Two Lakh Fifty Thousand Seven Hundred Fifty Only\" from block 18. Confidence 0.99, block 18.\n\nperiod_start: null (not printed). Confidence 0.99.\n\nperiod_end: null. Confidence 0.99.\n\nconsumer_no: null. Confidence 0.99.\n\nNow lines: from block 17, a table with one line. Need to parse: Description: \"Copper cable 4 sq mm\", HSN/SAC: \"8544\", Qty: \"2,125\" (but note it's \"2,125\" with comma), Unit: \"m\", Rate: \"100.00\", Taxable Value: \"2,12,500.00\". Also gst_rate: from block 19, IGST @ 18%, so gst_rate: 18. But the line item doesn't have GST rate printed; the tax summary shows IGST @ 18%. The line item likely has GST rate 18%. I'll include gst_rate: 18. Confidence for line: 0.95.\n\nThe line array should have objects with description, hsn_sac, qty, unit, rate, taxable, gst_rate, confidence.\n\nNote: qty is \"2,125\" but should be numeric? The spec says qty: ... probably as string. I'll keep as string \"2,125\". Similarly rate \"100.00\", taxable \"2,12,500.00\". gst_rate as number 18.\n\nNow produce JSON.\n\nMake sure to include all fields, even if null.\n\nLet's construct."
 }

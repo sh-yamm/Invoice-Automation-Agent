@@ -8,82 +8,82 @@
    },
    "supplier_name": {
     "value": "Mehta Electricals Pvt Ltd",
-    "confidence": 0.98,
+    "confidence": 0.95,
     "block": 1
    },
    "supplier_gstin": {
     "value": "27AACCM4471B1ZR",
-    "confidence": 0.98,
+    "confidence": 0.95,
     "block": 2
    },
    "supplier_phone": {
     "value": "+91 22 2386 3306",
-    "confidence": 0.98,
+    "confidence": 0.95,
     "block": 2
    },
    "supplier_email": {
     "value": "ar@mehtaelectricals.in",
-    "confidence": 0.98,
+    "confidence": 0.95,
     "block": 2
    },
    "buyer_name": {
-    "value": "Zentra Retail Pvt Ltd",
-    "confidence": 0.98,
+    "value": "Sample Client Retail Pvt Ltd (demo company)",
+    "confidence": 0.95,
     "block": 13
    },
    "buyer_gstin": {
     "value": "29AABCZ5821K1ZW",
-    "confidence": 0.98,
+    "confidence": 0.95,
     "block": 15
    },
    "invoice_no": {
     "value": "ME/26-27/1918",
-    "confidence": 0.98,
+    "confidence": 0.95,
     "block": 8
    },
    "invoice_date": {
     "value": "19/08/2026",
-    "confidence": 0.98,
+    "confidence": 0.95,
     "block": 9
    },
    "po_ref": {
     "value": "PO-4309",
-    "confidence": 0.98,
+    "confidence": 0.95,
     "block": 10
    },
    "place_of_supply_state": {
     "value": "Karnataka (29)",
-    "confidence": 0.98,
+    "confidence": 0.95,
     "block": 11
    },
    "irn": {
     "value": "865da75bceed3c81c2a685b9d6966a7c5c482a1823ca4c28080a1780e45dddf1",
-    "confidence": 0.95,
+    "confidence": 0.9,
     "block": 3
    },
    "has_qr": {
     "value": false,
-    "confidence": 0.9,
+    "confidence": 0.8,
     "block": null
    },
    "bank_name": {
     "value": "Kotak Mahindra Bank",
-    "confidence": 0.98,
+    "confidence": 0.95,
     "block": 18
    },
    "bank_account": {
     "value": "4512113306",
-    "confidence": 0.98,
+    "confidence": 0.95,
     "block": 18
    },
    "ifsc": {
     "value": "KKBK0000654",
-    "confidence": 0.98,
+    "confidence": 0.95,
     "block": 18
    },
    "taxable_total": {
     "value": 46500.0,
-    "confidence": 0.98,
+    "confidence": 0.95,
     "block": 16
    },
    "cgst": {
@@ -98,12 +98,12 @@
    },
    "igst": {
     "value": 8370.0,
-    "confidence": 0.98,
+    "confidence": 0.95,
     "block": 16
    },
    "round_off": {
     "value": 0.0,
-    "confidence": 0.98,
+    "confidence": 0.95,
     "block": 16
    },
    "grand_total": {
@@ -113,7 +113,7 @@
    },
    "amount_in_words": {
     "value": "Rupees Fifty Four Thousand Eight Hundred Seventy Only",
-    "confidence": 0.98,
+    "confidence": 0.95,
     "block": 16
    },
    "period_start": {
@@ -141,9 +141,9 @@
     "rate": 7750.0,
     "taxable": 46500.0,
     "gst_rate": 18,
-    "confidence": 0.98
+    "confidence": 0.95
    }
   ]
  },
- "reasoning": "The user wants me to extract invoice data from the parsed page blocks and output JSON only. I need to carefully read each block and map to the required fields.\n\nLet me analyze the blocks:\n\nBlock 1: \"Mehta Electricals Pvt Ltd\" - This is the supplier name (title)\nBlock 2: Address and contact details for supplier - GSTIN, phone, email\nBlock 3: \"Original for recipient\" and IRN - IRN is printed\nBlock 4-7: Section headers for Invoice No, Invoice Date, PO Ref, Place of Supply\nBlock 8: \"ME/26-27/1918\" - Invoice number\nBlock 9: \"19/08/2026\" - Invoice date\nBlock 10: \"PO-4309\" - PO reference\nBlock 11: \"Karnataka (29)\" - Place of supply\nBlock 12-13: \"Bill to\" and \"Zentra Retail Pvt Ltd\" - Buyer name\nBlock 14: Buyer address\nBlock 15: Buyer GSTIN\nBlock 16: Table with line items and tax summary. Contains description, HSN/SAC, Qty, Unit, Rate, Taxable Value. Also shows taxable total, IGST, round off, and amount in words.\nBlock 17-18: Bank details\nBlock 19-21: Signatory and notes.\n\nNow I need to extract fields:\n\n- doc_title: The document title as printed. The first block is \"Mehta Electricals Pvt Ltd\" which is supplier name, not doc title. Usually GST invoices have \"TAX INVOICE\" printed. But not in these blocks. Maybe it's not printed? The user says \"Return only what is printed on the document. If a field is not printed, use null.\" So doc_title might be null. However, block 3 says \"Original for recipient\" which is a phrase but not the title. I'll set doc_title as null.\n\n- supplier_name: \"Mehta Electricals Pvt Ltd\" from block 1.\n\n- supplier_gstin: \"27AACCM4471B1ZR\" from block 2.\n\n- supplier_phone: \"+91 22 2386 3306\" from block 2.\n\n- supplier_email: \"ar@mehtaelectricals.in\" from block 2.\n\n- buyer_name: \"Zentra Retail Pvt Ltd\" from block 13.\n\n- buyer_gstin: \"29AABCZ5821K1ZW\" from block 15.\n\n- invoice_no: \"ME/26-27/1918\" from block 8.\n\n- invoice_date: \"19/08/2026\" from block 9.\n\n- po_ref: \"PO-4309\" from block 10.\n\n- place_of_supply_state: \"Karnataka (29)\" from block 11.\n\n- irn: The IRN appears in block 3: \"865da75bceed3c81c2a685b9d6966a7c5c482a1823ca4c28080a1780e45dddf1\". Actually it's split across two lines. The IRN is a 64-character hash. The block shows two lines: \"865da75bceed3c81c2a685b9d6966a7c\" and \"5c482a1823ca4c28080a1780e45dddf1\". Combined: \"865da75bceed3c81c2a685b9d6966a7c5c482a1823ca4c28080a1780e45dddf1\". That's 64 chars? Let's count: first line 32 chars, second line 32 chars = 64. So IRN is that combined string.\n\n- has_qr: The block doesn't mention QR code. But e-invoice usually has QR. However, not printed in text. The user says \"true if an e-invoice QR code is printed\". Since not mentioned, I'll set false.\n\n- bank_name: \"Kotak Mahindra Bank\" from block 18.\n\n- bank_account: \"4512113306\" from block 18.\n\n- ifsc: \"KKBK0000654\" from block 18.\n\n- taxable_total: From block 16, the taxable value total is 46,500.00 (printed as \"Taxable Value | 46,500.00\").\n\n- cgst: Not shown; only IGST. Since place of supply is Karnataka (different state from Maharashtra), it's interstate, so IGST applies. CGST and SGST would be null or 0. The fields expect amounts. The printed CGST and SGST are not present. I'll set them as null.\n\n- sgst: null.\n\n- igst: 8,370.00 from block 16.\n\n- round_off: 0.00 from block 16.\n\n- grand_total: The invoice total payable. Not explicitly printed as a single \"Grand Total\" but we can compute? The user says \"Never compute totals or taxes; copy the printed figures exactly.\" The grand total is not printed explicitly. However, the amount in words says \"Rupees Fifty Four Thousand Eight Hundred Seventy Only\". That is 54,870. That equals taxable 46,500 + IGST 8,370 = 54,870. Round off 0. So grand total is 54,870. But is it printed? The amount in words is printed. The grand total might be printed elsewhere but not in blocks. The user says \"every tax invoice prints it, often in the same block as the tax lines\". In block 16, after round off, there might be a total line but not shown. The block ends with round off. The amount in words is given. I think we should set grand_total as 54870.00? But we must copy printed figures exactly. The amount in words is printed, but the numeric grand total is not printed. However, the field \"grand_total\" expects the invoice total payable. Since it's not printed, maybe null. But the instruction: \"grand_total: the invoice total payable, including tax and round-off (labelled e.g. Invoice Total, Grand Total, Total Amount); every tax invoice prints it, often in the same block as the tax lines\". It says every tax invoice prints it. In this parsed blocks, maybe it's missing. I'll check block 16 again: It shows lines: Taxable Value 46,500.00, IGST @ 18% 8,370.00, Round Off 0.00. No total line. The amount in words is separate. I'll set grand_total as null, but maybe we can infer from amount in words? The user says never compute. So I'll set grand_total as null.\n\n- amount_in_words: \"Rupees Fifty Four Thousand Eight Hundred Seventy Only\" from block 16.\n\n- period_start: Not printed, null.\n\n- period_end: Not printed, null.\n\n- consumer_no: Not printed, null.\n\nNow lines: The table has one line item: Description: \"Distribution board 12-way\", HSN/SAC: \"8537\", Qty: 6, Unit: \"Nos\", Rate: 7,750.00, Taxable: 46,500.00, GST rate: 18% (since IGST @ 18%). The line should include gst_rate. The taxable value is 46,500.00. The line's taxable is the total for that line. The GST rate is 18%. I'll include that.\n\nConfidence: For each field, I need to assign confidence 0-1. Since the text is clear, high confidence, maybe 0.95. For IRN, it's split across two lines but clear, 0.9. For grand_total, not printed, confidence 0.\n\nBlock numbers: I need to indicate which block the value came from. For fields that come from multiple blocks, maybe use the primary block. I'll assign block numbers as per the parsed blocks list.\n\nLet's map:\n\n- supplier_name: block 1\n- supplier_gstin: block 2\n- supplier_phone: block 2\n- supplier_email: block 2\n- buyer_name: block 13\n- buyer_gstin: block 15\n- invoice_no: block 8\n- invoice_date: block 9\n- po_ref: block 10\n- place_of_supply_state: block 11\n- irn: block 3\n- has_qr: not printed, block null\n- bank_name: block 18\n- bank_account: block 18\n- ifsc: block 18\n- taxable_total: block 16\n- cgst: not printed, null\n- sgst: not printed, null\n- igst: block 16\n- round_off: block 16\n- grand_total: not printed, null\n- amount_in_words: block 16\n- period_start: null\n- period_end: null\n- consumer_no: null\n\nLines: from block 16.\n\nNow produce JSON.\n\nNote: The JSON must have \"fields\" object and \"lines\" array.\n\nI'll write the JSON now."
+ "reasoning": "The user wants me to extract invoice data from the parsed page blocks and return JSON only. Let me analyze the blocks carefully.\n\nFirst, identify the document title. Block 1 shows \"Mehta Electricals Pvt Ltd\" which is the supplier name, not the document title. The document title might be \"TAX INVOICE\" or similar, but it's not explicitly shown in the blocks. However, block 3 says \"Original for recipient\" which suggests it's a tax invoice. But the instruction says to return what is printed. I don't see a clear \"TAX INVOICE\" title. Maybe it's implied. I'll set doc_title as \"TAX INVOICE\" if not printed? But rule: \"Return only what is printed on the document. If a field is not printed, use null.\" So if not printed, null. However, block 3 says \"Original for recipient\" and IRN. That might be part of the invoice. I'll check for any title. Not present. So doc_title: null.\n\nSupplier name: Block 1: \"Mehta Electricals Pvt Ltd\". That's the supplier name.\n\nSupplier GSTIN: Block 2: \"GSTIN: 27AACCM4471B1ZR\". So supplier_gstin: \"27AACCM4471B1ZR\".\n\nSupplier phone: Block 2: \"Phone: +91 22 2386 3306\". So supplier_phone: \"+91 22 2386 3306\".\n\nSupplier email: Block 2: \"Email: ar@mehtaelectricals.in\". So supplier_email: \"ar@mehtaelectricals.in\".\n\nBuyer name: Block 13: \"Sample Client Retail Pvt Ltd (demo company)\". That's the buyer name.\n\nBuyer GSTIN: Block 15: \"GSTIN: 29AABCZ5821K1ZW\". So buyer_gstin: \"29AABCZ5821K1ZW\".\n\nInvoice no: Block 8: \"ME/26-27/1918\". That's the invoice number.\n\nInvoice date: Block 9: \"19/08/2026\". That's the date.\n\nPO Ref: Block 10: \"PO-4309\". So po_ref: \"PO-4309\".\n\nPlace of supply state: Block 11: \"Karnataka (29)\". So place_of_supply_state: \"Karnataka (29)\".\n\nIRN: Block 3: \"IRN: 865da75bceed3c81c2a685b9d6966a7c 5c482a1823ca4c28080a1780e45dddf1\". That's two lines? Actually it's split across two lines. The IRN is a single string: \"865da75bceed3c81c2a685b9d6966a7c5c482a1823ca4c28080a1780e45dddf1\"? Wait, the IRN is typically 64 characters. The first line: \"865da75bceed3c81c2a685b9d6966a7c\" (32 chars) and second line: \"5c482a1823ca4c28080a1780e45dddf1\" (32 chars). Combined: \"865da75bceed3c81c2a685b9d6966a7c5c482a1823ca4c28080a1780e45dddf1\". That's 64 chars. So IRN: that combined string.\n\nHas QR: Not explicitly mentioned. But e-invoice QR code might be printed. Not in blocks. So has_qr: false? But rule: \"true if an e-invoice QR code is printed\". Not sure. I'll set false.\n\nBank details: Block 18: \"Kotak Mahindra Bank A/c No.: 4512113306 IFSC: KKBK0000654\". So bank_name: \"Kotak Mahindra Bank\", bank_account: \"4512113306\", ifsc: \"KKBK0000654\".\n\nNow taxable total, CGST, SGST, IGST, round_off, grand_total.\n\nFrom block 16 (table): It shows:\nDescription: Distribution board 12-way, HSN/SAC: 8537, Qty: 6, Unit: Nos, Rate: 7,750.00, Taxable Value: 46,500.00.\nThen lines:\nTaxable Value: 46,500.00\nIGST @ 18%: 8,370.00\nRound Off: 0.00\n\nNo CGST or SGST because it's inter-state (place of supply Karnataka, supplier Maharashtra). So IGST only.\n\nTaxable total: 46,500.00\nCGST: 0? Not printed. Should be null? The fields: cgst, sgst, igst. Since CGST and SGST not printed, they are null. But the instruction: \"If a field is not printed, use null.\" So cgst: null, sgst: null, igst: 8,370.00.\n\nRound off: 0.00.\n\nGrand total: Not explicitly printed? The table shows taxable value, IGST, round off. The grand total would be taxable + IGST + round off = 46,500 + 8,370 + 0 = 54,870. But the amount in words: \"Rupees Fifty Four Thousand Eight Hundred Seventy Only\". That's 54,870. So grand total is 54,870. However, is it printed as a line \"Invoice Total\" or \"Grand Total\"? Not in blocks. The amount in words is printed. The grand total might be implied. But the rule: \"grand_total: the invoice total payable, including tax and round-off (labelled e.g. Invoice Total, Grand Total, Total Amount); every tax invoice prints it, often in the same block as the tax lines\". In block 16, after round off, there might be a total line but not shown. The amount in words is given. I think we should extract grand_total as 54,870.00? But we must copy printed figures exactly. The printed figure for grand total might not be shown. However, the amount in words indicates the total. The instruction: \"Never compute totals or taxes; copy the printed figures exactly.\" So if grand total is not printed as a numeric value, we should not compute it. But the amount in words is printed. The field \"grand_total\" expects a numeric value. The amount in words is separate field. I'll check if there is a printed grand total. In block 16, the table ends with round off. No total line. However, the amount in words is printed. The grand total might be printed elsewhere? Not in blocks. So maybe grand_total is null. But the rule says \"every tax invoice prints it\". Possibly it's printed but not captured in blocks? The blocks are parsed from the document. Block 16 includes the table and the amount in words. The table shows taxable value, IGST, round off. The total might be the sum. But we cannot compute. However, the amount in words is \"Rupees Fifty Four Thousand Eight Hundred Seventy Only\". That is the grand total in words. The numeric grand total might be printed as \"54,870.00\" somewhere. Not in blocks. I'll set grand_total as null? But the instruction: \"grand_total: the invoice total payable, including tax and round-off (labelled e.g. Invoice Total, Grand Total, Total Amount); every tax invoice prints it, often in the same block as the tax lines\". Since it's not in the blocks, maybe it's not printed. But the amount in words is printed. I'll set grand_total as 54870.00? But that would be computing. Better to set null and let the amount_in_words capture the total. However, the field expects a numeric value. I'll look at the block 16 again: \"Amount in words: Rupees Fifty Four Thousand Eight Hundred Seventy Only\". That's the only total representation. The numeric total might be printed as \"Total: 54,870.00\" but not captured. I'll assume it's not printed. So grand_total: null.\n\nBut wait, the table shows \"Taxable Value | 46,500.00\", \"IGST @ 18% | 8,370.00\", \"Round Off | 0.00\". The sum is 54,870. The amount in words matches. The grand total might be printed as \"Invoice Total: 54,870.00\" but not in the parsed blocks. Since the blocks are parsed from the document, maybe the parser didn't capture that line. However, the instruction says to extract from the parsed page blocks. So we only have what's in the blocks. So grand_total not present. I'll set null.\n\nAmount in words: \"Rupees Fifty Four Thousand Eight Hundred Seventy Only\". Exactly as printed.\n\nPeriod start and end: Not printed. So null.\n\nConsumer no: Not printed. So null.\n\nNow lines: The table has one line item. Description: \"Distribution board 12-way\", HSN/SAC: \"8537\", Qty: \"6\", Unit: \"Nos\", Rate: \"7,750.00\", Taxable: \"46,500.00\", GST rate: 18% (since IGST @ 18%). The line should include gst_rate: 18. The taxable value is 46,500.00. The line also includes tax amount? The line item in the table shows taxable value. The tax is separate. The lines array expects each line with description, hsn_sac, qty, unit, rate, taxable, gst_rate. That's fine.\n\nNow confidence: For each field, assign confidence based on clarity. The text seems clear. I'll assign high confidence like 0.95 for most. For IRN, it's split across two lines, but still clear: 0.9. For grand_total, null confidence? Not applicable.\n\nBlock numbers: Need to reference which block the value came from. For each field, provide block number.\n\nLet's map:\n\ndoc_title: not printed -> null, confidence 0, block null.\n\nsupplier_name: block 1, confidence 0.95.\n\nsupplier_gstin: block 2, confidence 0.95.\n\nsupplier_phone: block 2, confidence 0.95.\n\nsupplier_email: block 2, confidence 0.95.\n\nbuyer_name: block 13, confidence 0.95.\n\nbuyer_gstin: block 15, confidence 0.95.\n\ninvoice_no: block 8, confidence 0.95.\n\ninvoice_date: block 9, confidence 0.95.\n\npo_ref: block 10, confidence 0.95.\n\nplace_of_supply_state: block 11, confidence 0.95.\n\nirn: block 3, confidence 0.9 (since split).\n\nhas_qr: not printed -> false? But the field expects boolean? The schema says has_qr: true if printed. Not printed, so false. Confidence 0.9? But it's not printed, so we infer false. However, the rule: \"Return only what is printed on the document. If a field is not printed, use null.\" For has_qr, it's a boolean. If not printed, maybe null? But the field description: \"has_qr: true if an e-invoice QR code is printed\". It doesn't say what if not printed. Could be false. I'll set false with confidence 0.8.\n\nbank_name: block 18, confidence 0.95.\n\nbank_account: block 18, confidence 0.95.\n\nifsc: block 18, confidence 0.95.\n\ntaxable_total: from block 16, the taxable value line: 46,500.00. Confidence 0.95.\n\ncgst: not printed -> null.\n\nsgst: not printed -> null.\n\nigst: block 16, IGST @ 18%: 8,370.00. Confidence 0.95.\n\nround_off: block 16, Round Off: 0.00. Confidence 0.95.\n\ngrand_total: not printed -> null.\n\namount_in_words: block 16, \"Rupees Fifty Four Thousand Eight Hundred Seventy Only\". Confidence 0.95.\n\nperiod_start: null.\n\nperiod_end: null.\n\nconsumer_no: null.\n\nLines: one line from block 16. Description: \"Distribution board 12-way\", hsn_sac: \"8537\", qty: \"6\", unit: \"Nos\", rate: \"7,750.00\", taxable: \"46,500.00\", gst_rate: 18. Confidence 0.95.\n\nNow produce JSON.\n\nNote: The JSON must have fields object with each field having value, confidence, block. For lines, array of objects with description, hsn_sac, qty, unit, rate, taxable, gst_rate, confidence.\n\nI'll write the JSON accordingly.\n\nLet's double-check block numbers: The parsed blocks are numbered 1 to 21. I'll use those numbers.\n\nBlock 1: Title \"Mehta Electricals Pvt Ltd\"\nBlock 2: Text with address, GSTIN, phone, email\nBlock 3: Text \"Original for recipient IRN: ...\"\nBlock 4: Section-header \"Invoice No.\"\nBlock 5: Section-header \"Invoice Date\"\nBlock 6: Section-header \"PO Ref.\"\nBlock 7: Section-header \"Place of Supply\"\nBlock 8: Text \"ME/26-27/1918\"\nBlock 9: Text \"19/08/2026\"\nBlock 10: Text \"PO-4309\"\nBlock 11: Text \"Karnataka (29)\"\nBlock 12: Section-header \"Bill to\"\nBlock 13: Section-header \"Sample Client Retail Pvt Ltd (demo company)\"\nBlock 14: Text address\nBlock 15: Text \"GSTIN: 29AABCZ5821K1ZW\"\nBlock 16: Table with description, HSN/SAC, etc. and amount in words.\nBlock 17: Section-header \"Bank details for payment\"\nBlock 18: Text bank details\nBlock 19: Text \"For Mehta Electricals Pvt Ltd\"\nBlock 20: Text \"Authorised Signatory\"\nBlock 21: Text \"Subject to local jurisdiction...\"\n\nThus mapping is correct.\n\nNow produce JSON."
 }
