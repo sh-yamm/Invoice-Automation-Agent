@@ -38,7 +38,7 @@ def timeline(t: dict, selected: str | None) -> str:
                 f'<span class="twhen">{h(day(e["date"])) if e["date"] else "Now"} · {h(e["actor"])}</span>'
                 f'<b>{h(e["title"])}</b><small>{h(e.get("detail") or "")}</small></span>')
         href = f'?trail={h(t["key"])}&doc={h(doc)}' if doc else None
-        items.append(f'<li class="tev {e["kind"]}{sel}">' + (f'<a href="{href}" target="_self">{body}</a>' if href else
+        items.append(f'<li class="tev k-{e["kind"]}{sel}">' + (f'<a href="{href}" target="_self">{body}</a>' if href else
                                                            f'<div>{body}</div>') + "</li>")
     return f'<ol class="timeline">{"".join(items)}</ol>'
 

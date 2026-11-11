@@ -179,7 +179,7 @@ a { color: var(--accent-deep); }
 .tdot.vendor { background: var(--pill); color: var(--ink); }
 .tdot.agent { background: var(--ink); color: #fff; border-color: var(--ink); }
 .tdot.person { border-color: var(--sign); color: var(--sign); }
-.tev.waiting .tdot { background: var(--hold-wash); border-color: var(--hold); color: var(--hold); font-weight: 800; }
+.tev.k-waiting .tdot { background: var(--hold-wash); border-color: var(--hold); color: var(--hold); font-weight: 800; }
 .tbody { display: grid; gap: 1px; min-width: 0; }
 .tbody b { font-size: 14px; font-weight: 600; line-height: 1.35; }
 .tbody small { font-size: 12.5px; color: var(--body); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }

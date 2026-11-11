@@ -108,7 +108,7 @@ def trail_detail(key: str, deps, by_key: dict | None = None) -> dict | None:
         what = (f"{lines[0].qty:,.0f} {lines[0].unit} of {lines[0].description} at {fmt_inr(lines[0].rate)}"
                 if len(lines) == 1 else f"{len(lines)} lines")
         events.append({"kind": "po", "date": po.po_date.isoformat(), "actor": SHORT, "case_id": None,
-                       "title": f"PO {po.po_number} sent to {vname}",
+                       "title": f"{po.po_number} sent to {vname}",
                        "detail": f"{what}; {fmt_inr(po.value)} before GST", "doc": {"type": "po", "ref": po.po_number}})
         grns = {}
         for l in lines:
