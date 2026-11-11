@@ -29,8 +29,29 @@ def _secrets_to_env() -> None:
         pass
 
 
-@st.cache_resource(show_spinner="Starting the agent…")
-def _engine():
+CODE = [ROOT / "backend" / "src", ROOT / "rulebook"]
+
+
+def code_version(paths: list[Path] = CODE) -> str:
+    """A fingerprint of the backend code: changes when any file in it is added, removed or edited."""
+    parts = []
+    for base in paths:
+        files = [base] if base.is_file() else sorted(p for p in base.rglob("*") if p.is_file() and p.suffix in (".py", ".yaml"))
+        for p in files:
+            s = p.stat()
+            parts.append(f"{p}:{s.st_size}:{s.st_mtime_ns}")
+    return str(hash("|".join(parts)))
+
+
+@st.cache_resource(show_spinner="Starting the agent…", max_entries=1)
+def _engine(version: str):
+    """One API per version of the backend code. Streamlit Cloud hot-reloads on a push without restarting, so the
+    cache is keyed by the code's fingerprint and stale backend modules are dropped before the new API is built."""
+    previous = getattr(sys, "_ap_agent_engine_version", None)  # on sys: this module itself may be reloaded
+    if previous is not None and previous != version:
+        for name in [m for m in sys.modules if m == "ap_agent" or m.startswith("ap_agent.")]:
+            del sys.modules[name]
+    sys._ap_agent_engine_version = version
     _secrets_to_env()
     from fastapi.testclient import TestClient
 
@@ -47,11 +68,11 @@ class ApiError(Exception):
 
 
 def ctx():
-    return _engine()[1]
+    return _engine(code_version())[1]
 
 
 def call(method: str, path: str, **kw):
-    r = _engine()[0].request(method, path, **kw)
+    r = _engine(code_version())[0].request(method, path, **kw)
     if r.status_code >= 400:
         try:
             detail = r.json().get("detail")
