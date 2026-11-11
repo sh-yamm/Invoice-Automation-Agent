@@ -56,6 +56,6 @@ def kpis(request: Request, days: int | None = None):
 @router.get("/samples")
 def samples(request: Request):
     return J([{"id": s.id, "title": s.title, "blurb": s.blurb, "layout": s.layout, "scanned": s.scanned,
-               "vendor": s.supplier["name"], "total": s.invoice.grand_total,
+               "vendor": s.supplier["name"], "total": s.invoice.grand_total, "po": s.invoice.po_ref,
                "expected_outcome": int(s.expected_outcome), "expected_code": s.expected_code}
               for s in SPECS.values()])
