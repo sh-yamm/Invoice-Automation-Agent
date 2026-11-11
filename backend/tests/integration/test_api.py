@@ -280,3 +280,10 @@ def test_reset_restores_the_records(rw_client):
     assert not any(l["po_number"] == po for l in rw_client.get("/api/data/purchase_orders").json())
     assert next(v for v in rw_client.get("/api/data/vendors").json() if v["vendor_id"] == "V002")["bank_account"] != "999"
     assert rw_client.get("/api/record-changes").json() == []
+
+
+def test_documents_for_the_trail(client):
+    r = client.get("/api/documents/po/PO-4518.png")
+    assert r.status_code == 200 and r.headers["content-type"] == "image/png"
+    assert client.get("/api/documents/grn/GRN-7741.png").status_code == 200
+    assert client.get("/api/documents/po/PO-0000.png").status_code == 404

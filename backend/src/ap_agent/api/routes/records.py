@@ -88,3 +88,32 @@ def raise_po(request: Request, body: NewPo):
 @router.get("/record-changes")
 def record_changes(request: Request, ref: str | None = None):
     return J(ctx_of(request).deps.store.record_changes(ref))
+
+
+# ---------- documents for the trail viewer ----------
+
+@router.get("/documents/po/{po_number}.png")
+def po_document(request: Request, po_number: str):
+    from fastapi.responses import FileResponse
+
+    from ap_agent.documents.build import po_document as build
+    deps = ctx_of(request).deps
+    po = deps.repo.po(po_number)
+    vendor = deps.repo.vendor(po.vendor_id) if po else None
+    if not po or not vendor:
+        raise HTTPException(404, f"There is no purchase order {po_number}.")
+    return FileResponse(build(po, vendor, deps.files_dir / "documents"), media_type="image/png")
+
+
+@router.get("/documents/grn/{grn_number}.png")
+def grn_document(request: Request, grn_number: str):
+    from fastapi.responses import FileResponse
+
+    from ap_agent.documents.build import grn_document as build
+    deps = ctx_of(request).deps
+    grns = [g for g in deps.repo.all_grns() if g.grn_number == grn_number]
+    po = deps.repo.po(grns[0].po_number) if grns else None
+    vendor = deps.repo.vendor(po.vendor_id) if po else None
+    if not grns or not po or not vendor:
+        raise HTTPException(404, f"There is no goods receipt {grn_number}.")
+    return FileResponse(build(grns, po, vendor, deps.files_dir / "documents"), media_type="image/png")
