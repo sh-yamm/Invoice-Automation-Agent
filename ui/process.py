@@ -7,9 +7,12 @@ from html import escape as h
 import streamlit as st
 
 from ui import engine
-from ui.common import EMAIL_NOTE, go
+from ui.common import EMAIL_NOTE, go, open_trail
 from ui.parts import OUTCOME, inr
 
+from samples.edge_cases import EDGE_CASES  # noqa: E402
+
+EDGE = {c["sample"] for c in EDGE_CASES}
 FIND = "find"  # "No PO / not sure: let the agent find it"
 
 
@@ -31,7 +34,7 @@ def _start(data: dict, files: dict | None = None) -> None:
     case = engine.get(f"/api/cases/{r['case_id']}")
     from ap_agent.api.trails import case_key  # the trail this invoice lands in
     key = po or case_key({**case, "findings": []}, engine.ctx().deps.repo)
-    go(trail=key, doc=f"invoice:{r['case_id']}")
+    open_trail(key, f"invoice:{r['case_id']}")
 
 
 @st.dialog("Process an invoice", width="large")
@@ -63,7 +66,8 @@ def process_dialog(fixed_po: str | None = None) -> None:
         for s in group:
             cls, label, _ = OUTCOME[s["expected_outcome"]]
             c1, c2 = st.columns([5, 1.3], vertical_alignment="center")
-            c1.html(f'<div><b>{h(s["id"])} · {h(s["title"])}</b><div class="note">{h(s["blurb"])} · {h(s["vendor"])}, '
+            tag = ' <span class="st-chip running">Edge case</span>' if s["id"] in EDGE else ""
+            c1.html(f'<div><b>{h(s["id"])} · {h(s["title"])}</b>{tag}<div class="note">{h(s["blurb"])} · {h(s["vendor"])}, '
                     f'{inr(s["total"], 0)}{" · prints " + h(s["po"]) if s.get("po") else " · no PO printed"} · expected '
                     f'<span class="st-chip {cls}">{label}</span></div></div>')
             if c2.button("Run", key=f"run-{s['id']}", width="stretch"):
@@ -100,4 +104,4 @@ def raise_po_dialog() -> None:
         except engine.ApiError as e:
             st.error(str(e))
             return
-        go(trail=po, doc=f"po:{po}")
+        open_trail(po, f"po:{po}")

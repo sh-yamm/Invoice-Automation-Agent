@@ -10,7 +10,7 @@ import streamlit as st
 from PIL import Image, ImageDraw
 
 from ui import engine
-from ui.common import html
+from ui.common import html, reason_title
 from ui.parts import OUTCOME, TXN, check_log, inr, match_table, num, stage_tiles
 
 ASSIGNABLE = ("PO_ASSIGNMENT_MISMATCH", "PO_NOT_FOUND")
@@ -47,7 +47,7 @@ def decision_card(c: dict) -> str:
     acted = c.get("human_actions") or []
     done = f'<dt>Decided by</dt><dd>{h(acted[-1]["actor"])}: {h(acted[-1]["action"].replace("_", " "))}</dd>' if acted else ""
     return (f'<div class="decision {cls}"><div style="display:flex;justify-content:space-between;gap:10px">'
-            f'<span class="verdict">{label}</span><span class="code">{h(c.get("primary_code") or "")}</span></div>'
+            f'<span class="verdict">{label}</span><span class="code">{h(reason_title(c.get("primary_code")))}</span></div>'
             f'<div class="why">{h(c.get("why") or "")}</div><dl class="facts"><dt>Who should act</dt><dd>{h(c.get("owner") or "")}</dd>'
             f'<dt>Next step</dt><dd>{h(c.get("next_step") or "—")}</dd>{done}</dl>'
             f'{f"<div class=note style=margin-top:10px>Also found</div><ul style=margin:4px 0 0>{also}</ul>" if also else ""}</div>')

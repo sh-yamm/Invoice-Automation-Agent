@@ -15,6 +15,18 @@ def html(s: str) -> None:
         st.html(s)
 
 
+PAGES: dict = {}  # filled by streamlit_app.py: the navigation's pages, by name
+
+
+def open_trail(trail: str | None, doc: str | None = None) -> None:
+    """Open a PO trail (and a document in it) on the Purchase orders page, from whichever page we are on."""
+    params = {k: v for k, v in {"trail": trail, "doc": doc}.items() if v}
+    page = PAGES.get("orders")
+    if page is None:  # a page rendered on its own (tests)
+        go(**params)
+    st.switch_page(page, query_params=params)
+
+
 def go(**params) -> None:
     """Open another view: trail=<key>, doc=<type:ref>. No params: the inbox."""
     st.query_params.clear()
@@ -22,3 +34,18 @@ def go(**params) -> None:
         if v:
             st.query_params[k] = v
     st.rerun()
+
+
+PEOPLE = {"APPROVED_BY_PERSON": "Approved by a person", "SIGNED_OFF": "Signed off by a person",
+          "REJECTED_BY_PERSON": "Rejected by a person"}
+
+
+def reason_title(code: str | None) -> str:
+    """A reason's plain name from the rulebook (the app never shows the code itself)."""
+    if not code:
+        return ""
+    if code in PEOPLE:
+        return PEOPLE[code]
+    from ui import engine
+    titles = {r["code"]: r.get("title") or r["code"] for r in engine.get("/api/aop")["reasons"]}
+    return titles.get(code, code.replace("_", " ").capitalize())

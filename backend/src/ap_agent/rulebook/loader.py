@@ -61,6 +61,7 @@ class Confidence(BaseModel):
 
 class Reason(BaseModel):
     code: str
+    title: str = ""  # the reason's plain name, shown in the app instead of the code
     outcome: Outcome | None
     owner: str
     explain: str
@@ -92,7 +93,7 @@ def load_aop(path: Path) -> Aop:
     reasons = {}
     for i, r in enumerate(raw.pop("reasons")):
         reasons[r["code"]] = Reason(
-            code=r["code"], outcome=_OUTCOMES[r["outcome"]], owner=r["owner"],
+            code=r["code"], title=r.get("title", ""), outcome=_OUTCOMES[r["outcome"]], owner=r["owner"],
             explain=r["explain"], next=r["next"], priority=i,
         )
     return Aop(**raw, reasons=reasons)

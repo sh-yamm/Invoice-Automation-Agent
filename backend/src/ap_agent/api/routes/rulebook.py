@@ -13,7 +13,7 @@ EDITABLE = ("authority", "tolerance", "duplicates", "confidence", "po_less_allow
 def aop_json(aop: Aop) -> dict:
     d = aop.model_dump(mode="json")
     d["locked"] = sorted(aop.locked)
-    d["reasons"] = [{"code": r.code, "outcome": outcome_name(r.outcome), "owner": r.owner, "explain": r.explain,
+    d["reasons"] = [{"code": r.code, "title": r.title, "outcome": outcome_name(r.outcome), "owner": r.owner, "explain": r.explain,
                      "next": r.next, "locked": r.code in aop.locked}
                     for r in sorted(aop.reasons.values(), key=lambda r: r.priority)]
     return d

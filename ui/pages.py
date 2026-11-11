@@ -61,7 +61,9 @@ def rules_page():
     with st.container(border=True):
         st.markdown("#### Locked rules")
         st.caption("These can never be approved without a written note, and the rulebook cannot unlock them.")
-        html("".join(f'<span class="pill" style="margin:0 6px 6px 0">{h(c)}</span>' for c in aop.get("locked") or []))
+        titles = {r["code"]: r.get("title") or r["code"] for r in aop.get("reasons") or []}
+        html("".join(f'<span class="pill" style="margin:0 6px 6px 0">{h(titles.get(c, c))}</span>'
+                     for c in aop.get("locked") or []))
     why = st.text_input("Why are you changing the rulebook?", placeholder="For example: steel prices are volatile this quarter")
     a, b = st.columns([1, 1])
     if a.button(f"Save {len(changes)} change{'s' if len(changes) != 1 else ''}" if changes else "Save changes",
