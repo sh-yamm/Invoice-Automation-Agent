@@ -14,7 +14,10 @@ if not URL:
     sys.exit("Set the APP_URL repository variable to the app's address, e.g. https://zamp-invoice-agent.streamlit.app")
 
 with sync_playwright() as p:
-    browser = p.chromium.launch()
+    try:
+        browser = p.chromium.launch(channel="chrome")  # the runner's Google Chrome
+    except Exception:
+        browser = p.chromium.launch()  # Playwright's own Chromium
     page = browser.new_page()
     page.goto(URL, wait_until="domcontentloaded", timeout=90_000)
     wake = page.get_by_role("button", name="Yes, get this app back up!")
