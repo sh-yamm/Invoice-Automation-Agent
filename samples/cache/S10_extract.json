@@ -27,7 +27,7 @@
     "block": 1
    },
    "buyer_name": {
-    "value": "Zentra Retail Pvt Ltd",
+    "value": "Sample Client Retail Pvt Ltd (demo company)",
     "confidence": 1.0,
     "block": 5
    },
@@ -48,7 +48,7 @@
    },
    "po_ref": {
     "value": null,
-    "confidence": 0.0,
+    "confidence": 1.0,
     "block": null
    },
    "place_of_supply_state": {
@@ -58,7 +58,7 @@
    },
    "irn": {
     "value": null,
-    "confidence": 0.0,
+    "confidence": 1.0,
     "block": null
    },
    "has_qr": {
@@ -97,9 +97,9 @@
     "block": 12
    },
    "igst": {
-    "value": "0.00",
+    "value": null,
     "confidence": 1.0,
-    "block": 12
+    "block": null
    },
    "round_off": {
     "value": "0.00",
@@ -118,17 +118,17 @@
    },
    "period_start": {
     "value": null,
-    "confidence": 0.0,
+    "confidence": 1.0,
     "block": null
    },
    "period_end": {
     "value": null,
-    "confidence": 0.0,
+    "confidence": 1.0,
     "block": null
    },
    "consumer_no": {
     "value": null,
-    "confidence": 0.0,
+    "confidence": 1.0,
     "block": null
    }
   },
@@ -140,10 +140,10 @@
     "unit": "Nos",
     "rate": "86,000.00",
     "taxable": "86,000.00",
-    "gst_rate": "18%",
+    "gst_rate": null,
     "confidence": 1.0
    }
   ]
  },
- "reasoning": "The user wants me to extract invoice data from the parsed page blocks and return JSON only. I need to carefully read each block and extract the required fields.\n\nLet me go through each block:\n\nBlock 1: Supplier info\n- Supplier name: \"Shree Ganesh Office Furniture\"\n- Supplier address: \"No. 42, 3rd Phase, Peenya Industrial Area, Bengaluru 560058, Karnataka\"\n- Supplier GSTIN: \"29AAKFS4417M1ZM\"\n- Supplier state: \"Karnataka (29)\"\n- Supplier phone: \"+91 80 4110 2290\"\n- Supplier email: \"accounts@shreeganeshfurniture.in\"\n\nBlock 2: Document title: \"TAX INVOICE\"\n\nBlock 3: \"Original for recipient\" - this is just a note, not a field.\n\nBlock 4: Section header \"Bill to\"\n\nBlock 5: Buyer name: \"Zentra Retail Pvt Ltd\"\n\nBlock 6: Buyer address and GSTIN: \"No. 14, Outer Ring Road, Bellandur, Bengaluru 560103, Karnataka GSTIN: 29AABCZ5821K1ZW\"\n- Buyer GSTIN: \"29AABCZ5821K1ZW\"\n\nBlock 7: Invoice No: \"SGOF/26-27/0445\"\n\nBlock 8: Invoice Date: \"03/11/2026\"\n\nBlock 9: Place of Supply: \"Karnataka (29)\"\n\nBlock 10: Table with line items:\n- Description: \"Conference table, 10-seater\"\n- HSN/SAC: \"9403\"\n- Qty: \"1\"\n- Unit: \"Nos\"\n- Rate: \"86,000.00\"\n- Taxable Value: \"86,000.00\"\n\nBlock 11: Amount in words: \"Rupees One Lakh One Thousand Four Hundred Eighty Only\"\n\nBlock 12: Tax summary table:\n- Taxable Value: 86,000.00\n- CGST @ 9%: 7,740.00\n- SGST @ 9%: 7,740.00\n- Round Off: 0.00\n- Invoice Total: 1,01,480.00\n\nBlock 13: Section header \"Bank details for payment\"\n\nBlock 14: Bank details: \"ICICI Bank A/c No.: 000405112290 IFSC: ICIC0000004\"\n- Bank name: \"ICICI Bank\"\n- Bank account: \"000405112290\"\n- IFSC: \"ICIC0000004\"\n\nBlock 15: \"For Shree Ganesh Office Furniture\" - just a signature line\n\nBlock 16: \"Authorised Signatory\" - signature line\n\nBlock 17: \"Subject to local jurisdiction. This is a computer generated invoice.\" - footer note\n\nNow I need to map these to the required fields:\n\nFields:\n- doc_title: \"TAX INVOICE\" (from block 2)\n- supplier_name: \"Shree Ganesh Office Furniture\" (block 1)\n- supplier_gstin: \"29AAKFS4417M1ZM\" (block 1)\n- supplier_phone: \"+91 80 4110 2290\" (block 1)\n- supplier_email: \"accounts@shreeganeshfurniture.in\" (block 1)\n- buyer_name: \"Zentra Retail Pvt Ltd\" (block 5)\n- buyer_gstin: \"29AABCZ5821K1ZW\" (block 6)\n- invoice_no: \"SGOF/26-27/0445\" (block 7)\n- invoice_date: \"03/11/2026\" (block 8)\n- po_ref: null (not printed)\n- place_of_supply_state: \"Karnataka (29)\" (block 9)\n- irn: null (not printed)\n- has_qr: false (no mention of QR code)\n- bank_name: \"ICICI Bank\" (block 14)\n- bank_account: \"000405112290\" (block 14)\n- ifsc: \"ICIC0000004\" (block 14)\n- taxable_total: \"86,000.00\" (block 12)\n- cgst: \"7,740.00\" (block 12)\n- sgst: \"7,740.00\" (block 12)\n- igst: \"0.00\" (not printed, but since CGST and SGST are present, IGST is 0)\n- round_off: \"0.00\" (block 12)\n- grand_total: \"1,01,480.00\" (block 12)\n- amount_in_words: \"Rupees One Lakh One Thousand Four Hundred Eighty Only\" (block 11)\n- period_start: null (not printed)\n- period_end: null (not printed)\n- consumer_no: null (not printed)\n\nLines array: one line item from block 10.\n\nConfidence: Since the text is clear in the parsed blocks, I'll use high confidence (0.95-1.0). For fields not present, confidence is not applicable but I'll set to 0.0 or null? The schema says confidence 0.0-1.0 for each field. For null values, I'll set confidence to 0.0.\n\nBlock numbers: I'll reference the block numbers from the parsed blocks (1-17). For each field, I'll indicate which block it came from.\n\nNow construct JSON."
+ "reasoning": "The user wants me to extract invoice data from the parsed page blocks and return JSON only. I need to carefully read each block and extract the required fields.\n\nLet me go through the blocks:\n\nBlock 1: Supplier info - Shree Ganesh Office Furniture, address, GSTIN: 29AAKFS4417M1ZM, State: Karnataka (29), Phone: +91 80 4110 2290, Email: accounts@shreeganeshfurniture.in\n\nBlock 2: Title - TAX INVOICE\n\nBlock 3: Text - Original for recipient (not a field we need)\n\nBlock 4: Section-header - Bill to\n\nBlock 5: Section-header - Sample Client Retail Pvt Ltd (demo company) - this is buyer_name\n\nBlock 6: Text - Address and GSTIN: 29AABCZ5821K1ZW - buyer_gstin\n\nBlock 7: Text - Invoice No. SGOF/26-27/0445 - invoice_no\n\nBlock 8: Text - Invoice Date 03/11/2026 - invoice_date\n\nBlock 9: Text - Place of Supply Karnataka (29) - place_of_supply_state\n\nBlock 10: Table - line item: Conference table, 10-seater, HSN 9403, Qty 1, Unit Nos, Rate 86,000.00, Taxable Value 86,000.00\n\nBlock 11: Caption - Amount in words: Rupees One Lakh One Thousand Four Hundred Eighty Only - amount_in_words\n\nBlock 12: Table - Tax summary: Taxable Value 86,000.00, CGST @ 9% 7,740.00, SGST @ 9% 7,740.00, Round Off 0.00, Invoice Total (Rs.) 1,01,480.00\n\nBlock 13: Section-header - Bank details for payment\n\nBlock 14: Text - ICICI Bank A/c No.: 000405112290 IFSC: ICIC0000004 - bank_name, bank_account, ifsc\n\nBlock 15: Text - For Shree Ganesh Office Furniture\n\nBlock 16: Text - Authorised Signatory\n\nBlock 17: Text - Subject to local jurisdiction. This is a computer generated invoice.\n\nNow I need to map these to the required fields.\n\nFields:\n- doc_title: \"TAX INVOICE\" from block 2\n- supplier_name: \"Shree Ganesh Office Furniture\" from block 1\n- supplier_gstin: \"29AAKFS4417M1ZM\" from block 1\n- supplier_phone: \"+91 80 4110 2290\" from block 1\n- supplier_email: \"accounts@shreeganeshfurniture.in\" from block 1\n- buyer_name: \"Sample Client Retail Pvt Ltd (demo company)\" from block 5\n- buyer_gstin: \"29AABCZ5821K1ZW\" from block 6\n- invoice_no: \"SGOF/26-27/0445\" from block 7\n- invoice_date: \"03/11/2026\" from block 8\n- po_ref: not printed, so null\n- place_of_supply_state: \"Karnataka (29)\" from block 9\n- irn: not printed, null\n- has_qr: not mentioned, false\n- bank_name: \"ICICI Bank\" from block 14\n- bank_account: \"000405112290\" from block 14\n- ifsc: \"ICIC0000004\" from block 14\n- taxable_total: \"86,000.00\" from block 12\n- cgst: \"7,740.00\" from block 12\n- sgst: \"7,740.00\" from block 12\n- igst: not printed (0), but field expects value, maybe null or 0? The spec says if not printed use null. Since IGST not mentioned, use null.\n- round_off: \"0.00\" from block 12\n- grand_total: \"1,01,480.00\" from block 12 (Invoice Total)\n- amount_in_words: \"Rupees One Lakh One Thousand Four Hundred Eighty Only\" from block 11\n- period_start: not printed, null\n- period_end: not printed, null\n- consumer_no: not printed, null\n\nLines: one line from block 10:\n- description: \"Conference table, 10-seater\"\n- hsn_sac: \"9403\"\n- qty: \"1\"\n- unit: \"Nos\"\n- rate: \"86,000.00\"\n- taxable: \"86,000.00\"\n- gst_rate: \"18%\" (since CGST 9% + SGST 9% = 18%) but the field gst_rate expects the rate printed? The table doesn't show GST rate explicitly, but we can infer from tax lines. However the rule says never compute, copy printed figures. The line table doesn't have GST rate column. The tax summary shows CGST @ 9% and SGST @ 9%. The line item doesn't have GST rate. Should we include gst_rate as \"18%\"? The spec says \"gst_rate\" in lines. Since not printed on line, maybe null. But we can derive from tax summary? The rule: \"Never compute totals or taxes; copy the printed figures exactly.\" So if not printed on line, use null. However the tax summary is separate. I think we should set gst_rate as null for the line, or maybe \"18%\" as printed in tax summary? The tax summary shows CGST @ 9% and SGST @ 9%, not a combined rate. I'll set gst_rate as null.\n\nConfidence: For each field, I need to assign confidence 0-1. Since text is clear, high confidence, maybe 0.95 or 1.0. But there might be some ambiguity: e.g., buyer_name includes \"(demo company)\" which is part of the printed text. I'll keep as is.\n\nBlock numbers: For each field, indicate which block it came from.\n\nLet's assign block numbers:\n- doc_title: block 2\n- supplier_name: block 1\n- supplier_gstin: block 1\n- supplier_phone: block 1\n- supplier_email: block 1\n- buyer_name: block 5\n- buyer_gstin: block 6\n- invoice_no: block 7\n- invoice_date: block 8\n- po_ref: null, block null\n- place_of_supply_state: block 9\n- irn: null, block null\n- has_qr: false, block null (not printed)\n- bank_name: block 14\n- bank_account: block 14\n- ifsc: block 14\n- taxable_total: block 12\n- cgst: block 12\n- sgst: block 12\n- igst: null, block null\n- round_off: block 12\n- grand_total: block 12\n- amount_in_words: block 11\n- period_start: null, block null\n- period_end: null, block null\n- consumer_no: null, block null\n\nLines: one line from block 10. Confidence high.\n\nNow produce JSON.\n\nNote: The values should be strings as printed, including commas. The spec doesn't specify numeric vs string, but we'll keep as strings.\n\nAlso, the grand_total is \"1,01,480.00\" (Indian numbering). Keep as printed.\n\nNow write JSON."
 }

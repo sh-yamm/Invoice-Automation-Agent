@@ -3,132 +3,132 @@
   "fields": {
    "doc_title": {
     "value": "TAX INVOICE",
-    "confidence": 1.0,
+    "confidence": 0.99,
     "block": 3
    },
    "supplier_name": {
     "value": "Kaveri Packaging Industries",
-    "confidence": 1.0,
+    "confidence": 0.99,
     "block": 1
    },
    "supplier_gstin": {
     "value": "29AADFK9013C1ZK",
-    "confidence": 1.0,
+    "confidence": 0.99,
     "block": 2
    },
    "supplier_phone": {
     "value": "+91 821 240 9023",
-    "confidence": 1.0,
+    "confidence": 0.99,
     "block": 2
    },
    "supplier_email": {
     "value": "billing@kaveripack.in",
-    "confidence": 1.0,
+    "confidence": 0.99,
     "block": 2
    },
    "buyer_name": {
-    "value": "Zentra Retail Pvt Ltd",
-    "confidence": 1.0,
+    "value": "Sample Client Retail Pvt Ltd (demo company)",
+    "confidence": 0.99,
     "block": 6
    },
    "buyer_gstin": {
     "value": "29AABCZ5821K1ZW",
-    "confidence": 1.0,
+    "confidence": 0.99,
     "block": 8
    },
    "invoice_no": {
     "value": "KPI/26-27/1011",
-    "confidence": 1.0,
+    "confidence": 0.99,
     "block": 9
    },
    "invoice_date": {
     "value": "05/08/2026",
-    "confidence": 1.0,
+    "confidence": 0.99,
     "block": 10
    },
    "po_ref": {
     "value": "PO-4302",
-    "confidence": 1.0,
+    "confidence": 0.99,
     "block": 11
    },
    "place_of_supply_state": {
     "value": "Karnataka (29)",
-    "confidence": 1.0,
+    "confidence": 0.99,
     "block": 12
    },
    "irn": {
     "value": null,
-    "confidence": 1.0,
+    "confidence": 0.95,
     "block": null
    },
    "has_qr": {
     "value": false,
-    "confidence": 1.0,
+    "confidence": 0.9,
     "block": null
    },
    "bank_name": {
     "value": "ICICI Bank",
-    "confidence": 1.0,
+    "confidence": 0.99,
     "block": 15
    },
    "bank_account": {
     "value": "001205019023",
-    "confidence": 1.0,
+    "confidence": 0.99,
     "block": 15
    },
    "ifsc": {
     "value": "ICIC0000012",
-    "confidence": 1.0,
+    "confidence": 0.99,
     "block": 15
    },
    "taxable_total": {
     "value": "3,78,500.00",
-    "confidence": 1.0,
+    "confidence": 0.99,
     "block": 13
    },
    "cgst": {
     "value": "34,065.00",
-    "confidence": 1.0,
+    "confidence": 0.99,
     "block": 13
    },
    "sgst": {
     "value": "34,065.00",
-    "confidence": 1.0,
+    "confidence": 0.99,
     "block": 13
    },
    "igst": {
-    "value": "0.00",
-    "confidence": 1.0,
-    "block": 13
+    "value": null,
+    "confidence": 0.95,
+    "block": null
    },
    "round_off": {
     "value": "0.00",
-    "confidence": 1.0,
+    "confidence": 0.99,
     "block": 13
    },
    "grand_total": {
     "value": "4,46,630.00",
-    "confidence": 1.0,
+    "confidence": 0.99,
     "block": 13
    },
    "amount_in_words": {
     "value": "Rupees Four Lakh Forty Six Thousand Six Hundred Thirty Only",
-    "confidence": 1.0,
+    "confidence": 0.99,
     "block": 13
    },
    "period_start": {
     "value": null,
-    "confidence": 1.0,
+    "confidence": 0.95,
     "block": null
    },
    "period_end": {
     "value": null,
-    "confidence": 1.0,
+    "confidence": 0.95,
     "block": null
    },
    "consumer_no": {
     "value": null,
-    "confidence": 1.0,
+    "confidence": 0.95,
     "block": null
    }
   },
@@ -141,9 +141,9 @@
     "rate": "100.00",
     "taxable": "3,78,500.00",
     "gst_rate": "18%",
-    "confidence": 1.0
+    "confidence": 0.85
    }
   ]
  },
- "reasoning": "The user wants me to extract invoice data from the parsed page blocks and return JSON only. Let me analyze the blocks carefully.\n\nFrom the blocks:\n- Block 1: Supplier name \"Kaveri Packaging Industries\"\n- Block 2: Supplier address, GSTIN, phone, email\n- Block 3: Document title \"TAX INVOICE\"\n- Block 4: \"Original for recipient\"\n- Block 5: \"Bill to\" section header\n- Block 6: Buyer name \"Zentra Retail Pvt Ltd\"\n- Block 7: Buyer address\n- Block 8: Buyer GSTIN \"29AABCZ5821K1ZW\"\n- Block 9: Invoice No \"KPI/26-27/1011\"\n- Block 10: Invoice Date \"05/08/2026\"\n- Block 11: PO Ref \"PO-4302\"\n- Block 12: Place of Supply \"Karnataka (29)\"\n- Block 13: Table with line items and totals\n- Block 14: \"Bank details for payment\"\n- Block 15: Bank details \"ICICI Bank A/c No.: 001205019023 IFSC: ICIC0000012\"\n- Block 16: \"For Kaveri Packaging Industries\"\n- Block 17: \"Authorised Signatory\"\n- Block 18: \"Subject to local jurisdiction. This is a computer generated invoice.\"\n\nNow I need to extract all fields. Let me parse the table in block 13 carefully.\n\nThe table shows:\n| Description | HSN/SAC | Qty | Unit | Rate (Rs.) Taxable Value (Rs.)\n1 | Carton sealing tape | 3919 | 3,785 | Rolls | 100.00 | 3,78,500.00\n\nThen there are summary lines:\nAmount in words: Rupees Four Lakh Forty Six Thousand Six Hundred Thirty Only | Taxable Value | | | 3,78,500.00\n| | | | CGST @ 9% | | | 34,065.00\n| | | | SGST @ 9% | | | 34,065.00\n| | | | Round Off | | | 0.00\n| | | | Invoice Total (Rs.) | | | 4,46,630.00\n\nSo:\n- Line item: description \"Carton sealing tape\", HSN/SAC \"3919\", Qty \"3,785\", Unit \"Rolls\", Rate \"100.00\", Taxable \"3,78,500.00\"\n- GST rate: CGST 9%, SGST 9% (so total 18%)\n- Taxable total: 3,78,500.00\n- CGST: 34,065.00\n- SGST: 34,065.00\n- IGST: 0 (not mentioned, since intra-state)\n- Round off: 0.00\n- Grand total: 4,46,630.00\n- Amount in words: \"Rupees Four Lakh Forty Six Thousand Six Hundred Thirty Only\"\n\nOther fields:\n- IRN: not printed\n- Has QR: not mentioned, so false\n- Period start/end: not printed\n- Consumer no: not printed\n\nNow I need to assign confidence and block numbers. For each field, I'll use the block where it appears.\n\nLet me construct the JSON."
+ "reasoning": "The user wants me to extract invoice data from the parsed page blocks and output JSON only. I need to carefully read each block and extract the required fields.\n\nLet me go through the blocks:\n\nBlock 1: \"Kaveri Packaging Industries\" - This is the supplier name.\nBlock 2: Contains supplier address, GSTIN, phone, email.\nBlock 3: \"TAX INVOICE\" - doc_title.\nBlock 4: \"Original for recipient\" - not a field we need.\nBlock 5: \"Bill to\" - section header.\nBlock 6: \"Sample Client Retail Pvt Ltd (demo company)\" - buyer_name.\nBlock 7: Buyer address.\nBlock 8: Buyer GSTIN.\nBlock 9: Invoice No.\nBlock 10: Invoice Date.\nBlock 11: PO Ref.\nBlock 12: Place of Supply.\nBlock 13: Table with line items and totals.\nBlock 14: Bank details section.\nBlock 15: Bank account and IFSC.\nBlock 16: \"For Kaveri Packaging Industries\" - not needed.\nBlock 17: \"Authorised Signatory\" - not needed.\nBlock 18: \"Subject to local jurisdiction...\" - not needed.\n\nNow extract fields:\n\n- doc_title: \"TAX INVOICE\" (block 3)\n- supplier_name: \"Kaveri Packaging Industries\" (block 1)\n- supplier_gstin: \"29AADFK9013C1ZK\" (block 2)\n- supplier_phone: \"+91 821 240 9023\" (block 2)\n- supplier_email: \"billing@kaveripack.in\" (block 2)\n- buyer_name: \"Sample Client Retail Pvt Ltd (demo company)\" (block 6)\n- buyer_gstin: \"29AABCZ5821K1ZW\" (block 8)\n- invoice_no: \"KPI/26-27/1011\" (block 9)\n- invoice_date: \"05/08/2026\" (block 10)\n- po_ref: \"PO-4302\" (block 11)\n- place_of_supply_state: \"Karnataka (29)\" (block 12)\n- irn: not printed, null\n- has_qr: not mentioned, false? The document doesn't mention QR code. I'll set false.\n- bank_name: \"ICICI Bank\" (block 15)\n- bank_account: \"001205019023\" (block 15)\n- ifsc: \"ICIC0000012\" (block 15)\n- taxable_total: from table, \"3,78,500.00\" (block 13)\n- cgst: \"34,065.00\" (block 13)\n- sgst: \"34,065.00\" (block 13)\n- igst: not present, null? The table shows CGST and SGST, no IGST. So null.\n- round_off: \"0.00\" (block 13)\n- grand_total: \"4,46,630.00\" (block 13)\n- amount_in_words: \"Rupees Four Lakh Forty Six Thousand Six Hundred Thirty Only\" (block 13)\n- period_start: not printed, null\n- period_end: not printed, null\n- consumer_no: not printed, null\n\nLines: There's one line item: \"Carton sealing tape\", HSN 3919, Qty 3,785, Unit Rolls, Rate 100.00, Taxable 3,78,500.00, GST rate? The tax is CGST 9% and SGST 9%, so total GST rate 18%. But the field gst_rate expects a number? The schema says gst_rate: ... Probably the GST rate percentage. Since it's intra-state, CGST 9% + SGST 9% = 18%. I'll put 18. But the instruction says never compute totals or taxes; copy printed figures exactly. The printed figures show CGST @ 9% and SGST @ 9%. The line item doesn't show a combined GST rate. However, the schema expects gst_rate for each line. I could put \"9% CGST + 9% SGST\" but that's not a number. Maybe the gst_rate is the rate applied to the line. Since the tax is split, but the rate is 18% total. I'll put 18 as a number? But the instruction says copy printed figures exactly. The printed figure for the line doesn't show a GST rate column. The table header shows \"Rate (Rs.) Taxable Value (Rs.)\". The tax lines are separate. I think gst_rate should be the GST rate applicable to that item. Since it's not explicitly printed per line, but the tax lines show CGST @ 9% and SGST @ 9%. I'll set gst_rate as \"18%\" but as a string? The schema doesn't specify type. I'll put \"18%\" as string. However, confidence may be lower.\n\nBetter to set gst_rate as null? But the field is required in lines array. I'll include it as \"18%\" with confidence 0.8.\n\nNow, confidence: For most fields, high confidence (0.95) because text is clear. For gst_rate, lower (0.8). For has_qr, false with confidence 0.9.\n\nBlock numbers: I'll assign block numbers as per the parsed blocks.\n\nNow produce JSON.\n\nNote: The JSON must have fields object and lines array.\n\nLet's construct."
 }

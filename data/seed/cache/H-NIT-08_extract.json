@@ -27,34 +27,34 @@
     "block": 3
    },
    "buyer_name": {
-    "value": "Zentra Retail Pvt Ltd",
+    "value": "Sample Client Retail Pvt Ltd (demo company)",
     "confidence": 1.0,
-    "block": 6
+    "block": 5
    },
    "buyer_gstin": {
     "value": "29AABCZ5821K1ZW",
     "confidence": 1.0,
-    "block": 7
+    "block": 5
    },
    "invoice_no": {
     "value": "NIT/26-27/084",
     "confidence": 1.0,
-    "block": 8
+    "block": 6
    },
    "invoice_date": {
     "value": "02/08/2026",
     "confidence": 1.0,
-    "block": 9
+    "block": 7
    },
    "po_ref": {
     "value": "PO-4490",
     "confidence": 1.0,
-    "block": 10
+    "block": 8
    },
    "place_of_supply_state": {
     "value": "Karnataka (29)",
     "confidence": 1.0,
-    "block": 11
+    "block": 9
    },
    "irn": {
     "value": null,
@@ -69,62 +69,62 @@
    "bank_name": {
     "value": "HDFC Bank",
     "confidence": 1.0,
-    "block": 15
+    "block": 12
    },
    "bank_account": {
     "value": "50200045515512",
     "confidence": 1.0,
-    "block": 15
+    "block": 12
    },
    "ifsc": {
     "value": "HDFC0001234",
     "confidence": 1.0,
-    "block": 15
+    "block": 12
    },
    "taxable_total": {
-    "value": "1,20,000.00",
+    "value": 120000.0,
     "confidence": 1.0,
-    "block": 13
+    "block": 11
    },
    "cgst": {
-    "value": null,
+    "value": 0.0,
     "confidence": 1.0,
-    "block": null
+    "block": 11
    },
    "sgst": {
-    "value": null,
+    "value": 0.0,
     "confidence": 1.0,
-    "block": null
+    "block": 11
    },
    "igst": {
-    "value": "21,600.00",
+    "value": 21600.0,
     "confidence": 1.0,
-    "block": 13
+    "block": 11
    },
    "round_off": {
-    "value": "0.00",
+    "value": 0.0,
     "confidence": 1.0,
-    "block": 13
+    "block": 11
    },
    "grand_total": {
-    "value": "1,41,600.00",
+    "value": 141600.0,
     "confidence": 1.0,
-    "block": 13
+    "block": 11
    },
    "amount_in_words": {
     "value": "Rupees One Lakh Forty One Thousand Six Hundred Only",
     "confidence": 1.0,
-    "block": 13
+    "block": 11
    },
    "period_start": {
     "value": "01/08/2026",
     "confidence": 1.0,
-    "block": 12
+    "block": 10
    },
    "period_end": {
     "value": "31/08/2026",
     "confidence": 1.0,
-    "block": 12
+    "block": 10
    },
    "consumer_no": {
     "value": null,
@@ -136,14 +136,14 @@
    {
     "description": "IT support retainer, August 2026",
     "hsn_sac": "998313",
-    "qty": "1",
+    "qty": 1,
     "unit": "Month",
-    "rate": "1,20,000.00",
-    "taxable": "1,20,000.00",
-    "gst_rate": "18%",
+    "rate": 120000.0,
+    "taxable": 120000.0,
+    "gst_rate": 18,
     "confidence": 1.0
    }
   ]
  },
- "reasoning": "The user wants me to extract invoice data from the parsed page blocks and output JSON only. I need to carefully read each block and extract the required fields.\n\nLet me go through the blocks:\n\nBlock 1: \"TAX INVOICE\" - this is the doc_title\nBlock 2: \"Nimbus IT Services LLP\" - supplier_name\nBlock 3: Contains supplier address, GSTIN, phone, email\n- GSTIN: 27AAPFN6620Q1ZH\n- Phone: +91 20 6720 5512\n- Email: finance@nimbusit.in\nBlock 4: \"Original for recipient\" - not a field we need\nBlock 5: \"Bill to\" - header\nBlock 6: \"Zentra Retail Pvt Ltd\" - buyer_name\nBlock 7: Buyer address and GSTIN: 29AABCZ5821K1ZW\nBlock 8: \"Invoice No.NIT/26-27/084\" - invoice_no\nBlock 9: \"Invoice Date02/08/2026\" - invoice_date (DD/MM/YYYY)\nBlock 10: \"PO Ref.PO-4490\" - po_ref\nBlock 11: \"Place of SupplyKarnataka (29)\" - place_of_supply_state\nBlock 12: \"Billing Period01/08/2026 to 31/08/2026\" - period_start and period_end\nBlock 13: Table with line items and totals\n- Description: \"IT support retainer, August 2026\"\n- HSN/SAC: 998313\n- Qty: 1\n- Unit: Month\n- Rate: 1,20,000.00\n- Taxable: 1,20,000.00\n- GST rate: 18% (IGST @ 18%)\n- Taxable total: 1,20,000.00\n- IGST: 21,600.00\n- Round Off: 0.00\n- Grand total: 1,41,600.00\n- Amount in words: \"Rupees One Lakh Forty One Thousand Six Hundred Only\"\nBlock 14: \"Bank details for payment\"\nBlock 15: \"HDFC Bank A/c No.: 50200045515512 IFSC: HDFC0001234\" - bank_name, bank_account, ifsc\nBlock 16: \"For Nimbus IT Services LLP\"\nBlock 17: \"Authorised Signatory\"\nBlock 18: \"Subject to local jurisdiction. This is a computer generated invoice.\"\n\nNow, I need to check for IRN and QR code - not mentioned in blocks, so null/false.\nConsumer_no - not mentioned, null.\nCGST and SGST - since it's interstate (Maharashtra to Karnataka), it's IGST only, so CGST and SGST are 0 or null? The fields expect values. The table shows IGST @ 18%, no CGST/SGST. So CGST and SGST should be 0.00 or null? The instruction says \"copy the printed figures exactly\". Since not printed, use null. But the table shows only IGST. I'll set CGST and SGST as null.\n\nAlso, taxable_total is 1,20,000.00 (printed as \"Taxable Value\" 1,20,000.00)\nIGST is 21,600.00\nRound_off is 0.00\nGrand_total is 1,41,600.00\n\nAmount in words: \"Rupees One Lakh Forty One Thousand Six Hundred Only\"\n\nPeriod start: 01/08/2026, period end: 31/08/2026\n\nNow, confidence: For each field, I need to assign confidence 0-1. Since the text is clear in blocks, high confidence, maybe 0.95 or 1.0. But some fields like phone, email are in block 3, clear. I'll use 0.98 for most.\n\nBlock numbers: I'll reference the block number where the value came from.\n\nFor lines: only one line item.\n\nNow, construct JSON.\n\nNote: The fields list includes many fields. I must include all, even if null.\n\nLet's write JSON."
+ "reasoning": "The user wants me to extract invoice data from the parsed page blocks and output JSON only. I need to carefully read each block and extract the required fields.\n\nLet me go through each block:\n\nBlock 1: \"TAX INVOICE\" - this is the doc_title\nBlock 2: \"Nimbus IT Services LLP\" - supplier_name\nBlock 3: Contains supplier address, GSTIN, phone, email\n- supplier_gstin: \"27AAPFN6620Q1ZH\"\n- supplier_phone: \"+91 20 6720 5512\"\n- supplier_email: \"finance@nimbusit.in\"\nBlock 4: \"Original for recipient\" - not a field we need\nBlock 5: Buyer details\n- buyer_name: \"Sample Client Retail Pvt Ltd (demo company)\"\n- buyer_gstin: \"29AABCZ5821K1ZW\"\nBlock 6: \"Invoice No.NIT/26-27/084\" - invoice_no\nBlock 7: \"Invoice Date02/08/2026\" - invoice_date (DD/MM/YYYY)\nBlock 8: \"PO Ref.PO-4490\" - po_ref\nBlock 9: \"Place of SupplyKarnataka (29)\" - place_of_supply_state\nBlock 10: \"Billing Period01/08/2026 to 31/08/2026\" - period_start and period_end\nBlock 11: Table with line items and tax summary\n- Description: \"IT support retainer, August 2026\"\n- HSN/SAC: \"998313\"\n- Qty: \"1\"\n- Unit: \"Month\"\n- Rate: \"1,20,000.00\"\n- Taxable: \"1,20,000.00\"\n- GST rate: 18% (IGST @ 18%)\n- Taxable total: \"1,20,000.00\"\n- IGST: \"21,600.00\"\n- CGST: 0 (not shown, but since it's interstate, IGST applies)\n- SGST: 0\n- Round off: \"0.00\"\n- Grand total: taxable + IGST + round off = 1,20,000 + 21,600 + 0 = 1,41,600.00\n- Amount in words: \"Rupees One Lakh Forty One Thousand Six Hundred Only\"\nBlock 12: Bank details\n- bank_name: \"HDFC Bank\"\n- bank_account: \"50200045515512\"\n- ifsc: \"HDFC0001234\"\nBlock 13-15: Not needed for fields.\n\nNow, I need to determine confidence for each field. Since the text is clear in the parsed blocks, confidence should be high, maybe 0.95-1.0.\n\nFor lines array: one line item.\n\nLet me construct the JSON.\n\nNote: The taxable_total, cgst, sgst, igst, round_off, grand_total should be numeric values? The spec says \"copy the printed figures exactly\". The printed figures have commas. I'll keep them as strings? The example in the spec doesn't specify. Usually they'd be numbers. But \"copy the printed figures exactly\" suggests keep formatting. However, JSON numbers don't have commas. I'll output as numbers without commas, but the printed figures have commas. I'll output as strings? The spec says \"value\": ... could be string or number. I'll use numbers (float) for amounts, but the printed figures have commas. I'll parse them as numbers: 120000.00, 21600.00, 0.00, 141600.00.\n\nBut the spec says \"copy the printed figures exactly\". That might mean keep the string representation. However, the fields like taxable_total are likely expected as numbers. I'll output as numbers.\n\nConfidence: 0.98 for most.\n\nBlock numbers: I'll assign block numbers as per the parsed blocks.\n\nNow, lines array: each line with description, hsn_sac, qty, unit, rate, taxable, gst_rate, confidence.\n\ngst_rate: 18 (percentage). The printed says \"IGST @ 18%\". So gst_rate: 18.\n\nNow, let's write JSON."
 }
