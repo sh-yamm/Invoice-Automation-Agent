@@ -17,7 +17,7 @@ if str(REPO_ROOT) not in sys.path:  # the demo sample specs live in samples/ at 
 
 from ap_agent.ai.gateway import Gateway  # noqa: E402
 from ap_agent.api.common import AppContext  # noqa: E402
-from ap_agent.api.routes import cases, dashboard, data, demo, records, rulebook  # noqa: E402
+from ap_agent.api.routes import cases, dashboard, data, demo, records, rulebook, trails  # noqa: E402
 from ap_agent.erp.repository import Repository  # noqa: E402
 from ap_agent.pipeline.graph import Deps, Pipeline  # noqa: E402
 from ap_agent.storage.cases import Store  # noqa: E402
@@ -41,7 +41,7 @@ def create_app(deps: Deps | None = None, seed_path: Path | None = None) -> FastA
     app = FastAPI(title="Zamp Invoice Agent", version="0.1.0")
     app.state.ctx = AppContext(deps=deps, pipeline=Pipeline(deps), executor=ThreadPoolExecutor(max_workers=2),
                                seed_path=seed_path or s.seed_path)
-    for r in (cases.router, rulebook.router, data.router, dashboard.router, demo.router, records.router):
+    for r in (cases.router, rulebook.router, data.router, dashboard.router, demo.router, records.router, trails.router):
         app.include_router(r)
 
     @app.get("/api/health")
