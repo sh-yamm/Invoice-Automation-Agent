@@ -19,10 +19,13 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - name: Install a headless browser
+      # The runner image already has Google Chrome, so no system packages are installed (apt mirrors can be
+      # unreachable). Playwright's own Chromium is downloaded only as a fallback, from Playwright's CDN.
+      - name: Install Playwright
+        timeout-minutes: 4
         run: |
           pip install playwright==1.48.0
-          python -m playwright install --with-deps chromium
+          google-chrome --version || python -m playwright install chromium
       - name: Open the app
         env:
           APP_URL: ${{ vars.APP_URL }}
