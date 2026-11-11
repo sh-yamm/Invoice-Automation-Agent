@@ -24,9 +24,18 @@ with sync_playwright() as p:
         wake.click()
     except PlaywrightTimeout:
         print("App was awake")
-    # The app itself runs inside an iframe on Streamlit Cloud; wait for its dashboard text in any frame.
+    # The app itself runs inside an iframe on Streamlit Cloud; wait for its home page text in any frame.
+    # Case-insensitive: the page shows some headings in capitals through CSS only.
+    markers = ("accounts payable", "purchase orders and their invoices")
+
+    def rendered(frame) -> bool:
+        if frame.is_detached():
+            return False
+        text = frame.content().lower()
+        return any(m in text for m in markers)
+
     for _ in range(36):  # up to about 3 minutes for a cold start
-        if any("Accounts payable" in (f.content() if not f.is_detached() else "") for f in page.frames):
+        if any(rendered(f) for f in page.frames):
             print("Dashboard rendered: the app is up")
             break
         page.wait_for_timeout(5_000)
