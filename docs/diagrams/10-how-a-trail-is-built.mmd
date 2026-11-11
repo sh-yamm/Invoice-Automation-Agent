@@ -1,0 +1,6 @@
+flowchart TB
+  REC["Company records<br/>contract · PO · goods receipts"] --> EV
+  CASES["Agent's store<br/>invoices · decisions · people's actions"] --> KEY{"Which trail?<br/>matched PO → PO-xxxx<br/>no PO → vendor-Vxxx<br/>else → unmatched"}
+  KEY --> EV["Events in date order<br/>contract · PO · receipt · invoice · decision · person · waiting"]
+  EV --> T["One trail<br/>money left · status · needs you"]
+  T --> UI["Inbox row · timeline · documents"]

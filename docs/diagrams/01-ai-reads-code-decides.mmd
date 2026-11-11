@@ -1,0 +1,14 @@
+flowchart TB
+  PDF(["Invoice PDF"]) --> READ["AI reads the page<br/>OCR · fields · lines"]:::ai
+  READ --> GROUND["Code checks the reading<br/>every value must be on the page"]
+  GROUND --> RULES["Code applies 50 checks and the rulebook"]
+  RULES --> REVIEW["AI reviews the case<br/>can only make it stricter"]:::ai
+  REVIEW --> A["Approved"]:::ok
+  REVIEW --> S["Needs sign-off"]:::sign
+  REVIEW --> H["On hold"]:::hold
+  REVIEW --> R["Rejected"]:::rej
+  classDef ai fill:#E6EDFC,stroke:#2B5FD9,color:#14306E
+  classDef ok fill:#E1F2EA,stroke:#1F7F55,color:#0D3D27
+  classDef sign fill:#ECE6FA,stroke:#5B3CC4,color:#2E1A6B
+  classDef hold fill:#FBEEDB,stroke:#B26A0E,color:#5A3606
+  classDef rej fill:#F9E3E1,stroke:#B9342A,color:#5A1712

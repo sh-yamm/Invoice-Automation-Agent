@@ -1,0 +1,9 @@
+stateDiagram-v2
+  [*] --> running: invoice uploaded
+  running --> done: Approved or Rejected
+  running --> waiting: On hold or Needs sign-off
+  waiting --> done: approve anyway · sign off · reject
+  waiting --> running: confirm a field · re-check · assign to a PO
+  waiting --> waiting_vendor: ask the vendor
+  waiting_vendor --> running: re-check when the vendor replies
+  done --> [*]

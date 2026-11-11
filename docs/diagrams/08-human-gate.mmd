@@ -1,0 +1,11 @@
+flowchart TB
+  IN(["On hold or Needs sign-off"]) --> HG{"A person decides<br/>with a note"}
+  HG -->|"Approve anyway<br/>locked codes need a verification note"| F["Finalise<br/>PO ledger · payment date"]:::ok
+  HG -->|"Sign off"| F
+  HG -->|"Reject"| RJ(["Back to the vendor<br/>with the reason"]):::rej
+  HG -->|"Ask vendor"| WV(["Waiting for the vendor"]):::hold
+  HG -->|"Confirm a field · Re-check"| RV(["Re-run from validation"])
+  HG -->|"Assign to a PO"| RA(["Re-run from classification<br/>against the new PO"])
+  classDef ok fill:#E1F2EA,stroke:#1F7F55,color:#0D3D27
+  classDef rej fill:#F9E3E1,stroke:#B9342A,color:#5A1712
+  classDef hold fill:#FBEEDB,stroke:#B26A0E,color:#5A3606

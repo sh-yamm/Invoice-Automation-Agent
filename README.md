@@ -8,10 +8,6 @@ The app is organised the way an AP team thinks: around **purchase orders**. Each
 > **State:** 347 tests pass. All 16 demo invoices and all 38 history invoices reach their expected outcome end to end, run on fresh model replies.
 > **Client:** "Sample Client Retail Pvt Ltd (demo company)" is a made-up name; every vendor, PO and invoice here is sample data.
 
-| The inbox: one row per PO, the ones that need a person first | One PO's trail: what happened, in order, and the invoice with its decision |
-|---|---|
-| ![Inbox](docs/images/home.png) | ![A PO on hold](docs/images/trail-hold.png) |
-
 ---
 
 ## Contents
@@ -69,81 +65,26 @@ Region-specific rules live in their own rule pack, so a US pack can be added wit
 
 Every rupee comparison and every rule is deterministic code. The same invoice always gets the same decision, and every decision traces back to a named rule.
 
-```mermaid
-flowchart LR
-  PDF(["Invoice PDF"]) --> READ["AI reads<br/>OCR · fields · lines"]:::ai
-  READ --> GROUND["Code checks the reading<br/>every value must be on the page"]
-  GROUND --> RULES["Code applies 50 checks<br/>and the rulebook"]
-  RULES --> REVIEW["AI reviews the case<br/>can only make it stricter"]:::ai
-  REVIEW --> OUT{"Outcome"}
-  OUT --> A["Approved"]:::ok
-  OUT --> S["Needs sign-off"]:::sign
-  OUT --> H["On hold"]:::hold
-  OUT --> R["Rejected"]:::rej
-  classDef ai fill:#E6EDFC,stroke:#2B5FD9,color:#14306E
-  classDef ok fill:#E1F2EA,stroke:#1F7F55,color:#0D3D27
-  classDef sign fill:#ECE6FA,stroke:#5B3CC4,color:#2E1A6B
-  classDef hold fill:#FBEEDB,stroke:#B26A0E,color:#5A3606
-  classDef rej fill:#F9E3E1,stroke:#B9342A,color:#5A1712
-```
+<p align="center"><img src="docs/diagrams/01-ai-reads-code-decides.png" width="672" alt="The AI reads, the code decides"></p>
 
 ---
 
 ## The app, screen by screen
 
-There are three pages: **Purchase orders** (the inbox and each PO's trail), **Rulebook** and **Company records**.
+Three pages: **Purchase orders** (the inbox and each PO's trail), **Rulebook** (every tolerance and limit, editable) and **Company records** (vendors, POs, receipts, contracts; vendor controls).
 
-### 1. Purchase orders: the inbox
+<table>
+<tr>
+<td width="50%"><img src="docs/images/home.png" width="420" alt="Inbox"><br><b>Inbox.</b> One row per PO; the ones waiting for a person come first, with who should act and why.</td>
+<td width="50%"><img src="docs/images/process-dialog.png" width="420" alt="Process an invoice"><br><b>Process an invoice.</b> Pick the PO first (or let the agent find it), then upload the PDF or run a demo invoice.</td>
+</tr>
+<tr>
+<td><img src="docs/images/trail-hold.png" width="420" alt="A PO's trail"><br><b>A PO's trail.</b> The timeline on the left; the selected invoice on the right with its decision, actions and evidence boxes.</td>
+<td><img src="docs/images/po-document.png" width="420" alt="The PO as sent"><br><b>Documents.</b> Click any step to see the PO as sent to the vendor, the goods receipt, or the invoice.</td>
+</tr>
+</table>
 
-![Inbox](docs/images/home.png)
-
-- **Top row:** this week's numbers: invoices processed, the share done with no person, exceptions caught, money stopped as fraud or duplicate, and the average handling time.
-- **Needs you:** the POs where an invoice is waiting for a person, oldest first. Each row shows who should act and why, in one sentence.
-- **All trails:** every other PO, contract and vendor billing without a PO, latest activity first.
-- **Process an invoice** and **Raise a PO** are the only two things a person starts.
-
-### 2. Process an invoice: pick the PO first
-
-![Process an invoice](docs/images/process-dialog.png)
-
-1. **Step 1: which purchase order is this invoice for?** Open POs are listed with what is left on each. If you're not sure, pick "No PO / not sure: let the agent find it".
-2. **Step 2: the vendor's invoice.** Upload the PDF, or run a demo invoice. Demo invoices for the chosen PO are listed first.
-3. **Demo mode** slows each check down (450 ms) so you can follow the run. Without it, demo invoices finish in about a second because their model replies are recorded.
-
-If the invoice prints no PO number, it is read as being for the PO you chose. If it prints a *different* PO, it is held as `PO_ASSIGNMENT_MISMATCH`, because one of the two is wrong and a person should say which.
-
-### 3. One PO's trail: what happened, in order
-
-| A PO on hold: the price is over tolerance | A split PO: two invoices, one signed off |
-|---|---|
-| ![PO on hold](docs/images/trail-hold.png) | ![Split PO](docs/images/trail-split.png) |
-
-- **Left, the timeline:**
-  - the contract (if any);
-  - the PO sent to the vendor;
-  - each goods receipt;
-  - each invoice, with the agent's decision on it;
-  - what people did;
-  - "Waiting for you" last, if something is pending.
-- **Right, the document viewer.** Click any step to open its document:
-  - **the invoice:** the 7 stage tiles, the decision card (why, who should act, next step), the action buttons, and the page image with every problem boxed;
-  - **the purchase order, as sent to the vendor** (below);
-  - **the goods receipt note.**
-- **Header chips:** the vendor, what was ordered, billed and left, and whether it is a 3-way match (goods: PO, receipt, invoice) or a 2-way match (services: PO, invoice).
-
-| The PO as sent to the vendor | A contract: one retainer billed every month |
-|---|---|
-| ![PO document](docs/images/po-document.png) | ![Contract trail](docs/images/trail-contract.png) |
-
-### 4. Company records
-
-![Company records](docs/images/records.png)
-
-Sample Client's own records: orders and deliveries, vendors, contracts and expense accounts. The **Vendors** tab is where a person adds a vendor, approves or blocks one, or changes a bank account. Each change needs a reason and is kept with who made it and when.
-
-### 5. Rulebook
-
-The agent's operating procedure (`rulebook/aop.yaml`), in plain words, with every tolerance and limit editable. See [The rulebook](#the-rulebook).
+If an invoice prints no PO number, it is read as being for the PO you picked. If it prints a *different* PO, it is held as `PO_ASSIGNMENT_MISMATCH` for a person to say which is right. **Demo mode** slows each check to 450 ms so you can follow the run.
 
 ---
 
@@ -151,32 +92,11 @@ The agent's operating procedure (`rulebook/aop.yaml`), in plain words, with ever
 
 In production, invoices arrive by email and POs and receipts come from the ERP. In the demo, POs and receipts already exist and you upload the invoice.
 
-```mermaid
-flowchart LR
-  subgraph PEOPLE["People only"]
-    direction TB
-    P1["Raise a purchase order<br/>for an approved vendor, with a reason"]
-    P2["Add, approve or block a vendor<br/>change a bank account<br/>(classic fraud routes: never the agent)"]
-    P3["Decide what the agent flags<br/>approve anyway · sign off · reject<br/>ask the vendor · assign to a PO"]
-  end
-  subgraph AGENT["The agent"]
-    direction TB
-    A1["Read every invoice"]:::ai
-    A2["Find or confirm its PO"]
-    A3["Run all 50 checks"]
-    A4["Approve clean invoices<br/>and update the PO ledger"]:::ok
-    A5["Hold or reject the rest<br/>with reason, owner, next step"]:::hold
-    A1 --> A2 --> A3 --> A4
-    A3 --> A5
-  end
-  P1 -->|"the PO the invoice is matched against"| A2
-  A5 -->|"Needs you"| P3
-  P3 -->|"the run resumes"| A3
-  P2 -.->|"the vendor list the agent reads"| A3
-  classDef ai fill:#E6EDFC,stroke:#2B5FD9,color:#14306E
-  classDef ok fill:#E1F2EA,stroke:#1F7F55,color:#0D3D27
-  classDef hold fill:#FBEEDB,stroke:#B26A0E,color:#5A3606
-```
+| Only people | The agent |
+|---|---|
+| **Raise a purchase order** for an approved vendor, with a reason | **Reads** every invoice and **finds or confirms** its PO |
+| **Add, approve or block a vendor; change a bank account.** These are classic fraud routes, so the agent never does them | **Runs all 50 checks** against the PO, receipt, contract and vendor master |
+| **Decide what the agent flags:** approve anyway, sign off, reject, ask the vendor, assign to a PO | **Approves** clean invoices and updates the PO ledger; **holds or rejects** the rest with a reason, owner and next step |
 
 - The agent **reads** the vendor list and the POs but **never changes them**. Adding a vendor or changing a bank account is how invoice fraud usually gets in, so those stay human. Every change asks why and is logged in `record_changes`.
 - The one record the agent writes is the **PO ledger**: how much of each PO line has been billed, and only when an invoice is approved. That is what lets it catch an over-billed split PO.
@@ -187,58 +107,7 @@ flowchart LR
 
 One Python process hosts everything. The Streamlit pages call the agent's JSON API **in-process**, through FastAPI's test client, so there is no second server and no network hop. That is how one free Streamlit Community Cloud app runs the whole system.
 
-```mermaid
-flowchart TB
-  subgraph WHO["Who opens it"]
-    U["Person in a browser<br/>invoice-automation-agent.streamlit.app"]
-    GH["GitHub Actions, every 30 min<br/>headless browser keeps the app awake"]
-  end
-  subgraph ST["Streamlit app · streamlit_app.py · ui/"]
-    HOME["home.py · inbox"]
-    TRAIL["trail_page.py · timeline + documents"]
-    PROC["process.py · process an invoice · raise a PO"]
-    REC["records.py · company records · vendor controls"]
-    ENG["engine.py · FastAPI TestClient<br/>cached per version of the backend code"]
-  end
-  subgraph API["FastAPI routes · backend/src/ap_agent/api"]
-    R1["cases · start, read, act"]
-    R2["trails · one story per PO"]
-    R3["records · vendors, POs"]
-    R4["documents · PO and receipt images"]
-    R5["kpis · samples · rulebook · reset"]
-  end
-  subgraph AG["The agent"]
-    PIPE["Pipeline · LangGraph · 17 steps<br/>pipeline/graph.py · steps/s1 … s7"]
-    CHK["50 checks · checks/*.py"]
-    DEC["Decision engine · decision/engine.py"]
-    RB["Rulebook · rulebook/aop.yaml"]
-    GW["AI gateway · ai/gateway.py<br/>3 tries per model, then a backup"]:::ai
-  end
-  NV["NVIDIA models<br/>parse · read · classify · review"]:::ai
-  subgraph DATA["Data"]
-    DB[("SQLite · storage/runs.db<br/>cases · findings · events · model calls<br/>ledgers · record_changes")]
-    CP[("checkpoints.db<br/>paused runs")]
-    FILES["storage/files/&lt;case&gt;/<br/>PDF · page images · documents"]
-    ERP["storage/erp/*.csv<br/>working copy of Sample Client's records"]
-    SEED["data/seed/ · data/erp/<br/>38-invoice history · original records"]
-  end
-  U --> ST
-  GH --> ST
-  HOME & TRAIL & PROC & REC --> ENG
-  ENG -->|"in-process JSON"| API
-  R1 -->|"start · resume"| PIPE
-  PIPE --> CHK --> DEC
-  RB --> CHK
-  RB --> DEC
-  PIPE --> GW -->|HTTPS| NV
-  PIPE --> DB & CP & FILES
-  R2 --> DB
-  R3 --> ERP
-  R4 --> ERP
-  CHK --> ERP
-  SEED -->|"demo reset"| DB & ERP
-  classDef ai fill:#E6EDFC,stroke:#2B5FD9,color:#14306E
-```
+<p align="center"><img src="docs/diagrams/02-architecture.png" width="860" alt="Architecture"></p>
 
 - **Cases run in the background.** `POST /api/cases` answers at once and the pipeline runs on one of two worker threads. The invoice view re-reads the case and its events every second, so the stage tiles light up and checks appear while the agent works.
 - **A paused run survives.** Holds and sign-offs stop at a LangGraph `interrupt()`. The run is saved in `checkpoints.db` and resumes exactly where it stopped when a person acts.
@@ -250,75 +119,15 @@ flowchart TB
 
 Each stage is one file under `backend/src/ap_agent/pipeline/steps/`, numbered like the stage tiles on screen. `pipeline/nodes.py` lists the steps in run order.
 
-```mermaid
-flowchart TB
-  subgraph S1["1 · Receive · s1_receive.py"]
-    direction LR
-    ingest["ingest<br/>fingerprint, file checks"] --> render["render<br/>page images"] --> parse["parse<br/>OCR blocks + boxes"]:::ai
-  end
-  subgraph S2["2 · Read · s2_read.py"]
-    direction LR
-    reconcile["reconcile<br/>hidden text vs page · injection"] --> extract["extract<br/>fields + lines as JSON"]:::ai --> ground["ground<br/>seen on page? · recover totals<br/>· assigned PO"]
-  end
-  subgraph S3["3 · Classify · s3_classify.py"]
-    direction LR
-    cdoc["document<br/>tax invoice?"]:::ai --> ctx["transaction<br/>which path?"]:::ai
-  end
-  subgraph S4["4 · Validate · s4_validate.py"]
-    validate["validate<br/>10 GST checks"]
-  end
-  subgraph S5["5 · Match · s5_match.py (one of three)"]
-    direction LR
-    spo["standard PO<br/>3-way / 2-way"]
-    rec["recurring<br/>contract, period"]
-    pol["PO-less<br/>policy, GL coding"]:::ai
-  end
-  subgraph S6["6 · Controls · s6_controls.py"]
-    controls["controls<br/>vendor · bank · duplicates · splits · limits"]
-  end
-  subgraph S7["7 · Decide · s7_decide.py"]
-    direction LR
-    guard["completeness<br/>guard"] --> decide["decide<br/>rules floor → AI review"]:::ai
-    decide --> gate["human gate<br/>pauses for a person"]:::hold
-    decide --> fin["finalise<br/>ledger, payment date"]:::ok
-    gate --> fin
-  end
-  S1 --> S2 --> S3 --> S4 --> S5 --> S6 --> S7
-  S2 -.->|"fatal problem: skip to decide"| S7
-  pol -.->|"a PO turns up: rerouted"| spo
-  gate -.->|"confirm a field · re-check"| S4
-  gate -.->|"assign to a PO"| S3
-  classDef ai fill:#E6EDFC,stroke:#2B5FD9,color:#14306E
-  classDef hold fill:#FBEEDB,stroke:#B26A0E,color:#5A3606
-  classDef ok fill:#E1F2EA,stroke:#1F7F55,color:#0D3D27
-```
+<p align="center"><img src="docs/diagrams/03-pipeline.png" width="594" alt="The pipeline"></p>
 
 **The life of a case.** Approved and rejected invoices finish. Holds and sign-offs wait for a person, and the person's action resumes the run.
 
-```mermaid
-stateDiagram-v2
-  [*] --> running: invoice uploaded
-  running --> done: Approved or Rejected
-  running --> waiting: On hold or Needs sign-off
-  waiting --> done: approve anyway · sign off · reject
-  waiting --> running: confirm a field · re-check · assign to a PO
-  waiting --> waiting_vendor: ask the vendor
-  waiting_vendor --> running: re-check when the vendor replies
-  done --> [*]
-```
+<p align="center"><img src="docs/diagrams/04-case-states.png" width="702" alt="The life of a case"></p>
 
 **Where the 50 checks are:**
 
-```mermaid
-pie showData
-  title 50 checks by stage
-  "Intake and reading" : 7
-  "Validation (GST)" : 10
-  "Standard PO match" : 12
-  "Recurring match" : 7
-  "PO-less match" : 6
-  "Controls" : 8
-```
+<p align="center"><img src="docs/diagrams/05-checks-by-stage.png" width="731" alt="50 checks by stage"></p>
 
 ---
 
@@ -326,38 +135,7 @@ pie showData
 
 Every file one invoice passes through, in the order it runs. The example is a digital PDF uploaded against a PO, like demo S02.
 
-```mermaid
-sequenceDiagram
-  autonumber
-  actor P as Person
-  participant UI as Streamlit<br/>process.py
-  participant EN as ui/engine.py
-  participant API as api/routes/cases.py
-  participant G as pipeline/graph.py
-  participant S as steps s1 … s7
-  participant AI as ai/gateway.py
-  participant DB as SQLite store
-  P->>UI: pick PO-4518, upload the PDF
-  UI->>EN: post /api/cases (file, assigned_po)
-  EN->>API: in-process call
-  API->>G: prepare: copy PDF, render page 1, create case
-  API-->>UI: case id (answers at once)
-  UI-->>P: opens the PO's trail, invoice selected
-  G->>S: run the graph on a worker thread
-  S->>AI: parse page, read fields, classify, review
-  AI-->>S: JSON, with retries and backups
-  S->>DB: every event, finding, model call
-  loop every second while running
-    UI->>DB: read the case and new events
-    UI-->>P: stage tiles light up, checks appear
-  end
-  S->>DB: outcome, reason, owner, next step
-  Note over S,DB: On hold: the run pauses in checkpoints.db
-  P->>UI: Approve anyway, with a note
-  UI->>API: post /api/cases/{id}/actions
-  API->>G: resume from the checkpoint
-  G->>S: finalise: write the PO ledger
-```
+<p align="center"><img src="docs/diagrams/06-one-invoice.png" width="860" alt="One invoice, end to end"></p>
 
 | # | File | What happens |
 |---|---|---|
@@ -402,25 +180,7 @@ Three guardrails make it safe to let the agent act on money.
    - Code discards any agent output that is less strict than the rules or cites findings that don't exist. The agent has no "approve" tool.
 3. **Fail closed.** A model or tool error becomes a finding and holds the case.
 
-```mermaid
-flowchart TD
-  F(["All findings"]) --> G{"Every required check<br/>for this path ran?"}
-  G -->|no| GX["CHECKS_INCOMPLETE · On hold"]:::hold
-  G -->|yes| FL["Rules floor<br/>Rejected > On hold > Sign-off > Approved"]
-  FL --> Q{"Floor is Approved?"}
-  Q -->|"no: a person will look"| NOTE["Agent review runs as a note<br/>outcome unchanged"]:::ai
-  Q -->|yes| RV["Agent review<br/>may propose stricter, with cited findings"]:::ai
-  RV --> V{"Stricter AND cites<br/>real findings?"}
-  V -->|no| DROP["Proposal discarded<br/>AGENT_RATIONALE_INVALID · warning"]:::warn
-  V -->|yes| ESC["AGENT_ESCALATION · On hold or sign-off"]:::hold
-  NOTE --> OUT["Verdict: reason from the rulebook<br/>owner · next step · also found"]
-  DROP --> OUT
-  ESC --> OUT
-  FL -.-> OUT
-  classDef ai fill:#E6EDFC,stroke:#2B5FD9,color:#14306E
-  classDef hold fill:#FBEEDB,stroke:#B26A0E,color:#5A3606
-  classDef warn fill:#FFF7D6,stroke:#B89A00,color:#4D4000
-```
+<p align="center"><img src="docs/diagrams/07-decision.png" width="860" alt="How a decision is made"></p>
 
 **Every problem at once.** A failed check records its finding and the run continues, so the case shows every issue, not only the first. A few checks stop the run because nothing after them would be meaningful; they are marked ⛔ below.
 
@@ -428,231 +188,111 @@ flowchart TD
 
 ## Every rule, stage by stage
 
-How to read these diagrams:
-- The solid spine is the order the checks run in.
-- A dashed arrow is what happens when a check fails: the reason code, the outcome, and the risk ID from the risk catalogue (for example `L5`).
+Each table lists a stage's checks in the order they run, the reason code when a check fails, and the outcome. The letters after a code (for example `L5`) are its ID in the risk catalogue. ⛔ marks a check that stops the run, because nothing after it would be meaningful.
 
-Colours: 🟥 Reject · 🟧 Hold · 🟪 Needs sign-off · 🟨 Warning (recorded; doesn't change the outcome alone) · 🟦 an AI step · 🟪 (purple border) an agent with tools
+Outcomes: 🟥 Reject · 🟧 Hold · 🟪 Needs sign-off · 🟨 Warning (recorded; doesn't change the outcome alone) · 🟦 an AI step
 
 ### Stage 1: Intake and reading
 
-```mermaid
-flowchart TD
-  S(["PDF arrives"]) --> A1["File fingerprint: seen this exact file before?"]
-  A1 -.->|yes| A1x["⛔ DUPLICATE_EXACT → Reject · A1 K1"]:::rej
-  A1 --> A2["Real, readable PDF?"]
-  A2 -.->|no| A2x["⛔ UNREADABLE_DOCUMENT → Hold · A2"]:::hold
-  A2 --> A3["Password protected?"]
-  A3 -.->|yes| A3x["⛔ ENCRYPTED_DOCUMENT → Hold · A3"]:::hold
-  A3 --> RP["Render each page to an image"]
-  A3 --> TL["Read embedded text layer<br/>digital PDFs only"]
-  RP --> P["Parse each page<br/>nemotron-3.5-parse → text blocks + boxes<br/>parser down: a digital PDF uses its own text"]:::ai
-  P --> P2["More than one invoice, or pages missing?"]
-  P2 -.->|yes| P2x["MULTIPLE_INVOICES_IN_FILE / INCOMPLETE_DOCUMENT → Hold · A5 A6"]:::hold
-  P2 --> RC["Embedded text agrees with what the page shows?<br/>figures the invoice itself explains are ignored"]
-  TL --> RC
-  RC -.->|no| RCx["TEXT_LAYER_MISMATCH → Hold · L5"]:::hold
-  RC --> TM["PDF edited after issue?<br/>metadata dates · editing software"]
-  TM -.->|signals| TMx["DOCUMENT_TAMPER_SIGNALS → Warning · L4"]:::warn
-  TM --> PI["Text addressed to the AI?<br/>'approve this' · 'SYSTEM:' · 'set the total to …'"]
-  PI -.->|yes| PIx["SUSPICIOUS_INSTRUCTIONS_IN_DOCUMENT → Hold, locked · L6"]:::hold
-  PI --> X["Extract fields to JSON<br/>Nemotron 3 Ultra (digital) · Nemotron 3.5 Super VL (scan)"]:::ai
-  X --> XJ["Valid JSON after one retry?"]
-  XJ -.->|no| XJx["⛔ EXTRACTION_FAILED → Hold · B6"]:::hold
-  XJ --> GR["Grounding: every value found on the page?"]
-  GR -.->|no| GRx["UNGROUNDED_VALUE: value dropped · B1"]:::warn
-  GR --> RT["Total or tax missing? Recover from the PDF's own text<br/>only if it adds up and matches the amount in words"]
-  RT --> AP["Uploaded to a PO? No PO printed: take it.<br/>A different PO printed?"]
-  AP -.->|different| APx["PO_ASSIGNMENT_MISMATCH → Hold, AP team"]:::hold
-  AP --> CF["Every key field read with ≥ 85% confidence?"]
-  CF -.->|no| CFx["LOW_CONFIDENCE_FIELD → Hold, confirm in place · A4"]:::hold
-  CF --> N["Normalise: DD/MM dates · ₹ amounts · GSTIN · invoice-number form · units"]
-  N --> Z(["to classification"])
-  classDef rej fill:#F9E3E1,stroke:#B9342A,color:#5A1712
-  classDef hold fill:#FBEEDB,stroke:#B26A0E,color:#5A3606
-  classDef warn fill:#FFF7D6,stroke:#B89A00,color:#4D4000
-  classDef ai fill:#E6EDFC,stroke:#2B5FD9,color:#14306E
-```
+| # | Check | If it fails | Outcome |
+|---|---|---|---|
+| 1 | Seen this exact file before? (fingerprint) | `DUPLICATE_EXACT` ⛔ · A1 K1 | 🟥 Reject |
+| 2 | A real, readable PDF? | `UNREADABLE_DOCUMENT` ⛔ · A2 | 🟧 Hold |
+| 3 | Password protected? | `ENCRYPTED_DOCUMENT` ⛔ · A3 | 🟧 Hold |
+| 4 | OCR each page (Nemotron Parse); parser down → a digital PDF uses its own text | — | 🟦 AI |
+| 5 | More than one invoice, or pages missing? | `MULTIPLE_INVOICES_IN_FILE` / `INCOMPLETE_DOCUMENT` · A5 A6 | 🟧 Hold |
+| 6 | Hidden text agrees with the page? (figures the invoice explains are ignored) | `TEXT_LAYER_MISMATCH` · L5 | 🟧 Hold |
+| 7 | PDF edited after issue? (metadata, editing software) | `DOCUMENT_TAMPER_SIGNALS` · L4 | 🟨 Warning |
+| 8 | Text aimed at the AI? ('approve this', 'SYSTEM:', 'set the total to …') | `SUSPICIOUS_INSTRUCTIONS_IN_DOCUMENT`, locked · L6 | 🟧 Hold |
+| 9 | Read the fields as JSON (Nemotron 3 Ultra for digital, Super VL for scans); valid after one retry? | `EXTRACTION_FAILED` ⛔ · B6 | 🟧 Hold |
+| 10 | Grounding: every value found on the page? | `UNGROUNDED_VALUE`: value dropped · B1 | 🟨 Warning |
+| 11 | Total or tax missing? Recovered from the PDF's own text only if it adds up and matches the words | — | — |
+| 12 | Uploaded to a PO but a different PO is printed? | `PO_ASSIGNMENT_MISMATCH` | 🟧 Hold |
+| 13 | Every key field read with ≥ 85% confidence? | `LOW_CONFIDENCE_FIELD`: confirm in place · A4 | 🟧 Hold |
 
 If every model in a chain is unavailable, the case goes on hold with `AI_UNAVAILABLE` (B8). It is never approved.
 
 ### Stage 2: Classification
 
-```mermaid
-flowchart TD
-  S(["from reading"]) --> D["Classify document<br/>title and keywords · sign of totals · model if unclear"]:::ai
-  D -.->|proforma · quotation · statement| Dx1["⛔ NOT_A_TAX_INVOICE → Reject · C1"]:::rej
-  D -.->|credit or debit note| Dx2["⛔ CREDIT_NOTE_RECEIVED → Hold, AP team · C2 E4"]:::hold
-  D -->|tax invoice| SG["Deterministic signals<br/>PO printed? PO exists? PO type? service period printed? vendor category?"]
-  SG --> AG["Agent: classify_transaction · Nemotron 3 Ultra<br/>tools: vendor_lookup · po_search · contract_lookup"]:::agent
-  AG -.->|confidence below 80%| AGx["⛔ CLASSIFICATION_UNCERTAIN → Hold · E1"]:::hold
-  AG -->|Standard PO| SP(["Standard PO path"])
-  AG -->|Recurring| RE(["Recurring path"])
-  AG -->|PO-less| PL(["PO-less path"])
-  classDef rej fill:#F9E3E1,stroke:#B9342A,color:#5A1712
-  classDef hold fill:#FBEEDB,stroke:#B26A0E,color:#5A3606
-  classDef ai fill:#E6EDFC,stroke:#2B5FD9,color:#14306E
-  classDef agent fill:#F0E8FB,stroke:#7A3FC8,color:#3B1A66
-```
+| # | Check | If it fails | Outcome |
+|---|---|---|---|
+| 1 | Document type: tax invoice, or proforma / quotation / statement? | `NOT_A_TAX_INVOICE` ⛔ · C1 | 🟥 Reject |
+| 2 | A credit or debit note? | `CREDIT_NOTE_RECEIVED` ⛔ · C2 E4 | 🟧 Hold |
+| 3 | Transaction type from signals (PO printed? PO type? period? category); the agent decides only when signals conflict | `CLASSIFICATION_UNCERTAIN` ⛔ below 80% · E1 | 🟧 Hold |
 
 The signals decide clear cases on their own. For example, a printed PO that exists and is a blanket PO means Recurring. The agent is asked only when the signals conflict, and its answer, confidence and reasoning are stored.
 
 ### Stage 3: Validation (India rule pack)
 
-```mermaid
-flowchart TD
-  S(["classified invoice"]) --> V1["GST Rule 46 fields present?<br/>invoice no · date · supplier and buyer GSTIN · lines · taxable value · tax · total"]
-  V1 -.->|missing| V1x["MISSING_MANDATORY_FIELD → Reject · C3"]:::rej
-  V1 --> V2["Supplier GSTIN: format and check digit valid?"]
-  V2 -.->|no| V2x["INVALID_GSTIN → Reject · C4"]:::rej
-  V2 --> V3["GSTIN state code = vendor's state on file?"]
-  V3 -.->|no| V3x["GSTIN_STATE_MISMATCH → Hold · C5"]:::hold
-  V3 --> V4["Buyer GSTIN = Sample Client's GSTIN?<br/>supplier and buyer swapped: fixed, warning · B3"]
-  V4 -.->|no| V4x["WRONG_BUYER_GSTIN → Reject · C6"]:::rej
-  V4 --> V5["Vendor registration active?"]
-  V5 -.->|cancelled| V5x["GSTIN_INACTIVE → Reject · C9"]:::rej
-  V5 --> V6["Vendor must e-invoice? IRN present and 64 hex characters?"]
-  V6 -.->|missing| V6x["EINVOICE_IRN_MISSING → Reject · C7"]:::rej
-  V6 -.->|malformed| V6y["INVALID_IRN → Hold · C8"]:::hold
-  V6 --> V7["Tax type: same state → CGST + SGST, else IGST"]
-  V7 -.->|wrong type| V7x["WRONG_TAX_TYPE → Hold · D3"]:::hold
-  V7 --> V8["Arithmetic: qty × rate = line · lines add up · tax = rate × taxable · total within ₹1"]
-  V8 -.->|off| V8x["ARITHMETIC_MISMATCH → Hold · D1 D2 B5"]:::hold
-  V8 --> V9["Amount in words = amount in figures?"]
-  V9 -.->|no| V9x["AMOUNT_WORDS_MISMATCH → Hold · D6 B2"]:::hold
-  V9 --> V10["Dates: not in the future, not older than the tax-credit window"]
-  V10 -.->|future| V10x["FUTURE_DATED_INVOICE → Hold · B4"]:::hold
-  V10 -.->|old| V10y["STALE_INVOICE_DATE → Warning · C10"]:::warn
-  V10 --> Z(["to the path for this transaction type"])
-  classDef rej fill:#F9E3E1,stroke:#B9342A,color:#5A1712
-  classDef hold fill:#FBEEDB,stroke:#B26A0E,color:#5A3606
-  classDef warn fill:#FFF7D6,stroke:#B89A00,color:#4D4000
-```
+| # | Check | If it fails | Outcome |
+|---|---|---|---|
+| 1 | GST Rule 46 fields present? | `MISSING_MANDATORY_FIELD` · C3 | 🟥 Reject |
+| 2 | Supplier GSTIN format and check digit | `INVALID_GSTIN` · C4 | 🟥 Reject |
+| 3 | GSTIN state = vendor's state on file? | `GSTIN_STATE_MISMATCH` · C5 | 🟧 Hold |
+| 4 | Billed to Sample Client's GSTIN? (swapped supplier/buyer fixed: `GSTIN_SWAPPED_FIXED`, warning) | `WRONG_BUYER_GSTIN` · C6 | 🟥 Reject |
+| 5 | Vendor's GST registration active? | `GSTIN_INACTIVE` · C9 | 🟥 Reject |
+| 6 | Must e-invoice → IRN present and well formed? | `EINVOICE_IRN_MISSING` · C7 / `INVALID_IRN` · C8 | 🟥 Reject / 🟧 Hold |
+| 7 | Same state → CGST + SGST, else IGST | `WRONG_TAX_TYPE` · D3 | 🟧 Hold |
+| 8 | Arithmetic: lines, tax and total add up (within ₹1) | `ARITHMETIC_MISMATCH` · D1 D2 B5 | 🟧 Hold |
+| 9 | Amount in words = figures? | `AMOUNT_WORDS_MISMATCH` · D6 B2 | 🟧 Hold |
+| 10 | Not future-dated; not older than the tax-credit window | `FUTURE_DATED_INVOICE` · B4 / `STALE_INVOICE_DATE` · C10 | 🟧 Hold / 🟨 Warning |
 
 ### Stage 4a: Standard PO path
 
-```mermaid
-flowchart TD
-  S(["Standard PO"]) --> M1["PO number printed (or assigned) and found?"]
-  M1 -.->|no| M1a["Agent ranks the vendor's open POs<br/>item and HSN overlap · same rate · amount within balance"]:::agent
-  M1a -.->|score ≥ 90% and a clear lead| M1b["PO_INFERRED → Warning · G1"]:::warn
-  M1a -.->|otherwise| M1c["⛔ PO_NOT_FOUND → Hold, candidates listed · G2"]:::hold
-  M1 --> M2["PO issued to this vendor?"]
-  M1b --> M2
-  M2 -.->|no| M2x["PO_VENDOR_MISMATCH → Reject · G3"]:::rej
-  M2 --> M3["PO open, not closed or cancelled?"]
-  M3 -.->|no| M3x["PO_CLOSED → Hold · G4"]:::hold
-  M3 --> M4["Pair each invoice line with a PO line<br/>HSN + description similarity · agent breaks ties"]
-  M4 -.->|agent paired| M4a["LLM_LINE_PAIRING → Warning · G10"]:::warn
-  M4 -.->|invoice line with no PO line| M4b["UNEXPECTED_CHARGES → Hold · G9"]:::hold
-  M4 -.->|one lump line| M4c["HEADER_LEVEL_MATCH_ONLY → Warning · G11"]:::warn
-  M4 --> L1["Per line: GST rate = PO rate?"]
-  L1 -.->|no| L1x["GST_RATE_MISMATCH → Hold · D4"]:::hold
-  L1 --> L2["Per line: units match or convert? kg vs tonnes"]
-  L2 -.->|no| L2x["UNIT_MISMATCH → Hold · G8"]:::hold
-  L2 --> L3["Per line: rate ≤ PO rate + 2% AND extra ≤ ₹5,000"]
-  L3 -.->|above| L3x["PRICE_VARIANCE → Hold · G5"]:::hold
-  L3 -.->|below PO| L3y["UNDER_BILLED → Warning · G15"]:::warn
-  L3 --> L4["Per line: billed before + this qty ≤ ordered"]
-  L4 -.->|over| L4x["QTY_EXCEEDS_ORDERED → Hold · G7"]:::hold
-  L4 --> G0{"Goods PO?"}
-  G0 -->|services: 2-way| H0
-  G0 -->|goods: 3-way| L5["Goods receipt exists for the line?"]
-  L5 -.->|no| L5x["RECEIPT_MISSING → Hold, Warehouse · H1 L9"]:::hold
-  L5 --> L6["Billed before + this qty ≤ accepted qty<br/>QC-rejected goods don't count"]
-  L6 -.->|over| L6x["QTY_EXCEEDS_RECEIVED → Hold · H2 H3"]:::hold
-  L6 --> H0["PO total, before GST: billed to date + this ≤ PO value?"]
-  H0 -.->|over| H0x["AMOUNT_EXCEEDS_PO_BALANCE → Hold, ledger shown · G12"]:::hold
-  H0 -.->|already 100% billed| H0y["PO_FULLY_INVOICED → Hold · G13"]:::hold
-  H0 --> H1["Invoice dated on or after the PO date?"]
-  H1 -.->|before| H1x["INVOICE_BEFORE_PO → Hold · G14"]:::hold
-  H1 --> Z(["to controls"])
-  classDef rej fill:#F9E3E1,stroke:#B9342A,color:#5A1712
-  classDef hold fill:#FBEEDB,stroke:#B26A0E,color:#5A3606
-  classDef warn fill:#FFF7D6,stroke:#B89A00,color:#4D4000
-  classDef agent fill:#F0E8FB,stroke:#7A3FC8,color:#3B1A66
-```
+| # | Check | If it fails | Outcome |
+|---|---|---|---|
+| 1 | PO printed (or assigned) and found? If not, the agent ranks the vendor's open POs | `PO_INFERRED` (≥ 90%, clear lead) · G1 / `PO_NOT_FOUND` ⛔ · G2 | 🟨 Warning / 🟧 Hold |
+| 2 | PO issued to this vendor? | `PO_VENDOR_MISMATCH` · G3 | 🟥 Reject |
+| 3 | PO open? | `PO_CLOSED` · G4 | 🟧 Hold |
+| 4 | Pair invoice lines with PO lines (HSN + similarity; agent breaks ties) | `UNEXPECTED_CHARGES` · G9 · also `LLM_LINE_PAIRING`, `HEADER_LEVEL_MATCH_ONLY` warnings | 🟧 Hold |
+| 5 | Per line: GST rate = PO rate? | `GST_RATE_MISMATCH` · D4 | 🟧 Hold |
+| 6 | Per line: units match or convert? | `UNIT_MISMATCH` · G8 | 🟧 Hold |
+| 7 | Per line: rate ≤ PO rate + 2% and extra ≤ ₹5,000 (below the PO: `UNDER_BILLED`, warning) | `PRICE_VARIANCE` · G5 | 🟧 Hold |
+| 8 | Per line: billed before + this ≤ ordered | `QTY_EXCEEDS_ORDERED` · G7 | 🟧 Hold |
+| 9 | Goods only (3-way): goods receipt exists? | `RECEIPT_MISSING`, Warehouse · H1 L9 | 🟧 Hold |
+| 10 | Goods only: billed before + this ≤ accepted quantity | `QTY_EXCEEDS_RECEIVED` · H2 H3 | 🟧 Hold |
+| 11 | PO value before GST: billed to date + this ≤ PO value? | `AMOUNT_EXCEEDS_PO_BALANCE` · G12 / `PO_FULLY_INVOICED` · G13 | 🟧 Hold |
+| 12 | Invoice dated on or after the PO? | `INVOICE_BEFORE_PO` · G14 | 🟧 Hold |
 
 A rate above the PO but within tolerance passes, and the exact variance is recorded (G6). GST is paid on top of the PO value and never counts against the balance.
 
 ### Stage 4b: Recurring path
 
-```mermaid
-flowchart TD
-  S(["Recurring"]) --> R1["Contract or blanket PO found for this vendor?"]
-  R1 -.->|no| R1x["⛔ CONTRACT_NOT_FOUND → Hold"]:::hold
-  R1 --> R2["Billing period read from the invoice?"]
-  R2 -.->|unclear| R2x["LOW_CONFIDENCE_FIELD → Hold, confirm period · I5"]:::hold
-  R2 --> R3["Period inside the contract's start and end dates?"]
-  R3 -.->|no| R3x["CONTRACT_NOT_ACTIVE → Hold · I3"]:::hold
-  R3 --> R4["Period not already billed?<br/>period ledger, regardless of invoice number"]
-  R4 -.->|already billed| R4x["PERIOD_ALREADY_BILLED → Hold · I1"]:::hold
-  R4 --> R5["Period not in the future?"]
-  R5 -.->|future| R5x["ADVANCE_BILLING → Warning · I7"]:::warn
-  R5 --> R6["Amount = contract amount for the period?"]
-  R6 -.->|different| R6x["CONTRACT_AMOUNT_MISMATCH → Hold · I2 I6"]:::hold
-  R6 --> R7["Billed to date + this ≤ blanket PO total?"]
-  R7 -.->|over| R7x["AMOUNT_EXCEEDS_PO_BALANCE → Hold, ledger shown · I4"]:::hold
-  R7 --> Z(["to controls"])
-  classDef hold fill:#FBEEDB,stroke:#B26A0E,color:#5A3606
-  classDef warn fill:#FFF7D6,stroke:#B89A00,color:#4D4000
-```
+| # | Check | If it fails | Outcome |
+|---|---|---|---|
+| 1 | Contract or blanket PO found for this vendor? | `CONTRACT_NOT_FOUND` ⛔ | 🟧 Hold |
+| 2 | Billing period read clearly? | `LOW_CONFIDENCE_FIELD` · I5 | 🟧 Hold |
+| 3 | Period inside the contract dates? | `CONTRACT_NOT_ACTIVE` · I3 | 🟧 Hold |
+| 4 | Period not already billed (any invoice number)? | `PERIOD_ALREADY_BILLED` · I1 | 🟧 Hold |
+| 5 | Period not in the future? | `ADVANCE_BILLING` · I7 | 🟨 Warning |
+| 6 | Amount = the contract amount for the period? | `CONTRACT_AMOUNT_MISMATCH` · I2 I6 | 🟧 Hold |
+| 7 | Billed to date + this ≤ the blanket PO total? | `AMOUNT_EXCEEDS_PO_BALANCE` · I4 | 🟧 Hold |
 
 The duplicate check is period-aware for recurring invoices, so next month's retainer is not mistaken for a duplicate (K8).
 
 ### Stage 4c: PO-less path
 
-```mermaid
-flowchart TD
-  S(["PO-less"]) --> P1["Does an open PO exist for this vendor and these items?"]
-  P1 -.->|yes| P1x["PO_EXISTS_FOR_PO_LESS → Warning, rerouted to Standard PO · E2"]:::warn
-  P1 --> P2["Is this category allowed without a PO?<br/>utilities · telecom · rent · statutory · travel · subscriptions"]
-  P2 -.->|no, e.g. furniture| P2x["PO_REQUIRED_FOR_CATEGORY → Hold, Procurement · J1"]:::hold
-  P2 --> P3["Service account registered?<br/>e.g. electricity consumer number"]
-  P3 -.->|unknown| P3x["UNKNOWN_SERVICE_ACCOUNT → Hold · J4"]:::hold
-  P3 --> P4["Agent: GL coder<br/>chart of accounts → top 3 GL codes + cost centre + confidence"]:::agent
-  P4 -.->|confidence below 80%| P4x["GL_CODING_UNCERTAIN → Hold, owner picks from top 3 · J3"]:::hold
-  P4 --> P5["Amount within 3× the 6-month average?"]
-  P5 -.->|spike| P5x["AMOUNT_ANOMALY → Hold · J5"]:::hold
-  P5 --> P6["Amount ≤ ₹25,000 PO-less auto limit?"]
-  P6 -.->|above| P6x["NEEDS_SIGNOFF → Budget owner · J2"]:::sign
-  P6 --> Z(["to controls"])
-  classDef hold fill:#FBEEDB,stroke:#B26A0E,color:#5A3606
-  classDef warn fill:#FFF7D6,stroke:#B89A00,color:#4D4000
-  classDef sign fill:#ECE6FA,stroke:#5B3CC4,color:#2E1A6B
-  classDef agent fill:#F0E8FB,stroke:#7A3FC8,color:#3B1A66
-```
+| # | Check | If it fails | Outcome |
+|---|---|---|---|
+| 1 | An open PO exists for these items? (then rerouted to the standard PO path) | `PO_EXISTS_FOR_PO_LESS` · E2 | 🟨 Warning |
+| 2 | Category allowed without a PO? (utilities, telecom, rent, statutory, travel, subscriptions) | `PO_REQUIRED_FOR_CATEGORY`, Procurement · J1 | 🟧 Hold |
+| 3 | Service account registered? | `UNKNOWN_SERVICE_ACCOUNT` · J4 | 🟧 Hold |
+| 4 | Agent picks the GL account and cost centre with ≥ 80% confidence | `GL_CODING_UNCERTAIN` · J3 | 🟧 Hold |
+| 5 | Amount within 3× the 6-month average? | `AMOUNT_ANOMALY` · J5 | 🟧 Hold |
+| 6 | Amount ≤ ₹25,000 PO-less limit? | `NEEDS_SIGNOFF`, budget owner · J2 | 🟪 Sign-off |
 
 ### Stage 5: Controls (all paths)
 
-```mermaid
-flowchart TD
-  S(["from any path"]) --> K1["Vendor in the master and active?"]
-  K1 -.->|no| K1x["VENDOR_NOT_APPROVED → Reject, locked · F1 L2"]:::rej
-  K1 --> K2["Name close to another vendor but a different GSTIN?<br/>e.g. 'Kaveri Packaging Industry' vs 'Industries'"]
-  K2 -.->|yes| K2x["LOOKALIKE_VENDOR → Hold · F2 L3"]:::hold
-  K2 --> K3["Name and contact details match the master?"]
-  K3 -.->|name differs| K3x["VENDOR_IDENTITY_MISMATCH → Warning · F3"]:::warn
-  K3 -.->|phone or email differs| K3y["CONTACT_DETAILS_CHANGED → Warning · F4"]:::warn
-  K3 --> K4["Bank account and IFSC = vendor master?"]
-  K4 -.->|different| K4x["BANK_DETAILS_MISMATCH → Hold, locked · L1"]:::hold
-  K4 --> K5["Exact duplicate: same vendor + same normalised invoice number?"]
-  K5 -.->|earlier one approved| K5x["DUPLICATE_EXACT → Reject · K2"]:::rej
-  K5 -.->|earlier one still open| K5y["DUPLICATE_EXACT → Hold · K2"]:::hold
-  K5 -.->|same number, different amount| K5z["DUPLICATE_NUMBER_DIFFERENT_AMOUNT → Hold · K4"]:::hold
-  K5 --> K6["Fuzzy duplicate: same vendor and 2+ of<br/>number edit distance ≤ 2 · amount ±0.5% · dates ≤ 30 days · lines ≥ 90% similar"]
-  K6 -.->|vs approved or open| K6x["DUPLICATE_PROBABLE → Hold, original linked · K3 K5"]:::hold
-  K6 -.->|vs rejected| K6y["RESUBMISSION_OF_REJECTED → Warning · K6"]:::warn
-  K6 --> K7["Same vendor, 7 days: each under ₹5 L but together over?"]
-  K7 -.->|yes| K7x["SPLIT_BELOW_LIMIT → Sign-off on the total · L7"]:::sign
-  K7 --> K8["Total ≤ ₹5 L auto-approve limit?"]
-  K8 -.->|above| K8x["NEEDS_SIGNOFF → Finance controller · M1"]:::sign
-  K8 --> Z(["to decision"])
-  classDef rej fill:#F9E3E1,stroke:#B9342A,color:#5A1712
-  classDef hold fill:#FBEEDB,stroke:#B26A0E,color:#5A3606
-  classDef warn fill:#FFF7D6,stroke:#B89A00,color:#4D4000
-  classDef sign fill:#ECE6FA,stroke:#5B3CC4,color:#2E1A6B
-```
+| # | Check | If it fails | Outcome |
+|---|---|---|---|
+| 1 | Vendor on the approved list and active? | `VENDOR_NOT_APPROVED`, locked · F1 L2 | 🟥 Reject |
+| 2 | Name close to another vendor's, different GSTIN? | `LOOKALIKE_VENDOR` · F2 L3 | 🟧 Hold |
+| 3 | Name and contact details match the master? | `VENDOR_IDENTITY_MISMATCH` · F3 / `CONTACT_DETAILS_CHANGED` · F4 | 🟨 Warning |
+| 4 | Bank account and IFSC = vendor master? | `BANK_DETAILS_MISMATCH`, locked · L1 | 🟧 Hold |
+| 5 | Same vendor + same normalised invoice number? | `DUPLICATE_EXACT` · K2 (reject if the first was approved) / `DUPLICATE_NUMBER_DIFFERENT_AMOUNT` · K4 | 🟥 Reject / 🟧 Hold |
+| 6 | Probable resend: 2+ of number edit distance ≤ 2, amount ±0.5%, ≤ 30 days, lines ≥ 90% similar | `DUPLICATE_PROBABLE` · K3 K5 (vs a rejected one: `RESUBMISSION_OF_REJECTED`, warning) | 🟧 Hold |
+| 7 | Same vendor within 7 days: each under ₹5 L but together over? | `SPLIT_BELOW_LIMIT` · L7 | 🟪 Sign-off |
+| 8 | Total ≤ ₹5 L auto-approve limit? | `NEEDS_SIGNOFF`, finance controller · M1 | 🟪 Sign-off |
 
 The duplicate key always includes the vendor, so the same invoice number from two different vendors is legitimate (K7).
 
@@ -662,27 +302,9 @@ See the diagram under [How decisions are made](#how-decisions-are-made). The "wh
 
 ### Stage 7: Human gate and finalise
 
-```mermaid
-flowchart TD
-  O3(["On hold"]) --> HG["Human gate · LangGraph interrupt"]
-  O2(["Needs sign-off"]) --> HG
-  HG --> A1["Approve anyway"]
-  A1 --> A1c{"Locked reason code?<br/>bank change · injection · …"}
-  A1c -->|yes| A1n["Verification note required<br/>logged as a high-risk override · M2"]:::hold
-  A1c -->|no| F
-  A1n --> F
-  HG --> A2["Reject"] --> RJ(["Back to vendor with reason"])
-  HG --> A3["Ask vendor"] --> WV(["Waiting for vendor"])
-  HG --> A4["Sign off"] --> F
-  HG --> A5["Confirm a field"] --> RV(["Re-run from validation"])
-  HG --> A7["Assign to a PO"] --> RA(["Re-run from classification<br/>matched against the new PO"])
-  HG --> A6["Re-check with current data and rulebook"] --> RR(["Re-run · AOP_VERSION_CHANGED → Warning if rules changed · O3 O4"])
-  O1(["Approved"]) --> F["Finalise<br/>ledger write, idempotent per case · O2<br/>payment date = invoice date + vendor terms"]:::ok
-  ED["A rule edited, then the affected case approved, by the same person"] -.-> EDx["SOD_RULE_EDIT_AND_APPROVE → Warning · M3"]:::warn
-  classDef hold fill:#FBEEDB,stroke:#B26A0E,color:#5A3606
-  classDef warn fill:#FFF7D6,stroke:#B89A00,color:#4D4000
-  classDef ok fill:#E1F2EA,stroke:#1F7F55,color:#0D3D27
-```
+<p align="center"><img src="docs/diagrams/08-human-gate.png" width="860" alt="The human gate"></p>
+
+Approving anyway on a locked reason code (bank change, prompt injection, …) needs a verification note and is logged as a high-risk override (M2). If the same person edits a rule and then approves a case it affects, that is flagged `SOD_RULE_EDIT_AND_APPROVE` (M3). Finalising is idempotent per case (O2), and the payment date is the invoice date plus the vendor's terms.
 
 Every rule edit is versioned with who and why, and locked rules can't be edited at all. A rule can't be quietly loosened to push one invoice through (M4).
 
@@ -692,15 +314,7 @@ Every rule edit is versioned with who and why, and locked rules can't be edited 
 
 A vendor often bills one PO in several invoices: phase 1 and phase 2, or one per delivery. The agent handles this with the **PO ledger**. Every approved invoice adds its quantities and amount to the PO, so each later invoice is checked against what is *left*, not against the whole PO.
 
-```mermaid
-timeline
-  title PO-4540 · Orbit Office Systems · ₹12,45,000 ordered
-  20 Oct 2026 : PO-4540 sent to the vendor (3 lines)
-  30 Oct – 03 Nov 2026 : Goods received, GRN-7770, GRN-7771, GRN-7772
-  03 Nov 2026 : Invoice ORB/26-27/0211, ₹4,89,700 : Agent approved, ledger billed ₹4,15,000 before GST
-  04 Nov 2026 : Invoice ORB/26-27/0214, ₹4,89,700 : Two invoices in 7 days, together over ₹5 L, so SPLIT_BELOW_LIMIT, sign-off : Finance controller signed off, phase 2 on its own receipt
-  Now : ₹4,15,000 left on the PO
-```
+<p align="center"><img src="docs/diagrams/09-split-po-timeline.png" width="860" alt="A split PO"></p>
 
 What the trail and ledger catch on a split PO:
 
@@ -716,25 +330,7 @@ What the trail and ledger catch on a split PO:
 
 How a trail is put together (`api/trails.py`):
 
-```mermaid
-flowchart LR
-  subgraph REC["Company records"]
-    C["contracts.csv"]
-    PO["purchase_orders.csv"]
-    GRN["goods_receipts.csv"]
-  end
-  subgraph CASES["Agent's store"]
-    INV["cases · invoice, decision"]
-    HA["human_actions"]
-  end
-  K{"Trail key for each invoice<br/>matched PO → PO-xxxx<br/>no PO, known vendor → vendor-Vxxx<br/>otherwise → unmatched-case"}
-  INV --> K
-  C & PO & GRN --> EV["Events, in date order<br/>contract · po · grn · invoice<br/>decision · person · waiting"]
-  K --> EV
-  HA --> EV
-  EV --> T["One trail: title, money left,<br/>status, needs-you, events"]
-  T --> UI["Inbox row · timeline · documents"]
-```
+<p align="center"><img src="docs/diagrams/10-how-a-trail-is-built.png" width="619" alt="How a trail is built"></p>
 
 ---
 
@@ -749,25 +345,9 @@ All models are served through NVIDIA's OpenAI-compatible API (build.nvidia.com),
 | Reading a digital PDF, classifying, ranking POs, GL coding, the review | `nvidia/nemotron-3-ultra-550b-a55b` | `mistralai/mistral-large-4-1t-a52b` → `deepseek-ai/deepseek-v4.1-flash` |
 | Similarity: line pairing, duplicates, look-alike vendors | `nvidia/nemotron-3.5-embed-1b` | plain text similarity (vectors from different models can't be compared) |
 
-```mermaid
-flowchart TD
-  C(["Model call"]) --> REC{"Recorded reply<br/>for a demo invoice?"}
-  REC -->|yes| OK(["Reply"])
-  REC -->|no| TRY["Call the model"]
-  TRY --> R{"Result"}
-  R -->|answer| OK
-  R -->|"HTTP 400: bad request"| BAD(["Stop: another model<br/>would refuse it too"]):::rej
-  R -->|"rate limit or server error"| RT{"Tries left?<br/>3 per model, 1 s then 2 s apart"}
-  RT -->|yes| TRY
-  RT -->|no| NEXT
-  R -->|"timeout (120 s)"| LAST{"Last model<br/>in the chain?"}
-  LAST -->|"no: overloaded models rarely<br/>answer on the next try"| NEXT{"Backup model left?"}
-  LAST -->|yes| RT
-  NEXT -->|yes| TRY
-  NEXT -->|no| DOWN(["AI_UNAVAILABLE<br/>case held, never approved"]):::hold
-  classDef rej fill:#F9E3E1,stroke:#B9342A,color:#5A1712
-  classDef hold fill:#FBEEDB,stroke:#B26A0E,color:#5A3606
-```
+<p align="center"><img src="docs/diagrams/11-model-fallbacks.png" width="798" alt="Retries and fallbacks"></p>
+
+A timeout moves straight to the backup model, because an overloaded model rarely answers on the next try; only the last model in a chain retries a timeout. Demo and history invoices skip the call entirely and replay recorded replies.
 
 Every model call is logged on the case: which model answered, the prompt, the response, the reasoning trace and the latency.
 
@@ -781,15 +361,6 @@ Measured on two sets:
 
 Each was scored on five fields: invoice number, date, supplier GSTIN, total and line count.
 
-```mermaid
-xychart-beta
-  title "10 scans and photos: fields read correctly (of 5), best of three runs"
-  x-axis ["Minimal scan", "Minimal photo", "Classic scan", "Classic photo", "Handwritten scan", "Handwritten photo", "Injection 1", "Injection 2", "Thermal photo", "Thermal scan"]
-  y-axis "Fields correct" 0 --> 5
-  bar [5, 5, 5, 5, 5, 5, 5, 5, 3, 0]
-```
-
-The thermal scan scored 0 because no vision model answered in any run; it was held, not misread. In any single run, some invoices got no answer from the free endpoints and were held as `AI_UNAVAILABLE`.
 
 | Kind of document | Result | What happened |
 |---|---|---|
@@ -797,8 +368,6 @@ The thermal scan scored 0 because no vision model answered in any run; it was he
 | Minimal and classic layouts, scan and photo | ✅ 4 of 4 perfect | Every field right on scans and on phone photos. |
 | Handwritten bill book, scan and photo | ✅ perfect | Read by Gemma 4, the third model in the chain, after the first two timed out. |
 | Hidden-instruction invoices | ✅ perfect | The model ignored a note telling it to set the total to 0, and the note is flagged. |
-| Thermal receipt, phone photo | 🟨 3 of 5 fields | One GSTIN letter misread (G as O); the GSTIN check digit caught it. Grounding dropped a date it couldn't find on the page. |
-| Thermal receipt, scan | 🟥 not read | No vision model answered, so it was held as "AI unavailable" rather than guessed. |
 | **All 10 scans, when a model answered** | **43 of 45 fields (96%)** | 9 of 10 invoices read, 8 of them perfectly. The failures were the free endpoints not answering, not misreads. |
 
 **Speed:**
@@ -900,17 +469,15 @@ SQLite, in `storage/runs.db`:
 
 LangGraph's paused runs live in `storage/checkpoints.db`, and PDFs and page images in `storage/files/<case>/`.
 
-### Why SQLite here, and when you'd pick something else
+### Why SQLite is enough for this demonstration
 
-SQLite is a database in one file that the app opens directly, with no server. That matches this deployment: one process on one machine, a few hundred writes per invoice, and a history snapshot that ships with the code. A demo reset copies `data/seed/history.db` straight in, and LangGraph's `SqliteSaver` keeps the paused runs that make "approve later" work.
+- **One process, one machine.** Streamlit Community Cloud runs the whole app in a single container. SQLite is a file the app opens directly: no database server, credentials or network hop, and nothing extra to host for free.
+- **Low write volume.** Two worker threads write a few hundred rows per invoice, behind one lock. That is far below what SQLite handles comfortably.
+- **The demo history ships as files.** A reset copies `data/seed/history.db` and `checkpoints.db` straight in, so all 38 past invoices come back with their trails, and the held ones can still be acted on.
+- **Paused runs need no extra service.** LangGraph's `SqliteSaver` keeps each run that is waiting for a person, which is what makes "approve later" work.
+- **Tests stay fast and isolated.** Each test gets a fresh database in a temporary folder.
 
-| Choose | When | Here, it would mean |
-|---|---|---|
-| **SQLite** | One app instance, modest writes, data in a file, zero setup | What we use |
-| **PostgreSQL** | Several instances writing at once, data that must survive deploys, users and roles, backups | The production choice. The store's connection and LangGraph's `PostgresSaver` swap in; the schema stays the same |
-| **Object storage (S3, GCS)** | Large files | Would replace `storage/files/` |
-| **A queue (SQS, Redis, Celery)** | Many invoices at once, separate worker machines | Would replace the in-process thread pool |
-| **pgvector** | Similarity search across thousands of invoices | Would back duplicate and line-pairing similarity |
+The store sits behind one class (`storage/cases.py`), so a multi-user deployment could move to a server database without touching the pipeline.
 
 ---
 
@@ -1010,6 +577,7 @@ ui/
   pages.py                the rulebook page
   parts.py · common.py · style.py   HTML pieces, helpers, theme
 scripts/                  data-building scripts, numbered by run order in scripts/README.md
+docs/diagrams/            diagram sources (.mmd, Mermaid) and the images rendered from them
 docs/images/              screenshots used in this README
 .github/workflows/        keep-alive: opens the app every 30 minutes
 storage/                  runtime data, not committed (runs.db, checkpoints.db, files/, erp/ working copy)
@@ -1042,6 +610,8 @@ The JSON API also runs on its own: `python -m uvicorn ap_agent.api.app:app --app
 - Re-record the demos: `python samples/seed_cache.py`, or `python samples/seed_cache.py --fresh S08` to drop one sample's replies first.
 - Regenerate the demo PDFs: `python samples/generate.py`.
 - Rebuild the history: `python scripts/build_history.py`. It saves only if all 38 reach their intended outcome.
+
+**Diagrams.** The README shows images, not live Mermaid blocks, because GitHub draws Mermaid in a cross-site frame that privacy browsers often block. Edit a source in `docs/diagrams/*.mmd`, then run `python scripts/render_diagrams.py` (needs Playwright with Chromium) to regenerate its PNG.
 
 **Live model tests** (off by default): `python -m pytest -m live tests/live`.
 
