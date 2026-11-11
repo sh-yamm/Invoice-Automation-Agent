@@ -24,7 +24,8 @@ class Settings(BaseSettings):
     llm_max_rpm: int = 35
 
     rulebook_path: Path = REPO_ROOT / "rulebook" / "aop.yaml"
-    erp_dir: Path = REPO_ROOT / "data" / "erp"
+    erp_dir: Path = REPO_ROOT / "data" / "erp"            # the records as shipped (a demo reset restores them)
+    erp_work_dir: Path = REPO_ROOT / "storage" / "erp"    # the app's working copy, which people can change
     seed_path: Path = REPO_ROOT / "data" / "seed" / "history.json"
     samples_dir: Path = REPO_ROOT / "samples"
     storage_dir: Path = REPO_ROOT / "storage"

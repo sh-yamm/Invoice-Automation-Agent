@@ -101,6 +101,16 @@ def _restore_checkpoints(src: Path, dst: Path) -> None:
         con.close()
 
 
+def restore_records(seed_erp: Path, work_erp: Path) -> None:
+    """Put the company records back as shipped (vendors, POs, receipts, contracts, accounts)."""
+    seed_erp, work_erp = Path(seed_erp), Path(work_erp)
+    if seed_erp.resolve() == work_erp.resolve():
+        return
+    work_erp.mkdir(parents=True, exist_ok=True)
+    for f in seed_erp.glob("*.csv"):
+        shutil.copyfile(f, work_erp / f.name)
+
+
 def reset_demo(store: Store, path: Path, files_dir: Path | None = None, checkpoint_path: Path | None = None) -> int:
     """Delete every case, ledger row and stored file, then load the history again."""
     with store.db.lock:

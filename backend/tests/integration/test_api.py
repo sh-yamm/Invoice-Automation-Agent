@@ -231,3 +231,52 @@ def test_normal_runs_at_full_speed_and_demo_mode_paces_the_stages(client):
 def test_create_case_records_the_po_it_was_uploaded_to(client):
     cid = client.post("/api/cases", data={"sample_id": "S02", "assigned_po": "PO-4518"}).json()["case_id"]
     assert client.get(f"/api/cases/{cid}").json()["assigned_po"] == "PO-4518"
+
+
+@pytest.fixture
+def rw_client(tmp_path):
+    """Like client, but with a working copy of the company records that the test may change."""
+    s = Settings()
+    erp = tmp_path / "erp"
+    shutil.copytree(s.erp_dir, erp)
+    store = Store(tmp_path / "runs.db")
+    reset_demo(store, s.seed_path)
+    deps = Deps(repo=Repository.load(erp), store=store, aop_path=s.rulebook_path,
+                gateway=Gateway(s, store, CACHE, offline=True), files_dir=tmp_path / "files",
+                checkpoint_path=tmp_path / "cp.db", erp_dir=erp)
+    with TestClient(create_app(deps, seed_path=s.seed_path)) as c:
+        yield c
+
+
+LINE = {"description": "Visitor chair", "hsn_sac": "9401", "qty": "10", "unit": "Nos", "rate": "3800", "gst_rate": "18"}
+
+
+def test_raise_a_po_and_it_is_in_the_records(rw_client):
+    r = rw_client.post("/api/pos", json={"vendor_id": "V001", "po_type": "goods", "po_date": "2026-11-11",
+                                         "lines": [LINE], "actor": "Buyer", "why": "new branch"})
+    assert r.status_code == 201
+    po = r.json()["po_number"]
+    assert any(l["po_number"] == po for l in rw_client.get("/api/data/purchase_orders").json())
+    assert rw_client.get("/api/record-changes", params={"ref": po}).json()[0]["kind"] == "po_raised"
+
+
+def test_vendor_changes_are_refused_with_a_reason(rw_client):
+    bad = {"name": "X", "gstin": "29ABCDE1234F1Z0", "address": "", "phone": "", "email": "", "bank_name": "",
+           "bank_account": "", "ifsc": "", "einvoice_required": False, "payment_terms_days": 30, "category": "x",
+           "actor": "AP lead", "why": "test"}
+    r = rw_client.post("/api/vendors", json=bad)
+    assert r.status_code == 422 and "GSTIN" in r.json()["detail"]
+    r = rw_client.post("/api/vendors/V002/status", json={"status": "blocked", "actor": "AP lead", "why": "fraud alert"})
+    assert r.status_code == 200
+    assert next(v for v in rw_client.get("/api/data/vendors").json() if v["vendor_id"] == "V002")["status"] == "blocked"
+
+
+def test_reset_restores_the_records(rw_client):
+    po = rw_client.post("/api/pos", json={"vendor_id": "V001", "po_type": "goods", "po_date": "2026-11-11",
+                                          "lines": [LINE], "actor": "Buyer", "why": "x"}).json()["po_number"]
+    rw_client.post("/api/vendors/V002/bank", json={"bank_name": "X Bank", "bank_account": "999", "ifsc": "XBNK0000001",
+                                                   "actor": "AP lead", "why": "letter"})
+    assert rw_client.post("/api/demo/reset").status_code == 200
+    assert not any(l["po_number"] == po for l in rw_client.get("/api/data/purchase_orders").json())
+    assert next(v for v in rw_client.get("/api/data/vendors").json() if v["vendor_id"] == "V002")["bank_account"] != "999"
+    assert rw_client.get("/api/record-changes").json() == []
