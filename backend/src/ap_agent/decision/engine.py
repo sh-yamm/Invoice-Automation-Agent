@@ -61,7 +61,11 @@ def floor(findings: list[Finding], aop: Aop) -> tuple[Outcome, Finding | None]:
 
 def accept_escalation(floor_outcome: Outcome, proposal: dict, findings: list[Finding],
                       aop: Aop) -> tuple[Outcome, bool, Finding | None]:
-    """Apply the agent's review only if it is stricter than the rules and cites real findings."""
+    """Apply the agent's review only on an invoice the rules would approve, if it is stricter and cites real findings.
+
+    The agent catches what the rules missed. It never turns a hold or a sign-off into a rejection by restating a
+    concern the rules already raised: a person decides those, with the agent's note in front of them.
+    """
     target_name = (proposal or {}).get("escalate_to")
     if target_name in (None, "", "none"):
         return floor_outcome, False, None
@@ -71,7 +75,8 @@ def accept_escalation(floor_outcome: Outcome, proposal: dict, findings: list[Fin
         invalid = f"it proposed an unknown outcome ({target_name})"
     elif target < floor_outcome:
         invalid = f"it proposed {OUTCOME_LABELS[int(target)].lower()}, which is less strict than the rules"
-    elif target == floor_outcome:
+    elif target == floor_outcome or floor_outcome > Outcome.APPROVED:
+        # A person already reviews this invoice; the agent's concern reaches them as its review note
         return floor_outcome, False, None
     else:
         ids = {f.id for f in findings}

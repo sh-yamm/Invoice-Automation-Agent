@@ -123,3 +123,13 @@ def test_escalation_finding_carries_agent_reason(aop):
     f = escalation_finding(Outcome.ON_HOLD, {"reason": "round amount just under the limit", "cites": ["a1"]}, aop)
     assert f.code == "AGENT_ESCALATION" and f.outcome is Outcome.ON_HOLD and "round amount" in f.detail
     assert f.data["cites"] == ["a1"] and f.check == "agent_review"
+
+
+@pytest.mark.parametrize("floor_outcome,target", [(Outcome.ON_HOLD, "rejected"), (Outcome.NEEDS_SIGNOFF, "rejected"),
+                                                  (Outcome.NEEDS_SIGNOFF, "on_hold")])
+def test_escalation_does_not_override_a_person(aop, floor_outcome, target):
+    """When the rules already send the invoice to a person, the agent's concern is a note for them, not a new outcome."""
+    findings = [fail(aop, "PERIOD_ALREADY_BILLED")]
+    out, accepted, warn = accept_escalation(floor_outcome, {"escalate_to": target, "reason": "looks like a duplicate",
+                                                            "cites": [findings[0].id]}, findings, aop)
+    assert out is floor_outcome and accepted is False and warn is None
