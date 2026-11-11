@@ -1,0 +1,25 @@
+flowchart TB
+  U["Person in a browser"] --> APP
+  GH["GitHub Actions keep-alive<br/>opens the app every 30 min"] -.-> APP
+  subgraph APP["Streamlit app · ui/"]
+    direction LR
+    PAGES["Pages<br/>inbox · PO trail · process · records"] --> ENG["engine.py<br/>FastAPI TestClient, in-process"]
+  end
+  APP -->|"in-process JSON, no network"| API
+  subgraph API["FastAPI routes · api/"]
+    direction LR
+    R1["cases"] ~~~ R2["trails"] ~~~ R3["records"] ~~~ R4["documents"]
+  end
+  API -->|"start · resume"| AGENT
+  subgraph AGENT["The agent"]
+    direction LR
+    PIPE["Pipeline<br/>LangGraph, 17 steps"] --> CHK["50 checks<br/>+ rulebook"] --> DEC["Decision engine<br/>rules floor"]
+  end
+  AGENT --> GW["AI gateway<br/>3 tries, then a backup model"]:::ai
+  GW -->|HTTPS| NV["NVIDIA models<br/>OCR · read · classify · review"]:::ai
+  AGENT --> DATA
+  subgraph DATA["Data"]
+    direction LR
+    DB[("SQLite runs.db<br/>cases · ledgers · audit")] ~~~ CP[("checkpoints.db<br/>paused runs")] ~~~ FILES["storage/files<br/>PDFs · page images"] ~~~ ERP["storage/erp<br/>company records"]
+  end
+  classDef ai fill:#E6EDFC,stroke:#2B5FD9,color:#14306E

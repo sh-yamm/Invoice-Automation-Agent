@@ -1,0 +1,17 @@
+flowchart TD
+  F(["All findings"]) --> G{"Every required check<br/>for this path ran?"}
+  G -->|no| GX["CHECKS_INCOMPLETE · On hold"]:::hold
+  G -->|yes| FL["Rules floor<br/>Rejected > On hold > Sign-off > Approved"]
+  FL --> Q{"Floor is Approved?"}
+  Q -->|"no: a person will look"| NOTE["Agent review runs as a note<br/>outcome unchanged"]:::ai
+  Q -->|yes| RV["Agent review<br/>may propose stricter, with cited findings"]:::ai
+  RV --> V{"Stricter AND cites<br/>real findings?"}
+  V -->|no| DROP["Proposal discarded<br/>AGENT_RATIONALE_INVALID · warning"]:::warn
+  V -->|yes| ESC["AGENT_ESCALATION · On hold or sign-off"]:::hold
+  NOTE --> OUT["Verdict: reason from the rulebook<br/>owner · next step · also found"]
+  DROP --> OUT
+  ESC --> OUT
+  FL -.-> OUT
+  classDef ai fill:#E6EDFC,stroke:#2B5FD9,color:#14306E
+  classDef hold fill:#FBEEDB,stroke:#B26A0E,color:#5A3606
+  classDef warn fill:#FFF7D6,stroke:#B89A00,color:#4D4000

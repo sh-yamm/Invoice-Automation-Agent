@@ -1,0 +1,12 @@
+flowchart TD
+  C(["Call a model"]) --> R{"Result?"}
+  R -->|"answer"| OK(["Use the reply"]):::ok
+  R -->|"HTTP 400: bad request"| BAD(["Stop: any model<br/>would refuse it"]):::rej
+  R -->|"rate limit or server error"| RT["Retry the same model<br/>3 tries, 1 s then 2 s apart"]
+  R -->|"timeout after 120 s"| NX
+  RT -->|"still failing"| NX{"Backup model left?"}
+  NX -->|"yes"| C
+  NX -->|"no"| DOWN(["AI_UNAVAILABLE<br/>case held, never approved"]):::hold
+  classDef ok fill:#E1F2EA,stroke:#1F7F55,color:#0D3D27
+  classDef rej fill:#F9E3E1,stroke:#B9342A,color:#5A1712
+  classDef hold fill:#FBEEDB,stroke:#B26A0E,color:#5A3606

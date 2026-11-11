@@ -1,0 +1,25 @@
+sequenceDiagram
+  autonumber
+  actor P as Person
+  participant UI as Streamlit
+  participant API as API
+  participant G as Pipeline
+  participant AI as AI gateway
+  participant DB as SQLite
+  P->>UI: pick the PO, upload the PDF
+  UI->>API: POST /api/cases
+  API->>G: prepare: save PDF, render page
+  API-->>UI: case id, at once
+  G->>AI: OCR, read, classify, review
+  AI-->>G: JSON (retries, backups)
+  G->>DB: events, findings, model calls
+  loop every second while running
+    UI->>DB: read new events
+    UI-->>P: stages light up, checks appear
+  end
+  G->>DB: outcome, reason, owner
+  Note over G,DB: On hold: the run pauses in checkpoints.db
+  P->>UI: Approve anyway, with a note
+  UI->>API: POST /actions
+  API->>G: resume from the checkpoint
+  G->>DB: finalise: PO ledger
