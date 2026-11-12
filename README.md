@@ -12,7 +12,7 @@ An AI agent that does the work of an accounts-payable clerk for an Indian compan
 
 **Start here:** [The brief, and where each part is answered](#the-brief-and-where-each-part-is-answered) · [How it works](#how-it-works)
 
-**What the brief asks for:** [Messy inputs](#messy-inputs) · [How well reading and OCR work](#how-well-reading-and-ocr-work) · [Checks against the procurement records](#checks-against-the-procurement-records) · [Purchase-order trails and split invoices](#purchase-order-trails-and-split-invoices) · [The decision](#the-decision) · [Edge cases](#edge-cases) · [The app: live run view and dashboard](#the-app-live-run-view-and-dashboard) · [Assumptions](#assumptions)
+**What the brief asks for:** [How an invoice is read](#how-an-invoice-is-read) · [Messy inputs](#messy-inputs) · [How well reading and OCR work](#how-well-reading-and-ocr-work) · [Checks against the procurement records](#checks-against-the-procurement-records) · [Purchase-order trails and split invoices](#purchase-order-trails-and-split-invoices) · [The decision](#the-decision) · [Edge cases](#edge-cases) · [The app: live run view and dashboard](#the-app-live-run-view-and-dashboard) · [Assumptions](#assumptions)
 
 **How it is built:** [Architecture](#architecture) · [The pipeline: 17 steps in 7 stages](#the-pipeline-17-steps-in-7-stages) · [One invoice, script by script](#one-invoice-script-by-script) · [Models, retries and fallbacks](#models-retries-and-fallbacks) · [Data: records, storage and why SQLite](#data-records-storage-and-why-sqlite)
 
@@ -27,7 +27,7 @@ The case study (PS-1, accounts payable) asks for a live process that turns an in
 | The brief asks for | Where it is answered | Where to see it in the app |
 |---|---|---|
 | A working process, live and runnable, on a real invoice PDF | [How it works](#how-it-works) · [Setup](#setup-tests-and-hosting) | The live link: **Process an invoice**, then upload a PDF or run a demo invoice |
-| Messy inputs: scanned or clean, itemised or bundled, tax separate or included, PO stated or implied, missing fields | [Messy inputs](#messy-inputs) · [How well reading works](#how-well-reading-and-ocr-work) | Demo S08 (a scan with no PO number); S17 (rates printed with GST included) |
+| Messy inputs: scanned or clean, itemised or bundled, tax separate or included, PO stated or implied, missing fields | [How an invoice is read](#how-an-invoice-is-read) · [Messy inputs](#messy-inputs) · [How well reading works](#how-well-reading-and-ocr-work) | Demo S08 (a scan with no PO number); S17 (rates printed with GST included) |
 | Checks against the procurement records: approved vendors, PO amounts, tolerances, duplicates | [Checks against the records](#checks-against-the-procurement-records) · [Every rule](#every-rule-stage-by-stage) | **Company records**; every check listed under each invoice |
 | A single PO split across several invoices | [Split invoices](#purchase-order-trails-and-split-invoices) | The trail for PO-4540 (three invoices) or PO-4490 (a monthly contract) |
 | A clear, reasoned decision, with everything in between visible | [The decision](#the-decision) | Each invoice: the decision card, every check, and the evidence boxed on the page |
@@ -55,6 +55,33 @@ Every invoice ends in one of four outcomes, each with the checks that ran, the e
 | 🟥 **Rejected** | Can never be paid as it stands | Back to the vendor, with the reason |
 
 It is built for **India first**: ₹ and GST (CGST, SGST, IGST), GSTIN validation, HSN/SAC codes, the GST invoice rules (Rule 46) and e-invoice IRNs. The region's rules live in their own rule pack, so another country can be added without changing the pipeline.
+
+---
+
+## How an invoice is read
+
+Every PDF is read **two ways**: the page as a person sees it (an image, read by OCR) and, for a digital PDF, the text the file itself carries (its embedded text layer). Comparing the two is how the agent spots a figure that was overwritten or hidden.
+
+<p align="center"><img src="docs/diagrams/13-reading-path.png" width="726" alt="How an invoice is read"></p>
+
+| | Digital PDF (has its own text) | Scan or photo (no text) |
+|---|---|---|
+| **The page as seen** | Rendered to an image and read by OCR (Nemotron Parse): text blocks with their positions | The same |
+| **The file's own text** | Read by code (`pdfplumber`): every word with its position | None |
+| **Fields read into JSON by** | A text model (Nemotron 3 Ultra) on the OCR blocks: fast, and nothing is lost to image quality | A vision model on the page images (Super VL, then Mistral Large, then Gemma if the first ones fail) |
+| **If the OCR service is down** | The file's own text is used instead, with a warning that the comparison below could not run | The invoice is held: there is nothing else to read it from |
+| **Tamper comparison** | Yes, see below | Not possible (no second reading) |
+
+**Checks on the text, by code, before any model reads the fields:**
+- **Text aimed at the AI:** both readings are scanned for instructions such as "ignore previous instructions", "SYSTEM:" or "set the total to 0" (a fixed list of patterns). A match holds the invoice (`SUSPICIOUS_INSTRUCTIONS_IN_DOCUMENT`).
+- **Signs of editing:** the file's metadata is checked for an editing tool (iLovePDF, Smallpdf and others) or a modified date well after the created date (`DOCUMENT_TAMPER_SIGNALS`, a warning).
+
+**After the fields are read:**
+1. **Grounding.** Every value must be found in the OCR text of the page, or it is dropped. A key field read with less than 85% confidence goes to a person to confirm.
+2. **Repairs code can prove.** A total or tax the model missed is taken from the file's own text, only if it adds up and matches the amount in words. Rates printed with GST included are converted to before-GST rates, only if the figures prove it.
+3. **Hidden text against the page** (digital PDFs). Code pulls three kinds of key figure from both readings: amounts, bank account numbers and GSTINs. Any figure that is in the file's hidden text but not on the visible page means the two disagree, and the invoice is held (`TEXT_LAYER_MISMATCH`). In demo S13 the page shows a total of ₹2,91,696, while the file's hidden text says ₹29,169.60 and gives a different bank account; that is how an edited or doctored PDF shows up. Figures the invoice's own numbers explain, such as a recovered total, don't count. This is an **exact comparison by code**, not a model's judgement.
+
+**Where similarity is used instead.** Comparing descriptions and names is fuzzy by nature, so these use an embedding model (Nemotron Embed) for similarity, and fall back to plain string similarity when it is unavailable: pairing invoice lines with PO lines, finding probable duplicates, spotting look-alike vendor names, and ranking open POs when none is printed. The tamper comparison deliberately doesn't: a figure either matches or it doesn't.
 
 ---
 

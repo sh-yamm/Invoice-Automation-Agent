@@ -1,0 +1,22 @@
+flowchart TB
+  PDF(["Invoice PDF"]) --> ING["Fingerprint (SHA-256) · readable · not password protected"]
+  ING --> TL{"Has its own<br/>embedded text?"}
+  TL -->|"yes: digital PDF"| LAYER["Text layer read by code<br/>pdfplumber: words with positions"]
+  TL -->|"no: scan or photo"| IMG
+  ING --> IMG["Each page rendered to an image"]
+  IMG --> OCR["OCR of the page image<br/>Nemotron Parse: text blocks with positions"]:::ai
+  OCR -.->|"OCR down, digital PDF"| LAYER
+  OCR --> SCAN["Code scans all the text<br/>instructions aimed at the AI · signs of editing"]
+  LAYER --> SCAN
+  SCAN --> X{"Read the fields as JSON"}
+  X -->|"digital"| XT["Text model on the OCR blocks<br/>Nemotron 3 Ultra"]:::ai
+  X -->|"scan"| XV["Vision model on the page images<br/>Super VL → Mistral Large → Gemma"]:::ai
+  XT --> G["Grounding: keep only values found on the page<br/>low confidence → a person confirms"]
+  XV --> G
+  G --> FIX["Repairs code can prove<br/>a dropped total from the text layer · rates printed with GST"]
+  FIX --> CMP{"Digital PDF: hidden text<br/>vs what the page shows"}
+  LAYER -.-> CMP
+  CMP -->|"a figure only in the hidden text"| TLM["TEXT_LAYER_MISMATCH · hold"]:::hold
+  CMP -->|"they agree"| NEXT(["to classification"])
+  classDef ai fill:#E6EDFC,stroke:#2B5FD9,color:#14306E
+  classDef hold fill:#FBEEDB,stroke:#B26A0E,color:#5A3606
