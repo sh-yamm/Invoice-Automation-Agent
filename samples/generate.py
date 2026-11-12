@@ -122,9 +122,18 @@ def _story(spec: SampleSpec):
         story += [top, Spacer(1, 8), mid]
     story.append(Spacer(1, 8))
 
-    head = ["#", "Description", "HSN/SAC", "Qty", "Unit", "Rate (Rs.)", "Taxable Value (Rs.)"]
-    rows = [head] + [[str(i), Paragraph(l.description, st["body"]), l.hsn_sac or "", qty(l.qty), l.unit or "",
-                      amt(l.rate), amt(l.taxable)] for i, l in enumerate(inv.lines, 1)]
+    if spec.prices_include_gst:  # S17: the vendor prints rates and amounts with GST included
+        wrap = lambda s: Paragraph(f"<b>{s}</b>", ParagraphStyle("hd", parent=st["right"], fontSize=t["size"],
+                                                                 leading=t["size"] + 1.5))
+        head = ["#", "Description", "HSN/SAC", "Qty", "Unit", wrap("Rate incl.<br/>GST (Rs.)"),
+                wrap("Amount incl.<br/>GST (Rs.)")]
+        inc = lambda x, l: x * (1 + l.gst_rate / 100)
+        rows = [head] + [[str(i), Paragraph(l.description, st["body"]), l.hsn_sac or "", qty(l.qty), l.unit or "",
+                          amt(inc(l.rate, l)), amt(inc(l.taxable, l))] for i, l in enumerate(inv.lines, 1)]
+    else:
+        head = ["#", "Description", "HSN/SAC", "Qty", "Unit", "Rate (Rs.)", "Taxable Value (Rs.)"]
+        rows = [head] + [[str(i), Paragraph(l.description, st["body"]), l.hsn_sac or "", qty(l.qty), l.unit or "",
+                          amt(l.rate), amt(l.taxable)] for i, l in enumerate(inv.lines, 1)]
     lines = Table(rows, colWidths=[8 * mm, 72 * mm, 18 * mm, 16 * mm, 14 * mm, 24 * mm, 30 * mm], repeatRows=1)
     ls = [("FONT", (0, 0), (-1, 0), t["bold"], t["size"]), ("FONT", (0, 1), (-1, -1), t["font"], t["size"]),
           ("ALIGN", (3, 0), (-1, -1), "RIGHT"), ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
@@ -139,7 +148,8 @@ def _story(spec: SampleSpec):
     lines.setStyle(TableStyle(ls))
     story += [lines, Spacer(1, 6)]
 
-    tax_rows = [("Taxable Value", amt(inv.taxable_total))]
+    tax_rows = ([("Total incl. GST", amt(inv.grand_total)), ("of which:", "")] if spec.prices_include_gst else [])
+    tax_rows += [("Taxable Value", amt(inv.taxable_total))]
     rate = inv.lines[0].gst_rate
     if inv.cgst is not None:
         tax_rows += [(f"CGST @ {rate / 2:g}%", amt(inv.cgst)), (f"SGST @ {rate / 2:g}%", amt(inv.sgst))]

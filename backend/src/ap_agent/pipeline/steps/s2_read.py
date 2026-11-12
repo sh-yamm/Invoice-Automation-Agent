@@ -6,7 +6,10 @@ from __future__ import annotations
 
 from ap_agent.pipeline.steps._shared import *  # noqa: F401,F403  (helpers, models, checks)
 from ap_agent.reading.recover import recover_totals
+from decimal import Decimal
+
 from ap_agent.rules.po_assignment import apply_assigned_po
+from ap_agent.rules.tax_inclusive import normalise_inclusive
 
 
 @node("reconcile", "reconcile")
@@ -54,6 +57,12 @@ def ground_node(state, deps):
             detail="The page reader missed " + ", ".join(f"the {names[f]} ({fmt_inr(getattr(inv, f))})" for f in recovered)
                    + ". The PDF's embedded text has exactly that figure, and it matches the taxable value plus tax"
                    + (" and the amount in words." if inv.amount_in_words else ".")))
+    # Rates printed with GST included: converted to before GST, only when the invoice's own numbers prove it.
+    inv, inclusive = normalise_inclusive(inv)
+    if inclusive:
+        found.append(_finding(aop, "TAX_INCLUSIVE_NORMALISED", "Prices included GST; converted", "tax_inclusive",
+                              "read", {**inclusive, "with_gst": fmt_inr(Decimal(inclusive["with_gst"])),
+                                       "before_gst": fmt_inr(Decimal(inclusive["before_gst"]))}))
     # The PO the person uploaded it to: used when none is printed, a hold when the invoice names another.
     inv, how = apply_assigned_po(inv, state.get("assigned_po"))
     if how == "assigned":

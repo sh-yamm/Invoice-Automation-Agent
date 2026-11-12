@@ -63,4 +63,5 @@ ALSO_HANDLED = [
     {"sample": "S16", "title": "The amount in words doesn't match the figures"},
     {"sample": "S10", "title": "Furniture bought without a PO, where policy needs one"},
     {"sample": "S11", "title": "A proforma sent as if it were a tax invoice"},
+    {"sample": "S17", "title": "Rates printed with GST included: converted to before-GST rates, then matched"},
 ]

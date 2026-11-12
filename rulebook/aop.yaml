@@ -452,6 +452,12 @@ reasons:
     owner: AP team
     explain: "The invoice has one combined line, so it was checked against the PO total rather than line by line."
     next: "No action needed."
+  - code: TAX_INCLUSIVE_NORMALISED
+    title: "Prices included GST; converted"
+    outcome: warn
+    owner: AP team
+    explain: "The rates on this invoice include GST: its {lines} line(s) add up to {with_gst} with GST. Each was converted at its own GST rate to {before_gst} before GST, which matches the taxable value and GST shown, so it can be matched against the PO."
+    next: "No action needed."
   - code: UNDER_BILLED
     title: "Billed below the PO rate"
     outcome: warn
