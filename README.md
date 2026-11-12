@@ -72,6 +72,8 @@ Every PDF is read **two ways**: the page as a person sees it (an image, read by 
 | **If the OCR service is down** | The file's own text is used instead, with a warning that the comparison below could not run | The invoice is held: there is nothing else to read it from |
 | **Tamper comparison** | Yes, see below | Not possible (no second reading) |
 
+**Why a scan takes longer.** Both go through the same OCR (3–8 s a page). The difference is the next step: a digital PDF's fields are read by a text model from the OCR text alone (about 20–60 s), while a scan's are read by a vision model looking at the page images, which is far more input and runs on busier endpoints (about 4–8 minutes, mostly waiting for a model to answer).
+
 **Checks on the text, by code, before any model reads the fields:**
 - **Text aimed at the AI:** both readings are scanned for instructions such as "ignore previous instructions", "SYSTEM:" or "set the total to 0" (a fixed list of patterns). A match holds the invoice (`SUSPICIOUS_INSTRUCTIONS_IN_DOCUMENT`).
 - **Signs of editing:** the file's metadata is checked for an editing tool (iLovePDF, Smallpdf and others) or a modified date well after the created date (`DOCUMENT_TAMPER_SIGNALS`, a warning).
