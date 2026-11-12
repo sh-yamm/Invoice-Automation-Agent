@@ -62,6 +62,12 @@ def trail_page(key: str, doc: str | None) -> None:
     try:
         t = engine.get(f"/api/trails/{key}")
     except engine.ApiError:
+        # An invoice started before its PO was known lands on a temporary key; follow it to the PO it matched.
+        if doc and doc.startswith("invoice:"):
+            from ap_agent.api.trails import case_key
+            case = engine.ctx().deps.store.get_case(doc.split(":", 1)[1])
+            if case and case_key(case, engine.ctx().deps.repo) != key:
+                go(trail=case_key(case, engine.ctx().deps.repo), doc=doc)
         st.error(f"There is no trail {key}. A demo reset may have removed it.")
         return
     money = t.get("money")

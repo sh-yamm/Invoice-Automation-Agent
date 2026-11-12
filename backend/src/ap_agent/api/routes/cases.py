@@ -25,15 +25,20 @@ PACE = {"normal": 0, "demo": 450}
 
 @router.post("")
 async def create_case(request: Request, file: UploadFile | None = File(None), sample_id: str | None = Form(None),
-                      pace: str = Form("normal"), assigned_po: str | None = Form(None)):
+                      pace: str = Form("normal"), assigned_po: str | None = Form(None),
+                      live_sample: str | None = Form(None)):
+    """A real upload, a demo invoice (sample_id: recorded model replies) or a demo invoice run live (live_sample:
+    the same PDF, every model called live). Both kinds of demo run are trial runs: later checks never count them
+    as history, so they can be run again and again with the same result."""
     ctx = ctx_of(request)
-    if file is None and not sample_id:
+    if file is None and not sample_id and not live_sample:
         raise HTTPException(400, "Upload a PDF invoice or choose a demo sample.")
     case_id = "C-" + uuid.uuid4().hex[:6].upper()
-    if sample_id:
-        if sample_id not in SPECS:
-            raise HTTPException(404, f"No demo sample {sample_id}.")
-        path, name = REPO_ROOT / "samples" / "pdf" / f"{sample_id}.pdf", f"{sample_id}.pdf"
+    demo = sample_id or live_sample
+    if demo:
+        if demo not in SPECS:
+            raise HTTPException(404, f"No demo sample {demo}.")
+        path, name = REPO_ROOT / "samples" / "pdf" / f"{demo}.pdf", f"{demo}.pdf"
     else:
         data = await file.read()
         if not data.startswith(b"%PDF-"):
@@ -41,7 +46,8 @@ async def create_case(request: Request, file: UploadFile | None = File(None), sa
         tmp = Path(tempfile.mkdtemp()) / "upload.pdf"
         tmp.write_bytes(data)
         path, name = tmp, file.filename or "invoice.pdf"
-    ctx.pipeline.prepare(case_id, path, sample_id=sample_id, filename=name, assigned_po=assigned_po or None)
+    ctx.pipeline.prepare(case_id, path, sample_id=sample_id, filename=name, assigned_po=assigned_po or None,
+                         trial=bool(demo))
     ctx.deps.bus.pace_by_case[case_id] = PACE.get(pace, 0)
     ctx.executor.submit(ctx.pipeline.run, case_id)
     return J({"case_id": case_id}, 201)

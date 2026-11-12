@@ -87,8 +87,12 @@ def test_action_idempotent(client):
     assert first.status_code == 200 and second.status_code in (200, 409)
     case = client.get(f"/api/cases/{cid}").json()
     assert len(case["human_actions"]) == 1 and case["outcome"] == 0
+    # written exactly once; a demo run is a trial run, so the PO's balance doesn't count it
+    db = client.app.state.ctx.deps.store.db
+    rows = db.query("SELECT amount FROM po_ledger WHERE case_id = ?", (cid,))
+    assert [r["amount"] for r in rows] == ["247200.00"] or sum(float(r["amount"]) for r in rows) == 247200.0
     po = next(p for p in client.get("/api/data/po_ledger").json() if p["po_number"] == "PO-4518")
-    assert po["invoiced"] == "247200.00"
+    assert po["invoiced"] == "0.00"
 
 
 def test_action_on_unknown_case_404(client):
@@ -297,3 +301,27 @@ def test_edge_cases_listing(client):
         assert "_" not in c["outcome_title"]  # a plain name, not a code
         assert c["trail"].startswith("PO-") and c["po"] == c["trail"]
     assert {a["sample"] for a in r["also"]} >= {"S05", "S07", "S08", "S12", "S13", "S15"}
+
+
+def test_a_demo_invoice_run_is_a_trial_run(client):
+    r = client.post("/api/cases", data={"sample_id": "S01", "pace": "normal"})
+    case = client.get(f"/api/cases/{r.json()['case_id']}").json()
+    assert case["is_trial"] == 1 and case["sample_id"] == "S01"
+
+
+def test_a_live_demo_run_calls_the_models_and_is_a_trial_run(client):
+    """live_sample: the demo invoice's PDF with no recorded replies (no sample_id), never counted as history."""
+    r = client.post("/api/cases", data={"live_sample": "S18", "pace": "normal"})
+    assert r.status_code == 201
+    case = client.get(f"/api/cases/{r.json()['case_id']}").json()
+    assert case["is_trial"] == 1 and case["sample_id"] is None and case["filename"] == "S18.pdf"
+
+
+def test_an_unknown_live_sample_is_refused(client):
+    assert client.post("/api/cases", data={"live_sample": "S99"}).status_code == 404
+
+
+def test_an_upload_is_a_real_invoice(client):
+    pdf = (REPO_ROOT / "samples" / "pdf" / "S02.pdf").read_bytes()
+    r = client.post("/api/cases", files={"file": ("inv.pdf", pdf, "application/pdf")}, data={"pace": "normal"})
+    assert client.get(f"/api/cases/{r.json()['case_id']}").json()["is_trial"] == 0

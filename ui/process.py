@@ -57,6 +57,17 @@ def process_dialog(fixed_po: str | None = None) -> None:
     if up is not None and st.button("Process invoice", type="primary"):
         _start(data, files={"file": (up.name, up.getvalue(), "application/pdf")})
     samples = engine.get("/api/samples")
+    st.markdown("**Or run a demo invoice live**")
+    st.caption("Its PDF is read by the real models, every call made live: about a minute for a digital invoice. "
+               "Like every demo run it is a trial run, never counted as history, so it can be run again and again.")
+    names = {s["id"]: f'{s["id"]} · {s["title"]}' for s in samples}
+    ids = list(names)
+    lc, lb = st.columns([5, 1.3], vertical_alignment="bottom")
+    live = lc.selectbox("Demo invoice to run live", ids, index=ids.index("S18") if "S18" in ids else 0,
+                        format_func=names.get, key="live_sample", label_visibility="collapsed")
+    if lb.button("Run live", key="run-live", icon=":material/bolt:", width="stretch"):
+        printed = next((s.get("po") for s in samples if s["id"] == live), None)
+        _start({"live_sample": live, "pace": data["pace"], **({"assigned_po": printed} if printed else {})})
     mine = [s for s in samples if assigned and s.get("po") == assigned]
     rest = [s for s in samples if s not in mine]
     for title, group in (("For this PO", mine), ("Other demo invoices" if mine else "Or pick a demo invoice", rest)):

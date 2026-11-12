@@ -54,6 +54,9 @@ def test_process_an_invoice_starts_by_choosing_the_po():
     po_pick = at.selectbox(key="process_po")
     assert any("PO-4518" in str(o) for o in po_pick.options)
     assert any("let the agent find it" in str(o) for o in po_pick.options)
+    # a demo invoice can also be run live (real model calls), S18 by default
+    assert at.selectbox(key="live_sample").value == "S18"
+    assert any(b.label == "Run live" for b in at.button)
 
 
 def test_every_trail_page_renders():

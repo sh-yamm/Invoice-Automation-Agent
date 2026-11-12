@@ -309,7 +309,7 @@ Four pages: **Purchase orders** (the dashboard and each PO's trail), **Edge case
 </tr>
 </table>
 
-If an invoice prints no PO number, it is read as being for the PO you picked. If it prints a *different* PO, it is held as `PO_ASSIGNMENT_MISMATCH` for a person to say which is right.
+A demo invoice can also be **run live** (real model calls) from the same dialog; demo runs never count as history, so they can be repeated. If an invoice prints no PO number, it is read as being for the PO you picked. If it prints a *different* PO, it is held as `PO_ASSIGNMENT_MISMATCH` for a person to say which is right.
 
 ---
 
@@ -660,6 +660,10 @@ Every case keeps a complete, replayable record:
 ## Demo invoices
 
 The 18 demo invoices in `samples/pdf/` replay recorded model replies from `samples/cache/`, so the demo never depends on a live model call. All 18 reach their expected outcome.
+
+**Demo runs are trial runs, so they can be repeated.** A demo invoice run (from its **Run** button, or **Run live**) is a full case you can open and act on, but later checks never count it as history: not as the same file already processed, not as a past invoice for the duplicate, split or vendor-history checks, and not as billed on its PO. Every demo invoice therefore gets the same result however many times it is run. A real upload always counts.
+
+**Run live.** In **Process an invoice**, below Upload, pick a demo invoice (S18 by default) and choose **Run live**: its PDF goes through the real models, every call made live, instead of replaying recorded replies. It takes about a minute for a digital invoice, and the invoice's header says it was run live.
 
 | # | Invoice | Shows | Expected |
 |---|---|---|---|

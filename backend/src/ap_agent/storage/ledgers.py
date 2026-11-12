@@ -24,6 +24,10 @@ class CaseSummary:
     decided_at: str | None
 
 
+# Ledger rows written by demo (trial) runs don't count: a demo invoice must not use up a PO or a period.
+NOT_TRIAL = "case_id NOT IN (SELECT case_id FROM cases WHERE is_trial = 1)"
+
+
 def _d(v):
     return date.fromisoformat(v) if v else None
 
@@ -33,7 +37,7 @@ class Ledger:
         self.db = db
 
     def invoiced(self, po_number: str, line_no: int | None = None) -> tuple[Decimal, Decimal]:
-        sql = "SELECT qty, amount FROM po_ledger WHERE po_number = ?"
+        sql = f"SELECT qty, amount FROM po_ledger WHERE po_number = ? AND {NOT_TRIAL}"
         params: tuple = (po_number,)
         if line_no is not None:
             sql += " AND line_no = ?"
@@ -49,7 +53,7 @@ class Ledger:
 
     def period_billed(self, contract_id: str, period_start: date, exclude_case: str | None = None) -> str | None:
         rows = self.db.query(
-            "SELECT case_id FROM period_ledger WHERE contract_id = ? AND period_start = ? AND case_id != ?",
+            f"SELECT case_id FROM period_ledger WHERE contract_id = ? AND period_start = ? AND case_id != ? AND {NOT_TRIAL}",
             (contract_id, period_start.isoformat(), exclude_case or ""))
         return rows[0]["case_id"] if rows else None
 
@@ -60,7 +64,8 @@ class History:
 
     def cases_for_vendor(self, vendor_id: str, exclude_case: str) -> list[CaseSummary]:
         rows = self.db.query(
-            "SELECT * FROM cases WHERE vendor_id = ? AND case_id != ? ORDER BY invoice_date", (vendor_id, exclude_case))
+            "SELECT * FROM cases WHERE vendor_id = ? AND case_id != ? AND is_trial = 0 ORDER BY invoice_date",
+            (vendor_id, exclude_case))
         return [CaseSummary(
             case_id=r["case_id"], invoice_no=r["invoice_no"], invoice_no_norm=r["invoice_no_norm"],
             invoice_date=_d(r["invoice_date"]),

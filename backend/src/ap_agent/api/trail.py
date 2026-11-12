@@ -7,6 +7,7 @@ import re
 from decimal import Decimal
 
 from ap_agent.core.constants import OUTCOME_LABELS
+from ap_agent.storage.ledgers import NOT_TRIAL
 from ap_agent.core.money import fmt_inr, to_money
 
 
@@ -49,7 +50,8 @@ def build_trail(case: dict, deps) -> dict:
             got = repo.grns(po.po_number, l.line_no)
             grns += got
             before_qty, before_amt = Decimal("0"), Decimal("0")
-            for r in store.db.query("SELECT qty, amount FROM po_ledger WHERE po_number = ? AND line_no = ? AND case_id != ?",
+            for r in store.db.query("SELECT qty, amount FROM po_ledger WHERE po_number = ? AND line_no = ? AND case_id != ? "
+                                    f"AND {NOT_TRIAL}",
                                     (po.po_number, l.line_no, cid)):
                 before_qty += Decimal(r["qty"])
                 before_amt += Decimal(r["amount"])
@@ -61,7 +63,7 @@ def build_trail(case: dict, deps) -> dict:
     earlier = []
     if po:
         rows = store.db.query("SELECT case_id, SUM(CAST(amount AS REAL)) AS amt FROM po_ledger WHERE po_number = ? "
-                              "AND case_id != ? GROUP BY case_id", (po.po_number, cid))
+                              f"AND case_id != ? AND {NOT_TRIAL} GROUP BY case_id", (po.po_number, cid))
         for r in rows:
             other = store.get_case(r["case_id"])
             if other:

@@ -124,7 +124,7 @@ class Pipeline:
         return {"configurable": {"thread_id": case_id}, "recursion_limit": 60}
 
     def prepare(self, case_id: str, pdf_path: Path, sample_id: str | None = None, filename: str | None = None,
-                assigned_po: str | None = None) -> None:
+                assigned_po: str | None = None, trial: bool = False) -> None:
         """Store the file and create the case record (so the UI can open it before the run starts)."""
         folder = self.deps.files_dir / case_id
         folder.mkdir(parents=True, exist_ok=True)
@@ -137,7 +137,7 @@ class Pipeline:
         except Exception:  # an unreadable file is reported by the run's own checks
             pass
         self.deps.store.create_case(case_id, filename or Path(pdf_path).name, info["sha256"], sample_id,
-                                    assigned_po=assigned_po)
+                                    assigned_po=assigned_po, is_trial=trial)
 
     def run(self, case_id: str) -> dict:
         case = self.deps.store.get_case(case_id)
@@ -164,8 +164,8 @@ class Pipeline:
                                                     "next_step": nxt, "also": []})
 
     def start(self, case_id: str, pdf_path: Path, sample_id: str | None = None, filename: str | None = None,
-              assigned_po: str | None = None) -> dict:
-        self.prepare(case_id, pdf_path, sample_id, filename, assigned_po)
+              assigned_po: str | None = None, trial: bool = False) -> dict:
+        self.prepare(case_id, pdf_path, sample_id, filename, assigned_po, trial)
         return self.run(case_id)
 
     def check_action(self, case: dict, action: dict) -> None:

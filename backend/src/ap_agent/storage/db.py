@@ -59,7 +59,8 @@ TABLES = ("cases", "findings", "events", "tool_calls", "llm_calls", "human_actio
           "record_changes")
 
 # Columns added after a database may already exist: added in place on open.
-ADDED_COLUMNS = {"cases": {"assigned_po": "TEXT"}}
+ADDED_COLUMNS = {"cases": {"assigned_po": "TEXT",
+                           "is_trial": "INTEGER NOT NULL DEFAULT 0"}}  # a demo run: never counted as history
 
 
 class Db:

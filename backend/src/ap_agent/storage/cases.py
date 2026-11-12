@@ -35,11 +35,13 @@ class Store:
 
     # ---------- cases ----------
     def create_case(self, case_id: str, filename: str | None, sha256: str | None, sample_id: str | None,
-                    created_at: str | None = None, is_seed: bool = False, assigned_po: str | None = None) -> None:
+                    created_at: str | None = None, is_seed: bool = False, assigned_po: str | None = None,
+                    is_trial: bool = False) -> None:
+        """is_trial: a demo run. It runs and shows like any case, but later checks never count it as history."""
         self.db.execute(
-            "INSERT INTO cases (case_id, created_at, filename, sha256, sample_id, is_seed, assigned_po) "
-            "VALUES (?,?,?,?,?,?,?)",
-            (case_id, created_at or _now(), filename, sha256, sample_id, int(is_seed), assigned_po))
+            "INSERT INTO cases (case_id, created_at, filename, sha256, sample_id, is_seed, assigned_po, is_trial) "
+            "VALUES (?,?,?,?,?,?,?,?)",
+            (case_id, created_at or _now(), filename, sha256, sample_id, int(is_seed), assigned_po, int(is_trial)))
 
     def set_assigned_po(self, case_id: str, po: str | None) -> None:
         """The purchase order a person said this invoice is for (None: let the agent find it)."""
@@ -91,7 +93,8 @@ class Store:
         return rows[0]["status"] if rows else None
 
     def case_by_sha(self, sha256: str, exclude_case: str) -> str | None:
-        rows = self.db.query("SELECT case_id FROM cases WHERE sha256 = ? AND case_id != ? ORDER BY created_at",
+        rows = self.db.query("SELECT case_id FROM cases WHERE sha256 = ? AND case_id != ? AND is_trial = 0 "
+                             "ORDER BY created_at",
                              (sha256, exclude_case))
         return rows[0]["case_id"] if rows else None
 

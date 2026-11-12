@@ -285,3 +285,25 @@ def test_the_reviewing_agent_holds_a_clean_invoice_that_presses_for_payment(tmp_
     assert "ctx:invoice_text" in esc.data["cites"]
     review = [l for l in store.get_case("e2e-S18")["llm_calls"] if l["node"] == "agent_review"]
     assert review and len(review[-1]["reasoning"] or "") > 200
+
+
+# ---------- trial runs: demo invoices can be run again and again ----------
+
+def test_a_demo_invoice_run_twice_gets_the_same_result(tmp_path):
+    """A trial run never counts as history: not the same file, not a past invoice, not billed on the PO."""
+    require_cache("S01")
+    p, store = make_pipeline(tmp_path)
+    first = p.start("trial-1", PDF / "S01.pdf", sample_id="S01", trial=True)
+    second = p.start("trial-2", PDF / "S01.pdf", sample_id="S01", trial=True)
+    assert first["outcome"] is Outcome.APPROVED and second["outcome"] is Outcome.APPROVED
+    assert second["primary_code"] == "ALL_CHECKS_PASSED"
+    assert store.ledger.invoiced("PO-4501")[1] == 0  # the trial approvals didn't use up the PO
+
+
+def test_a_real_invoice_still_counts_as_history(tmp_path):
+    require_cache("S01")
+    p, store = make_pipeline(tmp_path)
+    p.start("real-1", PDF / "S01.pdf", sample_id="S01")
+    again = p.start("real-2", PDF / "S01.pdf", sample_id="S01")
+    assert again["primary_code"] == "DUPLICATE_EXACT"
+    assert store.ledger.invoiced("PO-4501")[1] > 0

@@ -149,6 +149,10 @@ def invoice_panel(cid: str, c: dict, running: bool) -> None:
     meta.append("recorded model replies" if replay else "live models")
     if c.get("sample_id"):
         meta.append(f"demo invoice {c['sample_id']}")
+    elif c.get("is_trial"):
+        meta.append(f"demo invoice {(c.get('filename') or '').removesuffix('.pdf')}, run live")
+    if c.get("is_trial"):
+        meta.append("trial run: not counted as history")
     html(f'<div class="viewer-h"><span class="eyebrow">Invoice from {h(c.get("vendor_name") or "the vendor")}</span>'
          f'<div class="note">{" · ".join(h(str(m)) for m in meta)}</div></div>')
     html(stage_tiles(evs, findings, c.get("txn_type"), running))
