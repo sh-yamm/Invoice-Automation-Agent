@@ -8,6 +8,8 @@ An AI agent that does the work of an accounts-payable clerk for an Indian compan
 
 ---
 
+> **PS:** I used Claude Code for this project. I designed the pipeline and directed the build, and Claude Code wrote the code. To see how I used it, [click here](#how-this-was-built).
+
 ## Contents
 
 **Start here:** [The brief, and where each part is answered](#the-brief-and-where-each-part-is-answered) · [How it works](#how-it-works)
