@@ -5,7 +5,7 @@ CSS = """
 <style>
 :root {
   --paper:#fffaf4; --sheet:#fffdf9; --card:#ffffff; --ink:#2e1f17; --body:#3d2c22; --ink-2:#5a4436; --muted:#6b5444; --faint:#8a7262;
-  --rule:#d6bb9f; --rule-2:#e5cfb8; --wash:#fae6d4; --pill:#f2e0cd; --track:#efd6c2;
+  --rule:#d6bb9f; --rule-2:#e5cfb8; --wash:#fbebdc; --pill:#f4e6d7; --track:#f1dbc9;
   --accent:#b5502c; --accent-deep:#8f3c1f; --accent-line:#e7b99c;
   --ok:#2f7a4b; --ok-wash:#e4f1e5; --sign:#6a46b8; --sign-wash:#efe8f8; --hold:#9a6a00; --hold-wash:#fbefc8; --rej:#b3213f; --rej-wash:#fae0e4;
   --hero: radial-gradient(120% 140% at 0% 0%, #fbe3d0 0%, #fff5ea 45%, #fffaf4 100%);

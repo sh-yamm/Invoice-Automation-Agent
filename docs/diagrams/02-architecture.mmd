@@ -3,17 +3,17 @@ flowchart TB
   GH["GitHub Actions keep-alive<br/>opens the app every 30 min"] -.-> APP
   subgraph APP["Streamlit app · ui/"]
     direction LR
-    PAGES["Pages<br/>inbox · PO trail · process · records"] --> ENG["engine.py<br/>FastAPI TestClient, in-process"]
+    PAGES["Pages<br/>inbox · PO trail · edge cases · process · records"] --> ENG["engine.py<br/>FastAPI TestClient, in-process"]
   end
   APP -->|"in-process JSON, no network"| API
   subgraph API["FastAPI routes · api/"]
     direction LR
-    R1["cases"] ~~~ R2["trails"] ~~~ R3["records"] ~~~ R4["documents"]
+    R1["cases"] ~~~ R2["trails"] ~~~ R3["records"] ~~~ R4["documents"] ~~~ R5["edge cases"]
   end
   API -->|"start · resume"| AGENT
   subgraph AGENT["The agent"]
     direction LR
-    PIPE["Pipeline<br/>LangGraph, 17 steps"] --> CHK["50 checks<br/>+ rulebook"] --> DEC["Decision engine<br/>rules floor"]
+    PIPE["Pipeline<br/>LangGraph, 17 steps"] --> CHK["50 checks<br/>+ rulebook"] --> DEC["Decision<br/>rules floor, then the reviewing agent<br/>(findings + invoice text, vendor history, PO lines)"]
   end
   AGENT --> GW["AI gateway<br/>3 tries, then a backup model"]:::ai
   GW -->|HTTPS| NV["NVIDIA models<br/>OCR · read · classify · review"]:::ai

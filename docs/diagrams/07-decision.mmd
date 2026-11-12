@@ -4,8 +4,8 @@ flowchart TD
   G -->|yes| FL["Rules floor<br/>Rejected > On hold > Sign-off > Approved"]
   FL --> Q{"Floor is Approved?"}
   Q -->|"no: a person will look"| NOTE["Agent review runs as a note<br/>outcome unchanged"]:::ai
-  Q -->|yes| RV["Agent review<br/>may propose stricter, with cited findings"]:::ai
-  RV --> V{"Stricter AND cites<br/>real findings?"}
+  Q -->|yes| RV["Agent review<br/>findings + invoice text, vendor history, PO lines<br/>may propose stricter, citing its evidence"]:::ai
+  RV --> V{"Stricter AND cites<br/>real findings or context?"}
   V -->|no| DROP["Proposal discarded<br/>AGENT_RATIONALE_INVALID · warning"]:::warn
   V -->|yes| ESC["AGENT_ESCALATION · On hold or sign-off"]:::hold
   NOTE --> OUT["Verdict: reason from the rulebook<br/>owner · next step · also found"]

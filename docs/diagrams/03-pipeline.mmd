@@ -1,11 +1,11 @@
 flowchart TB
   S1["<b>1 · Receive</b> · s1_receive.py<br/>fingerprint · page images · OCR"]:::ai
-  S2["<b>2 · Read</b> · s2_read.py<br/>tamper check · fields as JSON · grounding · assigned PO"]:::ai
+  S2["<b>2 · Read</b> · s2_read.py<br/>tamper check · fields as JSON · grounding<br/>GST-inclusive rates converted · assigned PO"]:::ai
   S3["<b>3 · Classify</b> · s3_classify.py<br/>tax invoice? · standard PO, recurring or PO-less?"]:::ai
   S4["<b>4 · Validate</b> · s4_validate.py<br/>10 GST checks"]
   S5["<b>5 · Match</b> · s5_match.py<br/>PO 3-way / 2-way · contract period · PO-less policy"]
   S6["<b>6 · Controls</b> · s6_controls.py<br/>vendor · bank · duplicates · splits · limits"]
-  S7["<b>7 · Decide</b> · s7_decide.py<br/>completeness guard · rules floor · AI review"]:::ai
+  S7["<b>7 · Decide</b> · s7_decide.py<br/>completeness guard · rules floor<br/>AI review with invoice text, vendor history, PO lines"]:::ai
   FIN["Finalise<br/>PO ledger · payment date"]:::ok
   GATE["Human gate<br/>run pauses for a person"]:::hold
   S1 --> S2 --> S3 --> S4 --> S5 --> S6 --> S7

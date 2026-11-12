@@ -338,19 +338,19 @@ Every file one invoice passes through, in the order it runs. The example is a di
 
 | # | File | What happens |
 |---|---|---|
-| 01 | `streamlit_app.py` | Entry point. Applies the theme (`ui/style.py`, `.streamlit/config.toml`) and routes to Purchase orders (the inbox, or one trail when the link has `?trail=`), Rulebook or Company records. |
+| 01 | `streamlit_app.py` | Entry point. Drops stale UI modules after a deploy, applies the theme (`ui/style.py`, `.streamlit/config.toml`) and routes to Purchase orders (the inbox, or one trail when the link has `?trail=`), Edge cases, Rulebook or Company records. |
 | 02 | `ui/engine.py` | Starts the agent the first time anyone opens the app. It copies the NVIDIA key from Streamlit secrets, builds the FastAPI app and its pipeline, and on an empty database restores the 38-invoice history and the company records. It is cached per fingerprint of the backend code, so a hot-reloaded deploy builds the new API. |
-| 03 | `ui/home.py` → `ui/process.py` | The inbox and the process dialog. The PO is picked first, then the PDF is posted with `engine.post("/api/cases", assigned_po=…)`, and the PO's trail opens. |
+| 03 | `ui/home.py` → `ui/process.py` | The inbox and the process dialog. The PO is picked first, then the PDF is posted with `engine.post("/api/cases", assigned_po=…)`, and the PO's trail opens. The Edge cases page (`ui/edge_cases.py`) runs a demo invoice the same way. |
 | 04 | `api/routes/cases.py` | Rejects anything that isn't a PDF, gives the case an ID, sets the pace (normal: none; demo mode: 450 ms per check), and hands the run to a worker thread. |
 | 05 | `pipeline/graph.py` | `prepare` copies the PDF into `storage/files/<case>/`, renders the page image straight away and creates the case row. `run` then executes the 17-step graph, checkpointing after each step. |
 | 06 | `pipeline/steps/_shared.py` | Wraps every step. It publishes "started" and "finished" events, saves each finding, and fails closed: if a step crashes or every model is down, the case is held. |
 | 07 | `steps/s1_receive.py` | Fingerprints the file (seen before?), checks it opens and isn't password-protected, and renders each page. It pulls the PDF's own embedded text and sends the page image to Nemotron Parse for OCR: text blocks with their positions. |
-| 08 | `steps/s2_read.py` | Compares the hidden text with the page (tampering) and looks for text aimed at the AI. It then has the model read every field and line as JSON. **Grounding** keeps only values found on the page; those become the boxes on the invoice image. If the reader dropped the total or tax, it is recovered from the PDF's own text, but only when it adds up and matches the amount in words. Last, the PO the invoice was uploaded to is applied. |
+| 08 | `steps/s2_read.py` | Compares the hidden text with the page (tampering) and looks for text aimed at the AI. It then has the model read every field and line as JSON. **Grounding** keeps only values found on the page; those become the boxes on the invoice image. If the reader dropped the total or tax, it is recovered from the PDF's own text, but only when it adds up and matches the amount in words. Rates printed with GST included are converted to before-GST rates, only when the invoice's own figures prove it (`rules/tax_inclusive.py`). Last, the PO the invoice was uploaded to is applied. |
 | 09 | `steps/s3_classify.py` | Is it a payable tax invoice, or a proforma, quotation or statement? Which path: standard PO, recurring or PO-less? When no PO is printed, the AI ranks the vendor's open POs. |
 | 10 | `steps/s4_validate.py` | 10 GST checks: billed to Sample Client's GSTIN, mandatory fields, GSTIN check digit, active registration, IGST versus CGST+SGST, IRN, arithmetic, amount in words, dates. |
 | 11 | `steps/s5_match.py` | Standard PO: pairs invoice lines with PO lines, then checks price, quantity ordered, quantity received, GST rate and PO balance. Recurring: contract, period, period not already billed. PO-less: allowed category, service account, GL code. |
 | 12 | `steps/s6_controls.py` | 8 controls: vendor approved, look-alike names, bank account changed, exact and probable duplicates, unusual amounts, splits under a limit, approval authority. |
-| 13 | `steps/s7_decide.py` | The guard confirms every check for this path ran. The strictest rule outcome sets the floor. The AI reviews the case and may only make an otherwise-approved invoice stricter. The wording comes from the rulebook. Holds and sign-offs pause at the human gate; approvals are written to the PO ledger. |
+| 13 | `steps/s7_decide.py` | The guard confirms every check for this path ran. The strictest rule outcome sets the floor. The reviewing agent (`decision/review.py`) gets every finding plus the invoice text, the vendor's history and the PO lines, and may only make an otherwise-approved invoice stricter, citing its evidence. The wording comes from the rulebook. Holds and sign-offs pause at the human gate; approvals are written to the PO ledger. |
 | 14 | `ui/trail_page.py` · `api/trails.py` | The PO's story in date order. Clicking a step opens its document: PO and receipt images from `documents/build.py`, or the invoice. |
 | 15 | `ui/invoice_view.py` · `api/trail.py` | One invoice: stage tiles while running, then the decision card, the ordered/received/billed table and every check by stage. `page_with_boxes` draws the evidence boxes. |
 | 16 | `ui/invoice_view.py` → `cases.py` → `graph.py` | A person acts with a note. The paused run resumes from its checkpoint: approving goes to `finalise`; confirming a field or re-checking goes back to validation; assigning a PO goes back to classification. |
@@ -677,7 +677,7 @@ rulebook/                 the agent's operating procedure (editable, versioned)
 data/
   erp/                    the company's original records (vendors, POs, receipts, contracts, GL, service accounts)
   seed/                   38 processed history invoices, their files and recorded replies, restored on reset
-samples/                  demo invoice specs, PDF generator, generated PDFs, recorded model replies
+samples/                  demo invoice specs, PDF generator, generated PDFs, recorded model replies; edge_cases.py (the edge cases shown in the README and the app)
 backend/
   src/ap_agent/
     core/                 settings, money, domain models, client name
@@ -687,9 +687,9 @@ backend/
     ai/                   model gateway (retries, backups, recorded replies), agent tool loop, tools
     reading/              1 · PDF → page images → parsed blocks → extracted, grounded invoice → recovered totals
     classify/             2 · document type and transaction type
-    rules/                pure rule functions: normalisation, india/ rule pack, po_assignment
+    rules/                pure rule functions: normalisation, india/ rule pack, po_assignment, tax_inclusive (GST-inclusive rates)
     checks/               3–5 · one file per stage: intake, validation, standard_po, recurring, po_less, controls
-    decision/             6 · rules floor, agent review guard, verdict
+    decision/             6 · rules floor, agent review guard, verdict; review.py (the reviewing agent's prompt and input)
     pipeline/             LangGraph wiring (graph.py), events, and the steps in run order:
       nodes.py            index of the 17 steps
       steps/s1_receive.py … s7_decide.py
@@ -701,15 +701,17 @@ ui/
   engine.py               the agent in-process (FastAPI TestClient), cached per version of the backend code
   home.py                 the inbox
   trail_page.py           one PO: timeline + document viewer
+  edge_cases.py           the Edge cases page: each edge case, runnable
   process.py              process an invoice (PO first) · raise a PO
   invoice_view.py         one invoice: stage tiles, decision card, actions, page with evidence boxes
   records.py              company records and vendor controls
   pages.py                the rulebook page
   parts.py · common.py · style.py   HTML pieces, helpers, theme
-scripts/                  data-building scripts, numbered by run order in scripts/README.md
+scripts/                  data-building scripts, numbered by run order in scripts/README.md; render_diagrams.py (README diagrams)
 docs/diagrams/            diagram sources (.mmd, Mermaid) and the images rendered from them
 docs/images/              screenshots used in this README
 .github/workflows/        keep-alive: opens the app every 30 minutes
+pytest.ini                test settings for a run from the repository root (the live model tests stay off)
 storage/                  runtime data, not committed (runs.db, checkpoints.db, files/, erp/ working copy)
 ```
 
