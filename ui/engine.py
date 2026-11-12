@@ -29,7 +29,7 @@ def _secrets_to_env() -> None:
         pass
 
 
-CODE = [ROOT / "backend" / "src", ROOT / "rulebook"]
+CODE = [ROOT / "backend" / "src", ROOT / "rulebook", ROOT / "samples"]  # samples/: demo specs the API reads
 
 
 def code_version(paths: list[Path] = CODE) -> str:
@@ -49,7 +49,7 @@ def _engine(version: str):
     cache is keyed by the code's fingerprint and stale backend modules are dropped before the new API is built."""
     previous = getattr(sys, "_ap_agent_engine_version", None)  # on sys: this module itself may be reloaded
     if previous is not None and previous != version:
-        for name in [m for m in sys.modules if m == "ap_agent" or m.startswith("ap_agent.")]:
+        for name in [m for m in sys.modules if m.split(".")[0] in ("ap_agent", "samples")]:
             del sys.modules[name]
     sys._ap_agent_engine_version = version
     _secrets_to_env()

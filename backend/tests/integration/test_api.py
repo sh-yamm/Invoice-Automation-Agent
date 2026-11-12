@@ -58,7 +58,7 @@ def sse_events(client, case_id):
 
 def test_samples_listing(client):
     samples = client.get("/api/samples").json()
-    assert len(samples) == 17 and samples[0]["id"] == "S01" and samples[0]["title"]
+    assert len(samples) == 18 and samples[0]["id"] == "S01" and samples[0]["title"]
 
 
 @pytest.mark.skipif(not cached("S01"), reason="S01 replies not recorded yet")

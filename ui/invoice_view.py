@@ -123,6 +123,21 @@ def actions(c: dict) -> None:
 
 
 
+def review_reasoning(c: dict) -> str | None:
+    """The reviewing agent's full reasoning trace, as the model returned it (the last review, if re-checked)."""
+    calls = [l for l in c.get("llm_calls") or [] if l.get("node") == "agent_review" and (l.get("reasoning") or "").strip()]
+    return calls[-1]["reasoning"].strip() if calls else None
+
+
+def reasoning_panel(text: str | None) -> str:
+    """Collapsed by default: the model's step-by-step reasoning before its answer."""
+    if not text:
+        return ""
+    return ("<details class=\"reason\"><summary>The model's full reasoning</summary>"
+            '<p class="note">Exactly as the model returned it, before its answer. Kept with the case for audit.</p>'
+            f'<pre>{h(text)}</pre></details>')
+
+
 def invoice_panel(cid: str, c: dict, running: bool) -> None:
     evs = engine.events(cid)
     findings = [e["payload"] for e in evs if e["type"] == "finding"] if running else (
@@ -157,6 +172,7 @@ def invoice_panel(cid: str, c: dict, running: bool) -> None:
             st.caption("After the rules decide, the agent reviews the whole case. It may only make the outcome "
                        "stricter, never approve.")
             st.write(c["agent_note"])
+            html(reasoning_panel(review_reasoning(c)))
     problems = sum(1 for f in findings if f["status"] == "fail")
     note = "running…" if running else f"{len(findings)} checks, " + (
         "no problems" if problems == 0 else "1 problem" if problems == 1 else f"{problems} problems")
