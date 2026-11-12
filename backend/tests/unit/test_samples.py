@@ -21,8 +21,8 @@ def text_of(path) -> str:
         return "\n".join(p.extract_text() or "" for p in pdf.pages)
 
 
-def test_sixteen_specs_with_expectations():
-    assert sorted(SPECS) == [f"S{i:02d}" for i in range(1, 17)]
+def test_seventeen_specs_with_expectations():
+    assert sorted(SPECS) == [f"S{i:02d}" for i in range(1, 18)]
     for s in SPECS.values():
         assert isinstance(s.expected_outcome, Outcome) and s.expected_code and s.title and s.blurb
 

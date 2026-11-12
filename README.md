@@ -3,7 +3,7 @@
 An AI agent that does the work of an accounts-payable clerk for an Indian company. A vendor invoice PDF goes in. The agent reads it, finds the purchase order it bills, checks it against the PO, the goods receipt, the contract and the approved-vendor list, and applies an editable rulebook. Then it either **approves the invoice on its own** or **hands it to the right person with the exact reason and the evidence**, and everything that happened in between stays visible.
 
 > **Live:** https://invoice-automation-agent.streamlit.app
-> **State:** 355 tests pass. All 16 demo invoices and all 38 history invoices reach their expected outcome end to end, on fresh model replies.
+> **State:** 364 tests pass. All 17 demo invoices and all 38 history invoices reach their expected outcome end to end, on fresh model replies.
 > **Client:** "Sample Client Retail Pvt Ltd (demo company)" is a made-up name; every vendor, PO and invoice here is sample data.
 
 ---
@@ -27,7 +27,7 @@ The case study (PS-1, accounts payable) asks for a live process that turns an in
 | The brief asks for | Where it is answered | Where to see it in the app |
 |---|---|---|
 | A working process, live and runnable, on a real invoice PDF | [How it works](#how-it-works) · [Setup](#setup-tests-and-hosting) | The live link: **Process an invoice**, then upload a PDF or run a demo invoice |
-| Messy inputs: scanned or clean, itemised or bundled, tax separate or included, PO stated or implied, missing fields | [Messy inputs](#messy-inputs) · [How well reading works](#how-well-reading-and-ocr-work) | Demo S08 (a scan with no PO number) |
+| Messy inputs: scanned or clean, itemised or bundled, tax separate or included, PO stated or implied, missing fields | [Messy inputs](#messy-inputs) · [How well reading works](#how-well-reading-and-ocr-work) | Demo S08 (a scan with no PO number); S17 (rates printed with GST included) |
 | Checks against the procurement records: approved vendors, PO amounts, tolerances, duplicates | [Checks against the records](#checks-against-the-procurement-records) · [Every rule](#every-rule-stage-by-stage) | **Company records**; every check listed under each invoice |
 | A single PO split across several invoices | [Split invoices](#purchase-order-trails-and-split-invoices) | The trail for PO-4540 (three invoices) or PO-4490 (a monthly contract) |
 | A clear, reasoned decision, with everything in between visible | [The decision](#the-decision) | Each invoice: the decision card, every check, and the evidence boxed on the page |
@@ -66,7 +66,7 @@ The brief names five ways an invoice can be messy. How each is handled:
 |---|---|---|
 | **Scanned or photographed**, not a clean digital PDF | A digital PDF is read from its own embedded text (fast and exact). A scan goes to a vision model that reads the page image, with two backup models. **Grounding** then keeps only values that can be found on the page, and a field read with less than 85% confidence goes to a person to confirm in place. | Demo S08 (a skewed, noisy scan); the [reading results](#how-well-reading-and-ocr-work) on 10 real scans and photos |
 | **Bundled**: one lump line instead of itemised lines | Itemised lines are paired with PO lines and checked one by one (price, quantity ordered, quantity received). A single combined line is checked against the PO's total instead, and recorded as a warning (`HEADER_LEVEL_MATCH_ONLY`), so a person can see it was not matched line by line. | Test `test_header_level_for_lump_invoice` in `backend/tests/unit/checks/test_standard_po.py` |
-| **Tax shown separately, or included in the prices** | Separate CGST/SGST/IGST is the normal case: the agent checks the GST type for the place of supply, the rate against the PO, and the arithmetic. **Prices that already include GST are not converted yet:** such a rate no longer equals the PO's rate before GST, so the invoice is stopped for a person rather than paid. Converting it is listed under [limitations](#known-limitations-and-production-work). | — |
+| **Tax shown separately, or included in the prices** | Separate CGST/SGST/IGST is the normal case: the agent checks the GST type for the place of supply, the rate against the PO, and the arithmetic. **Rates printed with GST included** are converted to before-GST rates in the reading stage, then matched as usual, and the conversion is recorded as a warning (`TAX_INCLUSIVE_NORMALISED`). It converts only when the invoice's own numbers prove it: the line amounts add up to the total with GST (or each rate equals the amount plus its GST), and the converted lines add up to the taxable value shown. Nothing is guessed: a line without a GST rate stops the conversion. An invoice that shows **no GST at all** is not a valid tax invoice, so it is still rejected for the missing tax amount (`MISSING_MANDATORY_FIELD`). | Demo S17 (12 chairs at ₹4,130 with GST, matched to the PO's ₹3,500) |
 | **PO stated or only implied** | A printed PO number is looked up. If none is printed, the person can pick the PO when uploading, or the agent ranks the vendor's open POs by items, rates and remaining balance and accepts the best only at 90% confidence with a clear lead (`PO_INFERRED`, a warning); otherwise it holds the invoice with the candidates listed. An invoice that names a *different* PO from the one it was uploaded to is held (`PO_ASSIGNMENT_MISMATCH`). | Demo S08 (no PO printed; the agent finds PO-4507) |
 | **Missing fields**: no invoice number, date or total | The GST Rule 46 fields are mandatory: a missing one rejects the invoice back to the vendor (`MISSING_MANDATORY_FIELD`). The model is told never to guess; a value it can't find stays empty. If only the reader dropped a total or tax that *is* printed, code recovers it from the PDF's own text, but only when it adds up and matches the amount in words. | 8 of the 38 history invoices had their total recovered this way |
 
@@ -75,7 +75,7 @@ The brief names five ways an invoice can be messy. How each is handled:
 ## How well reading and OCR work
 
 Measured on two sets:
-- our own **54 printed invoices** (16 demos and 38 history);
+- our own **55 printed invoices** (17 demos and 38 history);
 - **10 scanned or photographed Indian GST invoices** from a public dataset with answer keys.
 
 Each was scored on five fields: invoice number, date, supplier GSTIN, total and line count.
@@ -83,7 +83,7 @@ Each was scored on five fields: invoice number, date, supplier GSTIN, total and 
 
 | Kind of document | Result | What happened |
 |---|---|---|
-| Digital PDFs: demos and history | ✅ **54 of 54** read correctly | All in their original layouts. The page reader dropped the total row on 8 history invoices; the agent recovered each total from the PDF's own text because it added up and matched the amount in words. No false tamper alarms. |
+| Digital PDFs: demos and history | ✅ **55 of 55** read correctly | All in their original layouts. The page reader dropped the total row on 8 history invoices; the agent recovered each total from the PDF's own text because it added up and matched the amount in words. No false tamper alarms. |
 | Minimal and classic layouts, scan and photo | ✅ 4 of 4 perfect | Every field right on scans and on phone photos. |
 | Handwritten bill book, scan and photo | ✅ perfect | Read by Gemma 4, the third model in the chain, after the first two timed out. |
 | Hidden-instruction invoices | ✅ perfect | The model ignored a note telling it to set the total to 0, and the note is flagged. |
@@ -255,6 +255,7 @@ More situations the agent treats differently from the happy path, each with a de
 | The amount in words doesn't match the figures | 🟧 On hold: Amount in words doesn't match the figures | S16 |
 | Furniture bought without a PO, where policy needs one | 🟧 On hold: This purchase needs a PO | S10 |
 | A proforma sent as if it were a tax invoice | 🟥 Rejected: Not a tax invoice | S11 |
+| Rates printed with GST included: converted to before-GST rates, then matched | ✅ Approved: All checks passed | S17 |
 
 ---
 
@@ -295,8 +296,9 @@ Where the brief left a choice open, we made one and wrote it down:
 9. **The AI never approves.** The rules decide; the AI reviews and may only make an otherwise-approved invoice stricter.
 10. **Low confidence goes to a person.** Below 85% on a key field, a person confirms it; a PO the agent works out itself needs 90% and a clear lead.
 11. **Invoices are uploaded.** In production they would arrive by email and POs and receipts would come from the ERP; here the records are CSV files and you upload the invoice.
-12. **The demo replays recorded model replies** for its 16 demo invoices and 38 history invoices, so it never depends on a live model call; an uploaded PDF always calls the models live.
-13. **More than 2–4 edge cases.** The brief's range is read as a minimum; four are featured and nine more are handled.
+12. **The demo replays recorded model replies** for its 17 demo invoices and 38 history invoices, so it never depends on a live model call; an uploaded PDF always calls the models live.
+13. **Tax-inclusive rates are converted only on proof.** The invoice's own figures must show the rates include GST; an invoice with no GST shown is rejected under Rule 46 rather than having its GST worked out for it.
+14. **More than 2–4 edge cases.** The brief's range is read as a minimum; four are featured and ten more are handled.
 
 ---
 
@@ -447,8 +449,9 @@ Outcomes: 🟥 Reject · 🟧 Hold · 🟪 Needs sign-off · 🟨 Warning (recor
 | 9 | Read the fields as JSON (Nemotron 3 Ultra for digital, Super VL for scans); valid after one retry? | `EXTRACTION_FAILED` ⛔ · B6 | 🟧 Hold |
 | 10 | Grounding: every value found on the page? | `UNGROUNDED_VALUE`: value dropped · B1 | 🟨 Warning |
 | 11 | Total or tax missing? Recovered from the PDF's own text only if it adds up and matches the words | — | — |
-| 12 | Uploaded to a PO but a different PO is printed? | `PO_ASSIGNMENT_MISMATCH` | 🟧 Hold |
-| 13 | Every key field read with ≥ 85% confidence? | `LOW_CONFIDENCE_FIELD`: confirm in place · A4 | 🟧 Hold |
+| 12 | Rates printed with GST included? Converted to before-GST rates, only when the invoice's own figures prove it | `TAX_INCLUSIVE_NORMALISED` · D5 | 🟨 Warning |
+| 13 | Uploaded to a PO but a different PO is printed? | `PO_ASSIGNMENT_MISMATCH` | 🟧 Hold |
+| 14 | Every key field read with ≥ 85% confidence? | `LOW_CONFIDENCE_FIELD`: confirm in place · A4 | 🟧 Hold |
 
 If every model in a chain is unavailable, the case goes on hold with `AI_UNAVAILABLE` (B8). It is never approved.
 
@@ -562,7 +565,7 @@ The full list from `rulebook/aop.yaml`. Each code has an owner, a next step and 
 
 **✅ Approved (1):** `ALL_CHECKS_PASSED`
 
-**🟨 Warning (16):** `DOCUMENT_TAMPER_SIGNALS` · `STALE_INVOICE_DATE` · `GSTIN_SWAPPED_FIXED` · `UNGROUNDED_VALUE` · `PO_INFERRED` · `LLM_LINE_PAIRING` · `HEADER_LEVEL_MATCH_ONLY` · `UNDER_BILLED` · `ADVANCE_BILLING` · `PO_EXISTS_FOR_PO_LESS` · `VENDOR_IDENTITY_MISMATCH` · `CONTACT_DETAILS_CHANGED` · `RESUBMISSION_OF_REJECTED` · `AGENT_RATIONALE_INVALID` · `AOP_VERSION_CHANGED` · `SOD_RULE_EDIT_AND_APPROVE`
+**🟨 Warning (17):** `TAX_INCLUSIVE_NORMALISED` · `DOCUMENT_TAMPER_SIGNALS` · `STALE_INVOICE_DATE` · `GSTIN_SWAPPED_FIXED` · `UNGROUNDED_VALUE` · `PO_INFERRED` · `LLM_LINE_PAIRING` · `HEADER_LEVEL_MATCH_ONLY` · `UNDER_BILLED` · `ADVANCE_BILLING` · `PO_EXISTS_FOR_PO_LESS` · `VENDOR_IDENTITY_MISMATCH` · `CONTACT_DETAILS_CHANGED` · `RESUBMISSION_OF_REJECTED` · `AGENT_RATIONALE_INVALID` · `AOP_VERSION_CHANGED` · `SOD_RULE_EDIT_AND_APPROVE`
 
 When several findings share the worst outcome, the one listed first in the rulebook is shown as the main reason, and the rest appear under "Also found".
 
@@ -624,7 +627,7 @@ Every case keeps a complete, replayable record:
 
 ## Demo invoices
 
-The 16 demo invoices in `samples/pdf/` replay recorded model replies from `samples/cache/`, so the demo never depends on a live model call. All 16 reach their expected outcome.
+The 17 demo invoices in `samples/pdf/` replay recorded model replies from `samples/cache/`, so the demo never depends on a live model call. All 17 reach their expected outcome.
 
 | # | Invoice | Shows | Expected |
 |---|---|---|---|
@@ -644,6 +647,7 @@ The 16 demo invoices in `samples/pdf/` replay recorded model replies from `sampl
 | S14 | Third invoice in a week from one vendor | Split to avoid the limit | 🟪 `SPLIT_BELOW_LIMIT` |
 | S15 | Look-alike vendor name | Not on the approved list | 🟥 `VENDOR_NOT_APPROVED` |
 | S16 | Amount in words doesn't match | Words vs figures | 🟧 `AMOUNT_WORDS_MISMATCH` |
+| S17 | Rates printed with GST included | Tax-inclusive rates converted, then matched to the PO | ✅ Approved (with a `TAX_INCLUSIVE_NORMALISED` warning) |
 
 The **38 history invoices** (`data/seed/`) are real runs through the agent, dated over the past months and tied to real POs and receipts. They give every trail a past. A demo reset restores them with their full paper trail, and the held ones can still be acted on.
 
@@ -653,7 +657,6 @@ The **38 history invoices** (`data/seed/`) are real runs through the agent, date
 
 Deliberately out of scope for this version:
 
-- **Prices that include GST.** A rate printed with GST included isn't converted to the before-GST rate yet, so such an invoice is stopped for a person instead of being matched. (A helper, `rules/normalise.to_exclusive`, exists; it isn't wired into reading.)
 - **Concurrency.** Two invoices against the same PO processed at the same moment could both read the same remaining balance. Production needs a per-PO lock, with the balance re-checked inside the ledger transaction. Record edits are likewise not locked.
 - **No login.** The public demo has no users, so anyone can upload invoices (spending the NVIDIA credits) and change the records. A demo reset restores everything.
 - **Live government checks.** GSTIN status, GSTR-2B filing and IRN verification against the government portals; the vendor master stands in for them.
@@ -791,6 +794,7 @@ Every risk ID used in [Every rule, stage by stage](#every-rule-stage-by-stage), 
 | `D2` | Arithmetic and tax | Σ lines ≠ taxable value, or taxable + tax ≠ total (round-off > ₹1) |
 | `D3` | Arithmetic and tax | Wrong tax type: IGST charged on an intra-state supply (or CGST/SGST inter-state). Our ITC is at risk |
 | `D4` | Arithmetic and tax | GST rate differs from the PO (18% billed, PO says 12%) |
+| `D5` | Arithmetic and tax | Tax shown as inclusive on the invoice, exclusive on the PO |
 | `D6` | Arithmetic and tax | Amount in words ≠ amount in figures |
 | `E1` | Classification | Classifier is unsure (signals conflict) |
 | `E2` | Classification | Treated as PO-less, but an open PO exists for this vendor and item |

@@ -261,3 +261,13 @@ def test_a_persons_decision_names_the_reason_in_words_not_its_code(tmp_path):
                                  "note": "Called the vendor on the number on file."})
     assert "BANK_DETAILS_MISMATCH" not in case["why"]
     assert "Bank account differs from the vendor record" in case["why"]
+
+
+def test_rates_printed_with_gst_are_converted_then_matched(tmp_path):
+    require_cache("S17")
+    p, store = make_pipeline(tmp_path)
+    case = p.start("e2e-S17", PDF / "S17.pdf", sample_id="S17")
+    codes = {f.code for f in case["findings"]}
+    assert case["outcome"] is Outcome.APPROVED and "TAX_INCLUSIVE_NORMALISED" in codes
+    assert "PRICE_VARIANCE" not in codes and "ARITHMETIC_MISMATCH" not in codes
+    assert json.loads(store.get_case("e2e-S17")["invoice_json"])["lines"][0]["rate"] in ("3500.00", "3500")

@@ -1,0 +1,149 @@
+{
+ "data": {
+  "fields": {
+   "doc_title": {
+    "value": "TAX INVOICE",
+    "confidence": 0.99,
+    "block": 2
+   },
+   "supplier_name": {
+    "value": "Shree Ganesh Office Furniture",
+    "confidence": 0.99,
+    "block": 1
+   },
+   "supplier_gstin": {
+    "value": "29AAKFS4417M1ZM",
+    "confidence": 0.99,
+    "block": 1
+   },
+   "supplier_phone": {
+    "value": "+91 80 4110 2290",
+    "confidence": 0.99,
+    "block": 1
+   },
+   "supplier_email": {
+    "value": "accounts@shreeganeshfurniture.in",
+    "confidence": 0.99,
+    "block": 1
+   },
+   "buyer_name": {
+    "value": "Sample Client Retail Pvt Ltd (demo company)",
+    "confidence": 0.99,
+    "block": 5
+   },
+   "buyer_gstin": {
+    "value": "29AABCZ5821K1ZW",
+    "confidence": 0.99,
+    "block": 6
+   },
+   "invoice_no": {
+    "value": "SGOF/26-27/0452",
+    "confidence": 0.99,
+    "block": 7
+   },
+   "invoice_date": {
+    "value": "05/11/2026",
+    "confidence": 0.99,
+    "block": 8
+   },
+   "po_ref": {
+    "value": "PO-4541",
+    "confidence": 0.99,
+    "block": 9
+   },
+   "place_of_supply_state": {
+    "value": "Karnataka (29)",
+    "confidence": 0.99,
+    "block": 10
+   },
+   "irn": {
+    "value": null,
+    "confidence": 0.0,
+    "block": null
+   },
+   "has_qr": {
+    "value": false,
+    "confidence": 0.0,
+    "block": null
+   },
+   "bank_name": {
+    "value": "ICICI Bank",
+    "confidence": 0.99,
+    "block": 21
+   },
+   "bank_account": {
+    "value": "000405112290",
+    "confidence": 0.99,
+    "block": 21
+   },
+   "ifsc": {
+    "value": "ICIC0000004",
+    "confidence": 0.99,
+    "block": 21
+   },
+   "taxable_total": {
+    "value": 42000.0,
+    "confidence": 0.99,
+    "block": 15
+   },
+   "cgst": {
+    "value": 3780.0,
+    "confidence": 0.99,
+    "block": 16
+   },
+   "sgst": {
+    "value": 3780.0,
+    "confidence": 0.99,
+    "block": 17
+   },
+   "igst": {
+    "value": 0.0,
+    "confidence": 0.9,
+    "block": null
+   },
+   "round_off": {
+    "value": 0.0,
+    "confidence": 0.99,
+    "block": 18
+   },
+   "grand_total": {
+    "value": 49560.0,
+    "confidence": 0.99,
+    "block": 19
+   },
+   "amount_in_words": {
+    "value": "Rupees Forty Nine Thousand Five Hundred Sixty Only",
+    "confidence": 0.99,
+    "block": 12
+   },
+   "period_start": {
+    "value": null,
+    "confidence": 0.0,
+    "block": null
+   },
+   "period_end": {
+    "value": null,
+    "confidence": 0.0,
+    "block": null
+   },
+   "consumer_no": {
+    "value": null,
+    "confidence": 0.0,
+    "block": null
+   }
+  },
+  "lines": [
+   {
+    "description": "Visitor chair, cantilever",
+    "hsn_sac": "9401",
+    "qty": 12,
+    "unit": "Nos",
+    "rate": 4130.0,
+    "taxable": 42000.0,
+    "gst_rate": 18,
+    "confidence": 0.95
+   }
+  ]
+ },
+ "reasoning": "The user wants me to extract invoice data from the parsed page blocks and return JSON only. I need to carefully read each block and extract the required fields.\n\nLet me go through the blocks:\n\nBlock 1: Supplier info - Shree Ganesh Office Furniture, address, GSTIN: 29AAKFS4417M1ZM, State: Karnataka (29), Phone: +91 80 4110 2290, Email: accounts@shreeganeshfurniture.in\n\nBlock 2: Title - TAX INVOICE\n\nBlock 3: \"Original for recipient\" - not a field we need\n\nBlock 4: \"Bill to\" - section header\n\nBlock 5: Buyer name - Sample Client Retail Pvt Ltd (demo company)\n\nBlock 6: Buyer address and GSTIN: 29AABCZ5821K1ZW\n\nBlock 7: Invoice No. SGOF/26-27/0452\n\nBlock 8: Invoice Date 05/11/2026\n\nBlock 9: PO Ref. PO-4541\n\nBlock 10: Place of Supply Karnataka (29)\n\nBlock 11: Table with line items - Description: Visitor chair, cantilever, HSN/SAC: 9401, Qty: 12, Unit: Nos, Rate incl. GST: 4,130.00, Amount incl. GST: 49,560.00\n\nBlock 12: Amount in words: Rupees Forty Nine Thousand Five Hundred Sixty Only\n\nBlock 13: Total incl. GST 49,560.00\n\nBlock 14: \"of which:\"\n\nBlock 15: Taxable Value 42,000.00\n\nBlock 16: CGST @ 9% 3,780.00\n\nBlock 17: SGST @ 9% 3,780.00\n\nBlock 18: Round Off 0.00\n\nBlock 19: Invoice Total (Rs.) 49,560.00\n\nBlock 20: Bank details for payment\n\nBlock 21: ICICI Bank A/c No.: 000405112290 IFSC: ICIC0000004\n\nBlock 22: Note about rates inclusive of GST\n\nBlock 23-25: Footer text\n\nNow I need to map these to the required fields:\n\n- doc_title: \"TAX INVOICE\" (block 2)\n- supplier_name: \"Shree Ganesh Office Furniture\" (block 1)\n- supplier_gstin: \"29AAKFS4417M1ZM\" (block 1)\n- supplier_phone: \"+91 80 4110 2290\" (block 1)\n- supplier_email: \"accounts@shreeganeshfurniture.in\" (block 1)\n- buyer_name: \"Sample Client Retail Pvt Ltd (demo company)\" (block 5)\n- buyer_gstin: \"29AABCZ5821K1ZW\" (block 6)\n- invoice_no: \"SGOF/26-27/0452\" (block 7)\n- invoice_date: \"05/11/2026\" (block 8)\n- po_ref: \"PO-4541\" (block 9)\n- place_of_supply_state: \"Karnataka (29)\" (block 10)\n- irn: not printed, null\n- has_qr: not mentioned, false\n- bank_name: \"ICICI Bank\" (block 21)\n- bank_account: \"000405112290\" (block 21)\n- ifsc: \"ICIC0000004\" (block 21)\n- taxable_total: 42000.00 (block 15)\n- cgst: 3780.00 (block 16)\n- sgst: 3780.00 (block 17)\n- igst: 0 (not printed, but since CGST and SGST are present, IGST is 0)\n- round_off: 0.00 (block 18)\n- grand_total: 49560.00 (block 19)\n- amount_in_words: \"Rupees Forty Nine Thousand Five Hundred Sixty Only\" (block 12)\n- period_start: not printed, null\n- period_end: not printed, null\n- consumer_no: not printed, null\n\nFor lines: one line item from block 11:\n- description: \"Visitor chair, cantilever\"\n- hsn_sac: \"9401\"\n- qty: 12\n- unit: \"Nos\"\n- rate: 4130.00 (but note: the table says \"Rate incl. GST (Rs.)\" - this is rate inclusive of GST. The taxable rate would be different. But the instruction says \"copy the printed figures exactly\". So I should use the printed rate: 4,130.00)\n- taxable: 42000.00 (total taxable for this line? Actually the taxable value 42,000.00 is for the whole invoice, which matches 12 * (4130/1.18) = 12 * 3500 = 42000. So the taxable per unit is 3500. But the printed taxable total is 42,000.00. For the line, I need to provide taxable amount for that line. Since there's only one line, the taxable for the line is 42,000.00. However, the table shows \"Amount incl. GST (Rs.)\" 49,560.00. The taxable value is not shown per line. I'll use the total taxable value for the line since it's the only line.)\n- gst_rate: 18% (since CGST 9% + SGST 9% = 18%). But the printed GST rate per line is not explicitly shown. The table header says \"Rate incl. GST\". The tax breakdown shows CGST @ 9% and SGST @ 9%. So the GST rate is 18%. I'll use 18.\n\nConfidence: For most fields, high confidence (0.95-1.0) as text is clear. For line items, the rate is inclusive of GST, but we need to output the printed rate. The taxable amount per line is not printed separately; we have total taxable. I'll assign the total taxable to the line.\n\nLet me construct the JSON.\n\nNote: The instruction says \"Never compute totals or taxes; copy the printed figures exactly.\" So for the line, the rate printed is 4,130.00 (incl. GST). The taxable printed is 42,000.00 total. Since there's only one line, I'll use that.\n\nAlso, the unit is \"Nos\" from table.\n\nHSN/SAC: 9401.\n\nGST rate: The printed GST rate per line is not shown, but the tax breakdown shows CGST @ 9% and SGST @ 9%. I'll infer 18% but confidence lower. However, the instruction says \"copy the printed figures exactly\". The GST rate is not printed per line. I could leave it as null? But the schema expects a value. I'll put 18 with confidence 0.8.\n\nNow, block numbers: I need to assign block numbers for each field. The blocks are numbered 1-25. I'll reference the block where the value appears.\n\nLet's map:\n\n- doc_title: block 2\n- supplier_name: block 1\n- supplier_gstin: block 1\n- supplier_phone: block 1\n- supplier_email: block 1\n- buyer_name: block 5\n- buyer_gstin: block 6\n- invoice_no: block 7\n- invoice_date: block 8\n- po_ref: block 9\n- place_of_supply_state: block 10\n- irn: null, block null\n- has_qr: false, block null\n- bank_name: block 21\n- bank_account: block 21\n- ifsc: block 21\n- taxable_total: block 15\n- cgst: block 16\n- sgst: block 17\n- igst: not printed, but we can set 0 with confidence 0.5? Actually IGST is not printed; the invoice shows CGST and SGST, so IGST is 0. I'll set 0 with confidence 0.9.\n- round_off: block 18\n- grand_total: block 19\n- amount_in_words: block 12\n- period_start: null\n- period_end: null\n- consumer_no: null\n\nLines: one line, from block 11.\n\nNow, I'll write the JSON. Ensure no extra commentary. Use proper JSON format.\n\nConfidence values: For clear printed text, 0.95. For inferred, lower.\n\nLet's produce."
+}

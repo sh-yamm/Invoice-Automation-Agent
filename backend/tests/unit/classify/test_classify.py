@@ -134,7 +134,7 @@ def test_real_ai_gl_code_drops_unknown_accounts(store):
 
 def test_real_ai_rank_po_candidates_prefers_matching_items(store):
     texts = {"Filing cabinet, 4 drawer": [1.0, 0.0], "Ergonomic mesh chair": [0.0, 1.0],
-             "Workstation desk 1400mm": [0.1, 0.99], "Storage locker": [0.0, 1.0]}
+             "Workstation desk 1400mm": [0.1, 0.99], "Storage locker": [0.0, 1.0], "Visitor chair, cantilever": [0.0, 1.0]}
     gw = FakeGateway(embeddings=texts)
     ranked = RealAi(gw, repo(), store, "c1").rank_po_candidates(make_invoice("S08"), repo().open_pos("V001"))
     assert ranked[0][0] == "PO-4507" and ranked[0][1] >= 0.9 and ranked[1][1] < 0.5

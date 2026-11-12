@@ -73,6 +73,7 @@ class SampleSpec:
     hidden_text: list[str] | None = None   # invisible text-layer lines (S13)
     injection: str | None = None           # visible footer note aimed at an AI (S12)
     notes: list[str] = field(default_factory=list)
+    prices_include_gst: bool = False      # rates and amounts printed with GST included (S17)
 
 
 def _invoice(sup: dict, no: str, d: date, po: str | None, lines: list[tuple], *, gst: str = "18",
@@ -170,6 +171,11 @@ SPECS: dict[str, SampleSpec] = {s.id: s for s in [
                _invoice(SK, "SKL-1107", date(2026, 11, 4), "PO-4476", [(FREIGHT, "996511", "2", "Trips", "18500")],
                         gst="5", words="Rupees Thirty Eight Thousand Five Hundred Eighty Only"),
                Outcome.ON_HOLD, "AMOUNT_WORDS_MISMATCH"),
+    SampleSpec("S17", "Rates printed with GST included", "Converted to before-GST rates, then matched as usual", "classic",
+               S, _invoice(S, "SGOF/26-27/0452", date(2026, 11, 5), "PO-4541",
+                           [("Visitor chair, cantilever", "9401", "12", "Nos", "3500")]),
+               Outcome.APPROVED, "ALL_CHECKS_PASSED", prices_include_gst=True,
+               notes=["All rates and amounts are inclusive of GST."]),
 ]}
 
 BUYER = dict(name=BUYER_NAME, gstin=BUYER_GSTIN, address=BUYER_ADDRESS)
