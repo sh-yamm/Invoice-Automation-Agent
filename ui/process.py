@@ -24,6 +24,11 @@ def _po_options() -> dict[str, str]:
     return {**opts, FIND: "No PO / not sure: let the agent find it"}
 
 
+def demo_run(sample: dict, pace: str) -> dict:
+    """What a demo invoice's Run sends: the PO it prints (or none, so the agent finds it), never the step-1 choice."""
+    return {"pace": pace, "sample_id": sample["id"], **({"assigned_po": sample["po"]} if sample.get("po") else {})}
+
+
 def _start(data: dict, files: dict | None = None) -> None:
     try:
         r = engine.post("/api/cases", data=data, files=files)
@@ -43,7 +48,7 @@ def process_dialog(fixed_po: str | None = None) -> None:
     opts = _po_options()
     keys = list(opts)
     st.markdown("**Step 1 · Which purchase order is this invoice for?**")
-    po = st.selectbox("Purchase order", keys, index=keys.index(fixed_po) if fixed_po in keys else 0,
+    po = st.selectbox("Purchase order", keys, index=keys.index(fixed_po) if fixed_po in keys else keys.index(FIND),
                       format_func=opts.get, key="process_po", label_visibility="collapsed",
                       help="Pick the PO the vendor is billing. If you're not sure, the agent works it out from the "
                            "PO number printed on the invoice, or from the vendor's open POs.")
@@ -82,7 +87,7 @@ def process_dialog(fixed_po: str | None = None) -> None:
                     f'{inr(s["total"], 0)}{" · prints " + h(s["po"]) if s.get("po") else " · no PO printed"} · expected '
                     f'<span class="st-chip {cls}">{label}</span></div></div>')
             if c2.button("Run", key=f"run-{s['id']}", width="stretch"):
-                _start({**data, "sample_id": s["id"]})
+                _start(demo_run(s, data["pace"]))
     st.divider()
     if st.button("Reset demo data", help="Restore the 38 past invoices and the company records; removes everything run since."):
         n = engine.post("/api/demo/reset")["cases"]

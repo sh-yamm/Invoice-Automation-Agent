@@ -149,3 +149,14 @@ def test_the_reasoning_panel_is_collapsed_and_escaped():
     assert out.startswith("<details") and "<summary>The model's full reasoning</summary>" in out
     assert "<script>" not in out and "&lt;script&gt;" in out
     assert invoice_view.reasoning_panel(None) == ""
+
+
+def test_a_demo_invoice_run_from_the_dialog_uses_the_po_it_prints():
+    """Not whatever PO happens to be selected in step 1 (that held S01 as 'uploaded to a different PO')."""
+    from ui.process import demo_run
+    at = _run()
+    next(b for b in at.button if b.label == "Process an invoice").click().run()
+    assert at.selectbox(key="process_po").value == "find"  # an upload never silently claims the first PO
+    assert demo_run({"id": "S01", "po": "PO-4501"}, "normal") == {"pace": "normal", "sample_id": "S01",
+                                                                   "assigned_po": "PO-4501"}
+    assert demo_run({"id": "S08", "po": None}, "demo") == {"pace": "demo", "sample_id": "S08"}
