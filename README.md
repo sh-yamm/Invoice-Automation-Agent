@@ -16,7 +16,7 @@ An AI agent that does the work of an accounts-payable clerk for an Indian compan
 
 **How it is built:** [Architecture](#architecture) · [The pipeline: 17 steps in 7 stages](#the-pipeline-17-steps-in-7-stages) · [One invoice, script by script](#one-invoice-script-by-script) · [Models, retries and fallbacks](#models-retries-and-fallbacks) · [Data: records, storage and why SQLite](#data-records-storage-and-why-sqlite)
 
-**Reference:** [Every rule, stage by stage](#every-rule-stage-by-stage) · [Outcomes and reason codes](#outcomes-and-reason-codes) · [The rulebook](#the-rulebook) · [Audit trail](#audit-trail) · [Demo invoices](#demo-invoices) · [Known limitations and production work](#known-limitations-and-production-work) · [Repository layout](#repository-layout) · [Setup, tests and hosting](#setup-tests-and-hosting) · [Appendix: risk IDs](#appendix-risk-ids)
+**Reference:** [Every rule, stage by stage](#every-rule-stage-by-stage) · [Outcomes and reason codes](#outcomes-and-reason-codes) · [The rulebook](#the-rulebook) · [Audit trail](#audit-trail) · [Demo invoices](#demo-invoices) · [Known limitations and production work](#known-limitations-and-production-work) · [Repository layout](#repository-layout) · [Setup, tests and hosting](#setup-tests-and-hosting) · [Appendix: risk IDs](#appendix-risk-ids) · [How this was built](#how-this-was-built)
 
 ---
 
@@ -884,3 +884,13 @@ Every risk ID used in [Every rule, stage by stage](#every-rule-stage-by-stage), 
 | `M4` | Authority and controls | Rule loosened to push one invoice through (the what-if slider) |
 | `N5` | The agent itself | Long, unfaithful chain of thought |
 | `O2` | System and process | Re-running a case double-counts the ledger |
+
+---
+
+## How this was built
+
+I used Claude Code throughout this project, and I want to be clear about how the work was divided. I decided the architecture, the design of every stage and every choice along the way: what to build and what to cut, that the AI reads while the code decides, which model plays which role, which edge cases to build, that the app is organised around purchase orders, which controls stay with people, and how much the reviewing agent is allowed to see and do. Claude Code worked as my orchestrator. It set up the boilerplate code, then implemented, tested and iterated along my directions, designs and plans, and ran the model runs and comparisons I asked for.
+
+It also got things wrong, and I changed its course several times. One example is that when the page reader dropped the total row on some of the history invoices, its first fix changed those invoices' layout so the reader would cope, instead of fixing the reader. I rejected the workaround and had the agent itself fixed: a missing total is now recovered from the PDF's own text, but only when it adds up and matches the amount in words, and all 38 history invoices were rebuilt in their original layouts. Another is that the past invoices showed a decision but not how it was reached; the brief asks for everything in between to be visible, so I had every invoice's full trail and documents shown.
+
+The last round of changes came the same way. Looking at how the final decision is made, I asked what the reviewing agent actually sees, and found it was judging the checks without the invoice's own text, the vendor's history or the purchase order. I had it given all three, its instructions rewritten, and every invoice run again against the old version: the outcomes stayed the same, its unwarranted escalations went from four to none, and its notes now quote their evidence. I then had its full reasoning made visible in the app, and added a test invoice (S18) that only it can catch.
