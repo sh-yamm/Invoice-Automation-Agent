@@ -18,17 +18,6 @@ def guard(state, deps):
 
 # ---------- 6. decision ----------
 
-def _review_input(state, inv: Invoice, findings: list[Finding], floor_outcome: Outcome) -> str:
-    return json.dumps({
-        "rules_outcome": floor_outcome.name.lower(),
-        "invoice": {"supplier": inv.supplier_name, "invoice_no": inv.invoice_no, "date": str(inv.invoice_date),
-                    "total": str(inv.grand_total), "lines": [l.description for l in inv.lines],
-                    "transaction_type": state.get("txn_type")},
-        "findings": [{"id": f.id, "check": f.check, "status": f.status.value, "code": f.code, "title": f.title,
-                      "detail": f.detail} for f in findings],
-    }, ensure_ascii=False)
-
-
 @node("decide", "decide")
 def decide(state, deps):
     aop = load_aop(deps.aop_path)
@@ -39,7 +28,7 @@ def decide(state, deps):
     if outcome is not Outcome.REJECTED and not state.get("stopped"):
         try:
             msgs = [{"role": "system", "content": REVIEW_SYSTEM},
-                    {"role": "user", "content": _review_input(state, inv, findings, outcome)}]
+                    {"role": "user", "content": review_message(state, inv, findings, outcome, primary, deps)}]
             proposal, reasoning = deps.gateway.chat_json("agent", msgs, REVIEW_SCHEMA, case_id=state["case_id"],
                                                          node="agent_review", cache_key=_cache(state, "review"))
             note = proposal.get("rationale")
