@@ -1,49 +1,51 @@
 # Zamp Invoice Agent
 
-An AI agent that does the work of an accounts-payable clerk for an Indian company. A vendor invoice PDF goes in. The agent reads it, finds the purchase order it bills, checks it against the PO, the goods receipt, the contract and the vendor master, and applies an editable rulebook. Then it either **approves the invoice on its own** or **hands it to the right person with the exact reason and the evidence**.
-
-The app is organised the way an AP team thinks: around **purchase orders**. Each PO is one story, like a chat thread: the PO sent to the vendor, the goods arriving, each invoice the vendor sends against it, the agent's decision on each, and what people did.
+An AI agent that does the work of an accounts-payable clerk for an Indian company. A vendor invoice PDF goes in. The agent reads it, finds the purchase order it bills, checks it against the PO, the goods receipt, the contract and the approved-vendor list, and applies an editable rulebook. Then it either **approves the invoice on its own** or **hands it to the right person with the exact reason and the evidence**, and everything that happened in between stays visible.
 
 > **Live:** https://invoice-automation-agent.streamlit.app
-> **State:** 347 tests pass. All 16 demo invoices and all 38 history invoices reach their expected outcome end to end, run on fresh model replies.
+> **State:** 355 tests pass. All 16 demo invoices and all 38 history invoices reach their expected outcome end to end, on fresh model replies.
 > **Client:** "Sample Client Retail Pvt Ltd (demo company)" is a made-up name; every vendor, PO and invoice here is sample data.
 
 ---
 
 ## Contents
 
-1. [What it does](#what-it-does)
-2. [Edge cases](#edge-cases)
-3. [The app, screen by screen](#the-app-screen-by-screen)
-4. [Who does what: people and the agent](#who-does-what-people-and-the-agent)
-5. [Architecture](#architecture)
-6. [The pipeline: 17 steps in 7 stages](#the-pipeline-17-steps-in-7-stages)
-7. [One invoice, script by script](#one-invoice-script-by-script)
-8. [Transaction types](#transaction-types)
-9. [How decisions are made](#how-decisions-are-made)
-10. [Every rule, stage by stage](#every-rule-stage-by-stage)
-11. [Purchase-order trails and split invoices](#purchase-order-trails-and-split-invoices)
-12. [Models, retries and fallbacks](#models-retries-and-fallbacks)
-13. [How well reading and OCR work](#how-well-reading-and-ocr-work)
-14. [Outcomes and reason codes](#outcomes-and-reason-codes)
-15. [The rulebook](#the-rulebook)
-16. [Data: records, storage and why SQLite](#data-records-storage-and-why-sqlite)
-17. [Audit trail](#audit-trail)
-18. [Demo invoices](#demo-invoices)
-19. [Known limitations and production work](#known-limitations-and-production-work)
-20. [Repository layout](#repository-layout)
-21. [Setup, tests and hosting](#setup-tests-and-hosting)
-22. [Appendix: risk IDs](#appendix-risk-ids)
+**Start here:** [The brief, and where each part is answered](#the-brief-and-where-each-part-is-answered) · [How it works](#how-it-works)
+
+**What the brief asks for:** [Messy inputs](#messy-inputs) · [How well reading and OCR work](#how-well-reading-and-ocr-work) · [Checks against the procurement records](#checks-against-the-procurement-records) · [Purchase-order trails and split invoices](#purchase-order-trails-and-split-invoices) · [The decision](#the-decision) · [Edge cases](#edge-cases) · [The app: live run view and dashboard](#the-app-live-run-view-and-dashboard) · [Assumptions](#assumptions)
+
+**How it is built:** [Architecture](#architecture) · [The pipeline: 17 steps in 7 stages](#the-pipeline-17-steps-in-7-stages) · [One invoice, script by script](#one-invoice-script-by-script) · [Models, retries and fallbacks](#models-retries-and-fallbacks) · [Data: records, storage and why SQLite](#data-records-storage-and-why-sqlite)
+
+**Reference:** [Every rule, stage by stage](#every-rule-stage-by-stage) · [Outcomes and reason codes](#outcomes-and-reason-codes) · [The rulebook](#the-rulebook) · [Audit trail](#audit-trail) · [Demo invoices](#demo-invoices) · [Known limitations and production work](#known-limitations-and-production-work) · [Repository layout](#repository-layout) · [Setup, tests and hosting](#setup-tests-and-hosting) · [Appendix: risk IDs](#appendix-risk-ids)
 
 ---
 
-## What it does
+## The brief, and where each part is answered
 
-- **Input:** a vendor invoice PDF, digital or scanned, uploaded against a purchase order (or with "let the agent find it"), or picked from 16 demo invoices.
-- **Output:** one of four outcomes, with:
-  - every check that ran, and the evidence boxed on the page;
-  - the rule applied, in plain words;
-  - who owns the next step, and what that step is.
+The case study (PS-1, accounts payable) asks for a live process that turns an invoice PDF into a reasoned decision. Each requirement, and where to see it:
+
+| The brief asks for | Where it is answered | Where to see it in the app |
+|---|---|---|
+| A working process, live and runnable, on a real invoice PDF | [How it works](#how-it-works) · [Setup](#setup-tests-and-hosting) | The live link: **Process an invoice**, then upload a PDF or run a demo invoice |
+| Messy inputs: scanned or clean, itemised or bundled, tax separate or included, PO stated or implied, missing fields | [Messy inputs](#messy-inputs) · [How well reading works](#how-well-reading-and-ocr-work) | Demo S08 (a scan with no PO number) |
+| Checks against the procurement records: approved vendors, PO amounts, tolerances, duplicates | [Checks against the records](#checks-against-the-procurement-records) · [Every rule](#every-rule-stage-by-stage) | **Company records**; every check listed under each invoice |
+| A single PO split across several invoices | [Split invoices](#purchase-order-trails-and-split-invoices) | The trail for PO-4540 (three invoices) or PO-4490 (a monthly contract) |
+| A clear, reasoned decision, with everything in between visible | [The decision](#the-decision) | Each invoice: the decision card, every check, and the evidence boxed on the page |
+| A live run view that shows each stage as it executes | [The app](#the-app-live-run-view-and-dashboard) | Run any invoice: the 7 stage tiles light up and checks appear as they run |
+| A dashboard of history, status and outputs across runs | [The app](#the-app-live-run-view-and-dashboard) | **Purchase orders**: the week's numbers, "Needs you", and every PO's trail |
+| 2–4 edge cases of our own, where the process behaves differently | [Edge cases](#edge-cases) | **Edge cases** page: each one runnable |
+| Ambiguities resolved by a written assumption | [Assumptions](#assumptions) | — |
+| Own test data: invoice PDFs and a PO dataset | [Demo invoices](#demo-invoices) · [Data](#data-records-storage-and-why-sqlite) | **Company records** |
+
+---
+
+## How it works
+
+**The AI reads; the code decides.** AI is used only where perception or judgment is needed: reading messy and scanned pages, classifying the document and the purchase, pairing vaguely worded lines, and a final review. Every rupee comparison and every rule is deterministic code, so the same invoice always gets the same decision, and every decision traces back to a named rule in the rulebook.
+
+<p align="center"><img src="docs/diagrams/01-ai-reads-code-decides.png" width="672" alt="The AI reads, the code decides"></p>
+
+Every invoice ends in one of four outcomes, each with the checks that ran, the evidence, the rule applied in plain words, who should act and what they should do:
 
 | Outcome | Meaning | Goes to |
 |---|---|---|
@@ -52,22 +54,145 @@ The app is organised the way an AP team thinks: around **purchase orders**. Each
 | 🟧 **On hold** | Might be fine, but a person must check something | The owner named in the rulebook (Procurement, AP team, Warehouse, Vendor master team…) |
 | 🟥 **Rejected** | Can never be paid as it stands | Back to the vendor, with the reason |
 
-It is built for **India first**:
-- ₹ and GST (CGST/SGST/IGST);
-- GSTIN validation and HSN/SAC codes;
-- GST invoice rules (Rule 46) and e-invoice IRNs.
+It is built for **India first**: ₹ and GST (CGST, SGST, IGST), GSTIN validation, HSN/SAC codes, the GST invoice rules (Rule 46) and e-invoice IRNs. The region's rules live in their own rule pack, so another country can be added without changing the pipeline.
 
-Region-specific rules live in their own rule pack, so a US pack can be added without changing the pipeline.
+---
 
-**The core principle: the AI reads, the code decides.** AI is used where perception or judgment is needed:
-- reading messy and scanned pages;
-- classifying documents and transactions;
-- pairing vaguely worded lines;
-- a final review.
+## Messy inputs
 
-Every rupee comparison and every rule is deterministic code. The same invoice always gets the same decision, and every decision traces back to a named rule.
+The brief names five ways an invoice can be messy. How each is handled:
 
-<p align="center"><img src="docs/diagrams/01-ai-reads-code-decides.png" width="672" alt="The AI reads, the code decides"></p>
+| The invoice is… | What the agent does | See it |
+|---|---|---|
+| **Scanned or photographed**, not a clean digital PDF | A digital PDF is read from its own embedded text (fast and exact). A scan goes to a vision model that reads the page image, with two backup models. **Grounding** then keeps only values that can be found on the page, and a field read with less than 85% confidence goes to a person to confirm in place. | Demo S08 (a skewed, noisy scan); the [reading results](#how-well-reading-and-ocr-work) on 10 real scans and photos |
+| **Bundled**: one lump line instead of itemised lines | Itemised lines are paired with PO lines and checked one by one (price, quantity ordered, quantity received). A single combined line is checked against the PO's total instead, and recorded as a warning (`HEADER_LEVEL_MATCH_ONLY`), so a person can see it was not matched line by line. | Test `test_header_level_for_lump_invoice` in `backend/tests/unit/checks/test_standard_po.py` |
+| **Tax shown separately, or included in the prices** | Separate CGST/SGST/IGST is the normal case: the agent checks the GST type for the place of supply, the rate against the PO, and the arithmetic. **Prices that already include GST are not converted yet:** such a rate no longer equals the PO's rate before GST, so the invoice is stopped for a person rather than paid. Converting it is listed under [limitations](#known-limitations-and-production-work). | — |
+| **PO stated or only implied** | A printed PO number is looked up. If none is printed, the person can pick the PO when uploading, or the agent ranks the vendor's open POs by items, rates and remaining balance and accepts the best only at 90% confidence with a clear lead (`PO_INFERRED`, a warning); otherwise it holds the invoice with the candidates listed. An invoice that names a *different* PO from the one it was uploaded to is held (`PO_ASSIGNMENT_MISMATCH`). | Demo S08 (no PO printed; the agent finds PO-4507) |
+| **Missing fields**: no invoice number, date or total | The GST Rule 46 fields are mandatory: a missing one rejects the invoice back to the vendor (`MISSING_MANDATORY_FIELD`). The model is told never to guess; a value it can't find stays empty. If only the reader dropped a total or tax that *is* printed, code recovers it from the PDF's own text, but only when it adds up and matches the amount in words. | 8 of the 38 history invoices had their total recovered this way |
+
+---
+
+## How well reading and OCR work
+
+Measured on two sets:
+- our own **54 printed invoices** (16 demos and 38 history);
+- **10 scanned or photographed Indian GST invoices** from a public dataset with answer keys.
+
+Each was scored on five fields: invoice number, date, supplier GSTIN, total and line count.
+
+
+| Kind of document | Result | What happened |
+|---|---|---|
+| Digital PDFs: demos and history | ✅ **54 of 54** read correctly | All in their original layouts. The page reader dropped the total row on 8 history invoices; the agent recovered each total from the PDF's own text because it added up and matched the amount in words. No false tamper alarms. |
+| Minimal and classic layouts, scan and photo | ✅ 4 of 4 perfect | Every field right on scans and on phone photos. |
+| Handwritten bill book, scan and photo | ✅ perfect | Read by Gemma 4, the third model in the chain, after the first two timed out. |
+| Hidden-instruction invoices | ✅ perfect | The model ignored a note telling it to set the total to 0, and the note is flagged. |
+| **All 10 scans, when a model answered** | **43 of 45 fields (96%)** | 9 of 10 invoices read, 8 of them perfectly. The failures were the free endpoints not answering, not misreads. |
+
+**Speed:**
+- OCR: 3–8 s per page.
+- A digital PDF end to end: about 20–60 s.
+- A scan: about 4–8 minutes on the shared free vision endpoints, mostly waiting on models that time out before one answers.
+- Demo invoices: about 1 s, from recorded replies.
+
+**Why a misread rarely gets through:**
+- **Grounding:** every value must appear on the page.
+- **Arithmetic and amount in words:** totals must add up and match the words.
+- **GSTIN check digit** and the buyer GSTIN check.
+- **Hidden text vs page** comparison on digital PDFs.
+- **Low confidence:** a person confirms the field before anything is paid.
+
+---
+
+## Checks against the procurement records
+
+Every invoice is checked against Sample Client's records: the approved-vendor list, purchase orders, goods receipts, contracts and the chart of accounts (see [Data](#data-records-storage-and-why-sqlite)). 50 checks in all; the main ones the brief names:
+
+| The brief asks for | How it is checked | Reason code when it fails |
+|---|---|---|
+| **Approved vendors** | The vendor must be on the approved list and active. A name close to an approved vendor's but with a different GSTIN is a look-alike. Bank account and IFSC must match the vendor record. | `VENDOR_NOT_APPROVED` (reject), `LOOKALIKE_VENDOR`, `BANK_DETAILS_MISMATCH` (hold, locked) |
+| **PO amounts** | Each line's price, quantity ordered and (for goods) quantity received and accepted; the whole invoice against what is left on the PO, before GST. | `PRICE_VARIANCE`, `QTY_EXCEEDS_ORDERED`, `QTY_EXCEEDS_RECEIVED`, `AMOUNT_EXCEEDS_PO_BALANCE` |
+| **Tolerance thresholds** | From the rulebook: a price may be up to 2% **and** ₹5,000 over the PO rate; quantities and the PO balance may not be exceeded at all. Editable on the **Rulebook** page; the next invoice follows the change. | `PRICE_VARIANCE` |
+| **Duplicate detection** | Exact: same vendor and the same invoice number once normalised (`INV-001` = `INV001`). Probable: at least two of near-identical number, amount within 0.5%, dates within 30 days, and 90% similar lines. | `DUPLICATE_EXACT`, `DUPLICATE_PROBABLE` |
+| **A PO split across invoices** | Every approved invoice is written to the PO ledger, so each later invoice is checked against what is left. Invoices from one vendor within 7 days are added up for the approval limit. | `AMOUNT_EXCEEDS_PO_BALANCE`, `SPLIT_BELOW_LIMIT` |
+
+Three kinds of purchase take different paths through the checks:
+
+| Type | Example | How it's checked |
+|---|---|---|
+| **Standard PO** | 20 chairs against PO-4501 | Invoice vs PO, line by line. Goods POs are also checked against the goods receipt (**3-way match**); service POs need no receipt (**2-way**). |
+| **Recurring** | Monthly IT support retainer against a contract and its blanket PO | The billing period hasn't already been billed, the amount matches the contract, the contract is active, and the balance remains. |
+| **PO-less** | Electricity bill, telecom, rent | Nothing to match, so the checks are: is a PO-less purchase allowed for this category; which GL account and cost centre (suggested by the agent); routing to the budget owner; and a low auto-approve limit. |
+
+Every check, in the order it runs, is in [Every rule, stage by stage](#every-rule-stage-by-stage).
+
+---
+
+## Purchase-order trails and split invoices
+
+A vendor often bills one PO in several invoices: phase 1 and phase 2, or one per delivery. The agent handles this with the **PO ledger**. Every approved invoice adds its quantities and amount to the PO, so each later invoice is checked against what is *left*, not against the whole PO.
+
+<p align="center"><img src="docs/diagrams/09-split-po-timeline.png" width="860" alt="A split PO"></p>
+
+What the trail and ledger catch on a split PO:
+
+| Situation | What the agent does | Reason code |
+|---|---|---|
+| Second invoice bills more than is left on the PO | Hold, with the ledger shown | `AMOUNT_EXCEEDS_PO_BALANCE` |
+| PO already fully billed | Hold | `PO_FULLY_INVOICED` |
+| A line billed for more than was ordered, across invoices | Hold | `QTY_EXCEEDS_ORDERED` |
+| A line billed for more than was received and accepted | Hold, Warehouse | `QTY_EXCEEDS_RECEIVED` |
+| Several invoices in 7 days, each under ₹5 L but over it together | Sign-off on the total | `SPLIT_BELOW_LIMIT` |
+| The same phase billed twice under a new number | Hold, original linked | `DUPLICATE_PROBABLE` |
+| Recurring: the same month billed twice | Hold | `PERIOD_ALREADY_BILLED` |
+
+How a trail is put together (`api/trails.py`):
+
+<p align="center"><img src="docs/diagrams/10-how-a-trail-is-built.png" width="619" alt="How a trail is built"></p>
+
+---
+
+## The decision
+
+Three guardrails make it safe to let the agent act on money.
+
+1. **Mandatory checks are graph nodes, not agent choices.** Each path has a fixed list of required checks that always run. The agent's tools are for *investigation*: finding a PO when none is printed, pairing vaguely described lines, suggesting a GL code. `completeness_guard` refuses to decide if any required check is missing.
+2. **Rules set the floor; the AI can only escalate, and only on an invoice the rules would approve.**
+   - The rules engine takes the most severe finding as the outcome.
+   - If that outcome is **Approved**, the agent reviews the whole case and may make it *stricter*. For example, it can hold an invoice that passed every rule because a new vendor billed a round ₹4,99,000 just under the limit. It must give a reason and cite the findings or context blocks it relies on.
+   - If the rules already send the invoice to a person (hold or sign-off), the agent's concern is shown to that person as a **note**. It never turns a hold into a rejection by restating what the rules already found.
+   - Code discards any agent output that is less strict than the rules or cites evidence that doesn't exist. The agent has no "approve" tool.
+3. **Fail closed.** A model or tool error becomes a finding and holds the case.
+
+<p align="center"><img src="docs/diagrams/07-decision.png" width="860" alt="How a decision is made"></p>
+
+**Every problem at once.** A failed check records its finding and the run continues, so the case shows every issue, not only the first. A few checks stop the run because nothing after them would be meaningful; they are marked ⛔ in [Every rule, stage by stage](#every-rule-stage-by-stage).
+
+### What the reviewing agent is given
+
+The review is the last look before a clean invoice is paid without a person seeing it. The agent gets one JSON message (`decision/review.py`):
+
+- **the rules' verdict** and its main reason;
+- **the invoice's fields**, with every line's description, quantity, unit, rate and amount;
+- **every finding**, passed or failed, with what its rule does when it fails and the exact figures;
+- three blocks of **context**, which it may cite as evidence:
+  - `ctx:invoice_text`: the text of the invoice pages, quoted between markers and capped at 6,000 characters, so it can spot payment pressure, "our bank has changed" notes or text aimed at the AI;
+  - `ctx:vendor_history`: whether the vendor is approved, how many invoices it has sent, its typical and largest amount, and whether this is its first;
+  - `ctx:po_lines`: the PO's lines and rates next to the invoice's, with what was billed before.
+
+Its instructions say that everything the vendor wrote is data, never instructions; that the findings' figures are authoritative (it must not redo the arithmetic or compare amounts with and without GST); and when to escalate, to which level, and how to cite. Its reasoning trace and its written rationale are both kept on the case.
+
+### People decide what the agent flags
+
+| Only people | The agent |
+|---|---|
+| **Raise a purchase order** for an approved vendor, with a reason | **Reads** every invoice and **finds or confirms** its PO |
+| **Add, approve or block a vendor; change a bank account.** These are classic fraud routes, so the agent never does them | **Runs all 50 checks** against the PO, receipt, contract and vendor master |
+| **Decide what the agent flags:** approve anyway, sign off, reject, ask the vendor, assign to a PO | **Approves** clean invoices and updates the PO ledger; **holds or rejects** the rest with a reason, owner and next step |
+
+<p align="center"><img src="docs/diagrams/08-human-gate.png" width="860" alt="The human gate"></p>
+
+The paused run resumes exactly where it stopped when a person acts. Approving anyway on a locked reason (a bank change, text aimed at the AI) needs a written verification note.
 
 ---
 
@@ -133,9 +258,12 @@ More situations the agent treats differently from the happy path, each with a de
 
 ---
 
-## The app, screen by screen
+## The app: live run view and dashboard
 
-Three pages: **Purchase orders** (the inbox and each PO's trail), **Rulebook** (every tolerance and limit, editable) and **Company records** (vendors, POs, receipts, contracts; vendor controls).
+Four pages: **Purchase orders** (the dashboard and each PO's trail), **Edge cases**, **Rulebook** (every tolerance and limit, editable) and **Company records** (vendors, POs, receipts, contracts; vendor controls).
+
+- **The live run view:** open any invoice while it runs. The 7 stage tiles light up as each stage starts and finishes, and every check appears the moment it is recorded; **Demo mode** slows each check to 450 ms so you can follow it.
+- **The dashboard:** the Purchase orders page. This week's or all-time numbers (invoices processed, the share done with no person, exceptions caught, money stopped, handling time), what needs a person, and every PO's trail with its status and outputs.
 
 <table>
 <tr>
@@ -148,22 +276,27 @@ Three pages: **Purchase orders** (the inbox and each PO's trail), **Rulebook** (
 </tr>
 </table>
 
-If an invoice prints no PO number, it is read as being for the PO you picked. If it prints a *different* PO, it is held as `PO_ASSIGNMENT_MISMATCH` for a person to say which is right. **Demo mode** slows each check to 450 ms so you can follow the run.
+If an invoice prints no PO number, it is read as being for the PO you picked. If it prints a *different* PO, it is held as `PO_ASSIGNMENT_MISMATCH` for a person to say which is right.
 
 ---
 
-## Who does what: people and the agent
+## Assumptions
 
-In production, invoices arrive by email and POs and receipts come from the ERP. In the demo, POs and receipts already exist and you upload the invoice.
+Where the brief left a choice open, we made one and wrote it down:
 
-| Only people | The agent |
-|---|---|
-| **Raise a purchase order** for an approved vendor, with a reason | **Reads** every invoice and **finds or confirms** its PO |
-| **Add, approve or block a vendor; change a bank account.** These are classic fraud routes, so the agent never does them | **Runs all 50 checks** against the PO, receipt, contract and vendor master |
-| **Decide what the agent flags:** approve anyway, sign off, reject, ask the vendor, assign to a PO | **Approves** clean invoices and updates the PO ledger; **holds or rejects** the rest with a reason, owner and next step |
-
-- The agent **reads** the vendor list and the POs but **never changes them**. Adding a vendor or changing a bank account is how invoice fraud usually gets in, so those stay human. Every change asks why and is logged in `record_changes`.
-- The one record the agent writes is the **PO ledger**: how much of each PO line has been billed, and only when an invoice is approved. That is what lets it catch an over-billed split PO.
+1. **India first.** ₹, GST, GSTIN and e-invoice rules; other regions would be another rule pack.
+2. **Goods are matched three ways, services two.** A goods invoice needs a goods receipt; a service invoice is matched against the PO only. The PO's type decides.
+3. **Hold or reject.** *Hold* means it may be fine and a person must check. *Reject* means it can never be paid as it stands (not a tax invoice, a vendor not approved, a required GST detail or e-invoice number missing, an exact duplicate of a paid invoice), so it goes back to the vendor.
+4. **Tolerances.** A price may be at most 2% and ₹5,000 above the PO rate (both must hold); billing below the PO rate always passes; quantities and the PO balance may not be exceeded. All are editable in the rulebook.
+5. **Amounts are compared before GST.** A PO's value and its balance are before GST; GST is paid on top.
+6. **Approval limits.** The agent may approve up to ₹5,00,000 on its own (₹25,000 for a purchase without a PO). Invoices from one vendor within 7 days are added up.
+7. **The ledger moves only on approval.** A held invoice does not use up the PO's balance until someone approves it.
+8. **The agent never changes the records.** Only people raise POs, add or block vendors, and change bank details.
+9. **The AI never approves.** The rules decide; the AI reviews and may only make an otherwise-approved invoice stricter.
+10. **Low confidence goes to a person.** Below 85% on a key field, a person confirms it; a PO the agent works out itself needs 90% and a clear lead.
+11. **Invoices are uploaded.** In production they would arrive by email and POs and receipts would come from the ERP; here the records are CSV files and you upload the invoice.
+12. **The demo replays recorded model replies** for its 16 demo invoices and 38 history invoices, so it never depends on a live model call; an uploaded PDF always calls the models live.
+13. **More than 2–4 edge cases.** The brief's range is read as a minimum; four are featured and nine more are handled.
 
 ---
 
@@ -222,31 +355,61 @@ Every file one invoice passes through, in the order it runs. The example is a di
 
 ---
 
-## Transaction types
+## Models, retries and fallbacks
 
-| Type | Example | How it's checked |
+All models are served through NVIDIA's OpenAI-compatible API (build.nvidia.com), and every call goes through `ai/gateway.py`. Each model is a setting in `.env` and can be swapped without code changes.
+
+| Role | First choice | Backups, in order |
 |---|---|---|
-| **Standard PO** | 20 chairs against PO-4501 | Invoice vs PO, line by line. Goods POs are also checked against the goods receipt (**3-way match**); service POs need no receipt (**2-way**). |
-| **Recurring** | Monthly IT support retainer against a contract and its blanket PO | The billing period hasn't already been billed, the amount matches the contract, the contract is active, and the balance remains. |
-| **PO-less** | Electricity bill, telecom, rent | Nothing to match, so the checks are: is a PO-less purchase allowed for this category; which GL account and cost centre (suggested by the agent); routing to the budget owner; and a low auto-approve limit. |
+| Page OCR (text + boxes) | `nvidia/nemotron-3.5-parse` | the PDF's own embedded text (digital PDFs only) |
+| Reading a scan (vision) | `nvidia/nemotron-3.5-super-vl-120b-a12b` | `mistralai/mistral-large-4-1t-a52b` → `google/gemma-4-31b-it` |
+| Reading a digital PDF, classifying, ranking POs, GL coding, the review | `nvidia/nemotron-3-ultra-550b-a55b` | `mistralai/mistral-large-4-1t-a52b` → `deepseek-ai/deepseek-v4.1-flash` |
+| Similarity: line pairing, duplicates, look-alike vendors | `nvidia/nemotron-3.5-embed-1b` | plain text similarity (vectors from different models can't be compared) |
+
+<p align="center"><img src="docs/diagrams/11-model-fallbacks.png" width="798" alt="Retries and fallbacks"></p>
+
+A timeout moves straight to the backup model, because an overloaded model rarely answers on the next try; only the last model in a chain retries a timeout. Demo and history invoices skip the call entirely and replay recorded replies.
+
+Every model call is logged on the case: which model answered, the prompt, the response, the reasoning trace and the latency.
 
 ---
 
-## How decisions are made
+## Data: records, storage and why SQLite
 
-Three guardrails make it safe to let the agent act on money.
+### Company records (the ERP stand-in)
 
-1. **Mandatory checks are graph nodes, not agent choices.** Each path has a fixed list of required checks that always run. The agent's tools are for *investigation*: finding a PO when none is printed, pairing vaguely described lines, suggesting a GL code. `completeness_guard` refuses to decide if any required check is missing.
-2. **Rules set the floor; the AI can only escalate, and only on an invoice the rules would approve.**
-   - The rules engine takes the most severe finding as the outcome.
-   - If that outcome is **Approved**, the agent reviews the whole case and may make it *stricter*. For example, it can hold an invoice that passed every rule because a new vendor billed a round ₹4,99,000 just under the limit. It must give a reason and cite findings that exist.
-   - If the rules already send the invoice to a person (hold or sign-off), the agent's concern is shown to that person as a **note**. It never turns a hold into a rejection by restating what the rules already found.
-   - Code discards any agent output that is less strict than the rules or cites findings that don't exist. The agent has no "approve" tool.
-3. **Fail closed.** A model or tool error becomes a finding and holds the case.
+| File | Contents |
+|---|---|
+| `vendors.csv` | vendor master: GSTIN, state, bank account and IFSC, contact details, e-invoice flag, GST status, payment terms, category, status (active or blocked) |
+| `purchase_orders.csv` | PO lines: type (goods / services / blanket), item, HSN/SAC, qty, unit, rate, GST rate |
+| `goods_receipts.csv` | received and accepted quantities per PO line |
+| `contracts.csv` | recurring contracts: period, billing cycle, amount per period |
+| `chart_of_accounts.csv` | GL codes, cost centres, budget owners |
+| `service_accounts.csv` | registered utility and telecom account numbers |
 
-<p align="center"><img src="docs/diagrams/07-decision.png" width="860" alt="How a decision is made"></p>
+- **`data/erp/`** holds the original records, committed to git.
+- **`storage/erp/`** is the app's working copy. People's changes (a new vendor, a blocked vendor, a new bank account, a new PO) are written here and logged in the `record_changes` table. A demo reset restores it from `data/erp/`.
 
-**Every problem at once.** A failed check records its finding and the run continues, so the case shows every issue, not only the first. A few checks stop the run because nothing after them would be meaningful; they are marked ⛔ below.
+### The agent's own store
+
+SQLite, in `storage/runs.db`:
+- case records, findings, events;
+- tool and model calls;
+- people's actions;
+- the PO and period ledgers (billed to date);
+- record changes.
+
+LangGraph's paused runs live in `storage/checkpoints.db`, and PDFs and page images in `storage/files/<case>/`.
+
+### Why SQLite is enough for this demonstration
+
+- **One process, one machine.** Streamlit Community Cloud runs the whole app in a single container. SQLite is a file the app opens directly: no database server, credentials or network hop, and nothing extra to host for free.
+- **Low write volume.** Two worker threads write a few hundred rows per invoice, behind one lock. That is far below what SQLite handles comfortably.
+- **The demo history ships as files.** A reset copies `data/seed/history.db` and `checkpoints.db` straight in, so all 38 past invoices come back with their trails, and the held ones can still be acted on.
+- **Paused runs need no extra service.** LangGraph's `SqliteSaver` keeps each run that is waiting for a person, which is what makes "approve later" work.
+- **Tests stay fast and isolated.** Each test gets a fresh database in a temporary folder.
+
+The store sits behind one class (`storage/cases.py`), so a multi-user deployment could move to a server database without touching the pipeline.
 
 ---
 
@@ -375,90 +538,15 @@ The duplicate key always includes the vendor, so the same invoice number from tw
 
 ### Stage 6: Decision
 
-See the diagram under [How decisions are made](#how-decisions-are-made). The "why" sentence comes from the rulebook template, filled with the finding's numbers; it is never written by the model. The agent's own note is shown separately and labelled as the agent's, with its full reasoning one click away (N5).
+See [The decision](#the-decision). The "why" sentence comes from the rulebook template, filled with the finding's numbers; it is never written by the model. The agent's own note is shown separately and labelled as the agent's, with its full reasoning one click away (N5).
 
 ### Stage 7: Human gate and finalise
 
-<p align="center"><img src="docs/diagrams/08-human-gate.png" width="860" alt="The human gate"></p>
+The actions a person can take are shown under [The decision](#the-decision).
 
 Approving anyway on a locked reason code (bank change, prompt injection, …) needs a verification note and is logged as a high-risk override (M2). If the same person edits a rule and then approves a case it affects, that is flagged `SOD_RULE_EDIT_AND_APPROVE` (M3). Finalising is idempotent per case (O2), and the payment date is the invoice date plus the vendor's terms.
 
 Every rule edit is versioned with who and why, and locked rules can't be edited at all. A rule can't be quietly loosened to push one invoice through (M4).
-
----
-
-## Purchase-order trails and split invoices
-
-A vendor often bills one PO in several invoices: phase 1 and phase 2, or one per delivery. The agent handles this with the **PO ledger**. Every approved invoice adds its quantities and amount to the PO, so each later invoice is checked against what is *left*, not against the whole PO.
-
-<p align="center"><img src="docs/diagrams/09-split-po-timeline.png" width="860" alt="A split PO"></p>
-
-What the trail and ledger catch on a split PO:
-
-| Situation | What the agent does | Reason code |
-|---|---|---|
-| Second invoice bills more than is left on the PO | Hold, with the ledger shown | `AMOUNT_EXCEEDS_PO_BALANCE` |
-| PO already fully billed | Hold | `PO_FULLY_INVOICED` |
-| A line billed for more than was ordered, across invoices | Hold | `QTY_EXCEEDS_ORDERED` |
-| A line billed for more than was received and accepted | Hold, Warehouse | `QTY_EXCEEDS_RECEIVED` |
-| Several invoices in 7 days, each under ₹5 L but over it together | Sign-off on the total | `SPLIT_BELOW_LIMIT` |
-| The same phase billed twice under a new number | Hold, original linked | `DUPLICATE_PROBABLE` |
-| Recurring: the same month billed twice | Hold | `PERIOD_ALREADY_BILLED` |
-
-How a trail is put together (`api/trails.py`):
-
-<p align="center"><img src="docs/diagrams/10-how-a-trail-is-built.png" width="619" alt="How a trail is built"></p>
-
----
-
-## Models, retries and fallbacks
-
-All models are served through NVIDIA's OpenAI-compatible API (build.nvidia.com), and every call goes through `ai/gateway.py`. Each model is a setting in `.env` and can be swapped without code changes.
-
-| Role | First choice | Backups, in order |
-|---|---|---|
-| Page OCR (text + boxes) | `nvidia/nemotron-3.5-parse` | the PDF's own embedded text (digital PDFs only) |
-| Reading a scan (vision) | `nvidia/nemotron-3.5-super-vl-120b-a12b` | `mistralai/mistral-large-4-1t-a52b` → `google/gemma-4-31b-it` |
-| Reading a digital PDF, classifying, ranking POs, GL coding, the review | `nvidia/nemotron-3-ultra-550b-a55b` | `mistralai/mistral-large-4-1t-a52b` → `deepseek-ai/deepseek-v4.1-flash` |
-| Similarity: line pairing, duplicates, look-alike vendors | `nvidia/nemotron-3.5-embed-1b` | plain text similarity (vectors from different models can't be compared) |
-
-<p align="center"><img src="docs/diagrams/11-model-fallbacks.png" width="798" alt="Retries and fallbacks"></p>
-
-A timeout moves straight to the backup model, because an overloaded model rarely answers on the next try; only the last model in a chain retries a timeout. Demo and history invoices skip the call entirely and replay recorded replies.
-
-Every model call is logged on the case: which model answered, the prompt, the response, the reasoning trace and the latency.
-
----
-
-## How well reading and OCR work
-
-Measured on two sets:
-- our own **54 printed invoices** (16 demos and 38 history);
-- **10 scanned or photographed Indian GST invoices** from a public dataset with answer keys.
-
-Each was scored on five fields: invoice number, date, supplier GSTIN, total and line count.
-
-
-| Kind of document | Result | What happened |
-|---|---|---|
-| Digital PDFs: demos and history | ✅ **54 of 54** read correctly | All in their original layouts. The page reader dropped the total row on 8 history invoices; the agent recovered each total from the PDF's own text because it added up and matched the amount in words. No false tamper alarms. |
-| Minimal and classic layouts, scan and photo | ✅ 4 of 4 perfect | Every field right on scans and on phone photos. |
-| Handwritten bill book, scan and photo | ✅ perfect | Read by Gemma 4, the third model in the chain, after the first two timed out. |
-| Hidden-instruction invoices | ✅ perfect | The model ignored a note telling it to set the total to 0, and the note is flagged. |
-| **All 10 scans, when a model answered** | **43 of 45 fields (96%)** | 9 of 10 invoices read, 8 of them perfectly. The failures were the free endpoints not answering, not misreads. |
-
-**Speed:**
-- OCR: 3–8 s per page.
-- A digital PDF end to end: about 20–60 s.
-- A scan: about 4–8 minutes on the shared free vision endpoints, mostly waiting on models that time out before one answers.
-- Demo invoices: about 1 s, from recorded replies.
-
-**Why a misread rarely gets through:**
-- **Grounding:** every value must appear on the page.
-- **Arithmetic and amount in words:** totals must add up and match the words.
-- **GSTIN check digit** and the buyer GSTIN check.
-- **Hidden text vs page** comparison on digital PDFs.
-- **Low confidence:** a person confirms the field before anything is paid.
 
 ---
 
@@ -519,45 +607,6 @@ reasons:
 
 ---
 
-## Data: records, storage and why SQLite
-
-### Company records (the ERP stand-in)
-
-| File | Contents |
-|---|---|
-| `vendors.csv` | vendor master: GSTIN, state, bank account and IFSC, contact details, e-invoice flag, GST status, payment terms, category, status (active or blocked) |
-| `purchase_orders.csv` | PO lines: type (goods / services / blanket), item, HSN/SAC, qty, unit, rate, GST rate |
-| `goods_receipts.csv` | received and accepted quantities per PO line |
-| `contracts.csv` | recurring contracts: period, billing cycle, amount per period |
-| `chart_of_accounts.csv` | GL codes, cost centres, budget owners |
-| `service_accounts.csv` | registered utility and telecom account numbers |
-
-- **`data/erp/`** holds the original records, committed to git.
-- **`storage/erp/`** is the app's working copy. People's changes (a new vendor, a blocked vendor, a new bank account, a new PO) are written here and logged in the `record_changes` table. A demo reset restores it from `data/erp/`.
-
-### The agent's own store
-
-SQLite, in `storage/runs.db`:
-- case records, findings, events;
-- tool and model calls;
-- people's actions;
-- the PO and period ledgers (billed to date);
-- record changes.
-
-LangGraph's paused runs live in `storage/checkpoints.db`, and PDFs and page images in `storage/files/<case>/`.
-
-### Why SQLite is enough for this demonstration
-
-- **One process, one machine.** Streamlit Community Cloud runs the whole app in a single container. SQLite is a file the app opens directly: no database server, credentials or network hop, and nothing extra to host for free.
-- **Low write volume.** Two worker threads write a few hundred rows per invoice, behind one lock. That is far below what SQLite handles comfortably.
-- **The demo history ships as files.** A reset copies `data/seed/history.db` and `checkpoints.db` straight in, so all 38 past invoices come back with their trails, and the held ones can still be acted on.
-- **Paused runs need no extra service.** LangGraph's `SqliteSaver` keeps each run that is waiting for a person, which is what makes "approve later" work.
-- **Tests stay fast and isolated.** Each test gets a fresh database in a temporary folder.
-
-The store sits behind one class (`storage/cases.py`), so a multi-user deployment could move to a server database without touching the pipeline.
-
----
-
 ## Audit trail
 
 Every case keeps a complete, replayable record:
@@ -604,6 +653,7 @@ The **38 history invoices** (`data/seed/`) are real runs through the agent, date
 
 Deliberately out of scope for this version:
 
+- **Prices that include GST.** A rate printed with GST included isn't converted to the before-GST rate yet, so such an invoice is stopped for a person instead of being matched. (A helper, `rules/normalise.to_exclusive`, exists; it isn't wired into reading.)
 - **Concurrency.** Two invoices against the same PO processed at the same moment could both read the same remaining balance. Production needs a per-PO lock, with the balance re-checked inside the ledger transaction. Record edits are likewise not locked.
 - **No login.** The public demo has no users, so anyone can upload invoices (spending the NVIDIA credits) and change the records. A demo reset restores everything.
 - **Live government checks.** GSTIN status, GSTR-2B filing and IRN verification against the government portals; the vendor master stands in for them.
@@ -797,4 +847,3 @@ Every risk ID used in [Every rule, stage by stage](#every-rule-stage-by-stage), 
 | `M4` | Authority and controls | Rule loosened to push one invoice through (the what-if slider) |
 | `N5` | The agent itself | Long, unfaithful chain of thought |
 | `O2` | System and process | Re-running a case double-counts the ledger |
-

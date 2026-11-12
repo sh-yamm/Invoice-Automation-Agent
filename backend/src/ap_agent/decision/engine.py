@@ -79,7 +79,8 @@ def accept_escalation(floor_outcome: Outcome, proposal: dict, findings: list[Fin
         # A person already reviews this invoice; the agent's concern reaches them as its review note
         return floor_outcome, False, None
     else:
-        ids = {f.id for f in findings}
+        from ap_agent.decision.review import CONTEXT_IDS
+        ids = {f.id for f in findings} | set(CONTEXT_IDS)  # a finding, or a block of the review's context
         cites = proposal.get("cites") or []
         if not cites:
             invalid = "it cited no findings"
