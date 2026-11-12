@@ -1,0 +1,149 @@
+{
+ "data": {
+  "fields": {
+   "doc_title": {
+    "value": "TAX INVOICE",
+    "confidence": 1.0,
+    "block": 2
+   },
+   "supplier_name": {
+    "value": "Kaveri Packaging Industries",
+    "confidence": 1.0,
+    "block": 1
+   },
+   "supplier_gstin": {
+    "value": "29AADFK9013C1ZK",
+    "confidence": 1.0,
+    "block": 1
+   },
+   "supplier_phone": {
+    "value": "+91 821 240 9023",
+    "confidence": 1.0,
+    "block": 1
+   },
+   "supplier_email": {
+    "value": "billing@kaveripack.in",
+    "confidence": 1.0,
+    "block": 1
+   },
+   "buyer_name": {
+    "value": "Sample Client Retail Pvt Ltd (demo company)",
+    "confidence": 1.0,
+    "block": 9
+   },
+   "buyer_gstin": {
+    "value": "29AABCZ5821K1ZW",
+    "confidence": 1.0,
+    "block": 10
+   },
+   "invoice_no": {
+    "value": "KPI/26-27/1206",
+    "confidence": 1.0,
+    "block": 4
+   },
+   "invoice_date": {
+    "value": "05/11/2026",
+    "confidence": 1.0,
+    "block": 5
+   },
+   "po_ref": {
+    "value": "PO-4542",
+    "confidence": 1.0,
+    "block": 6
+   },
+   "place_of_supply_state": {
+    "value": "Karnataka (29)",
+    "confidence": 1.0,
+    "block": 7
+   },
+   "irn": {
+    "value": null,
+    "confidence": 1.0,
+    "block": null
+   },
+   "has_qr": {
+    "value": false,
+    "confidence": 1.0,
+    "block": null
+   },
+   "bank_name": {
+    "value": "ICICI Bank",
+    "confidence": 1.0,
+    "block": 13
+   },
+   "bank_account": {
+    "value": "001205019023",
+    "confidence": 1.0,
+    "block": 13
+   },
+   "ifsc": {
+    "value": "ICIC0000012",
+    "confidence": 1.0,
+    "block": 13
+   },
+   "taxable_total": {
+    "value": "37,200.00",
+    "confidence": 1.0,
+    "block": 11
+   },
+   "cgst": {
+    "value": "3,348.00",
+    "confidence": 1.0,
+    "block": 11
+   },
+   "sgst": {
+    "value": "3,348.00",
+    "confidence": 1.0,
+    "block": 11
+   },
+   "igst": {
+    "value": null,
+    "confidence": 1.0,
+    "block": null
+   },
+   "round_off": {
+    "value": "0.00",
+    "confidence": 1.0,
+    "block": 11
+   },
+   "grand_total": {
+    "value": "43,896.00",
+    "confidence": 1.0,
+    "block": 11
+   },
+   "amount_in_words": {
+    "value": "Rupees Forty Three Thousand Eight Hundred Ninety Six Only",
+    "confidence": 1.0,
+    "block": 11
+   },
+   "period_start": {
+    "value": null,
+    "confidence": 1.0,
+    "block": null
+   },
+   "period_end": {
+    "value": null,
+    "confidence": 1.0,
+    "block": null
+   },
+   "consumer_no": {
+    "value": null,
+    "confidence": 1.0,
+    "block": null
+   }
+  },
+  "lines": [
+   {
+    "description": "Corrugated box 3-ply 12x10x8",
+    "hsn_sac": "4819",
+    "qty": "3,000",
+    "unit": "Nos",
+    "rate": "12.40",
+    "taxable": "37,200.00",
+    "gst_rate": 18,
+    "confidence": 0.95
+   }
+  ]
+ },
+ "reasoning": "The user wants me to extract invoice data from the parsed page blocks and return JSON only. I need to carefully read each block and extract the required fields.\n\nLet me go through the blocks:\n\nBlock 1: Supplier info\n- supplier_name: \"Kaveri Packaging Industries\"\n- supplier_gstin: \"29AADFK9013C1ZK\"\n- supplier_phone: \"+91 821 240 9023\"\n- supplier_email: \"billing@kaveripack.in\"\n- Also address and state, but not needed as separate fields.\n\nBlock 2: Title: \"TAX INVOICE\" -> doc_title\n\nBlock 3: \"Original for recipient\" - not a field.\n\nBlock 4: Invoice No. KPI/26-27/1206 -> invoice_no\n\nBlock 5: Invoice Date 05/11/2026 -> invoice_date\n\nBlock 6: PO Ref. PO-4542 -> po_ref\n\nBlock 7: Place of Supply Karnataka (29) -> place_of_supply_state\n\nBlock 8: Section-header \"Bill to\"\n\nBlock 9: Buyer name: \"Sample Client Retail Pvt Ltd (demo company)\" -> buyer_name\n\nBlock 10: Buyer address and GSTIN: \"29AABCZ5821K1ZW\" -> buyer_gstin\n\nBlock 11: Table with line items and totals. This is a bit messy. Let's parse.\n\nThe table shows:\n| Description | HSN/SAC | Qty | Unit | Rate (Rs.) | Taxable Value (Rs.)\n1 | Corrugated box 3-ply 12x10x8 | 4819 | 3,000 | Nos | 12.40 | 37,200.00\n\nThen there are lines:\nAmount in words: Rupees Forty Three Thousand Eight Hundred Ninety Six Only | Taxable Value | \\mbox{} | \\mbox{} | 37,200.00\n\\mbox{} | \\mbox{} | \\mbox{} | CGST @ 9% | \\mbox{} | \\mbox{} | 3,348.00\n\\mbox{} | \\mbox{} | \\mbox{} | SGST @ 9% | \\mbox{} | \\mbox{} | 3,348.00\n\\mbox{} | \\mbox{} | \\mbox{} | Round Off | \\mbox{} | \\mbox{} | 0.00\n\\mbox{} | \\mbox{} | \\mbox{} | Invoice Total (Rs.) | \\mbox{} | \\mbox{} | 43,896.00\n\nSo we have:\n- One line item: description \"Corrugated box 3-ply 12x10x8\", HSN/SAC \"4819\", Qty \"3,000\", Unit \"Nos\", Rate \"12.40\", Taxable \"37,200.00\"\n- Taxable total: 37,200.00\n- CGST: 3,348.00\n- SGST: 3,348.00\n- Round Off: 0.00\n- Invoice Total: 43,896.00\n- Amount in words: \"Rupees Forty Three Thousand Eight Hundred Ninety Six Only\"\n\nAlso note: The table includes \"Amount in words\" line, but that's not a line item. We'll capture amount_in_words.\n\nBlock 12: Section-header \"Bank details for payment\"\n\nBlock 13: \"ICICI Bank A/c No.: 001205019023 IFSC: ICIC0000012\" -> bank_name \"ICICI Bank\", bank_account \"001205019023\", ifsc \"ICIC0000012\"\n\nBlock 14: Note about overdue - ignore.\n\nBlock 15: Note about WhatsApp - ignore.\n\nBlock 16: \"For Kaveri Packaging Industries\" - ignore.\n\nBlock 17: \"Authorised Signatory\" - ignore.\n\nBlock 18: Footer - ignore.\n\nNow, fields not present: irn, has_qr, period_start, period_end, consumer_no. Should be null.\n\nAlso, igst: not present (since intra-state), so null.\n\nNow, confidence: I need to assign confidence based on clarity. The text seems clear, so high confidence (0.95-1.0). For block numbers, I'll reference the block where the value appears.\n\nLet's map each field to block:\n\n- doc_title: block 2\n- supplier_name: block 1\n- supplier_gstin: block 1\n- supplier_phone: block 1\n- supplier_email: block 1\n- buyer_name: block 9\n- buyer_gstin: block 10\n- invoice_no: block 4\n- invoice_date: block 5\n- po_ref: block 6\n- place_of_supply_state: block 7\n- irn: null (not printed)\n- has_qr: false (not mentioned)\n- bank_name: block 13\n- bank_account: block 13\n- ifsc: block 13\n- taxable_total: from block 11 (the taxable value line)\n- cgst: block 11\n- sgst: block 11\n- igst: null\n- round_off: block 11\n- grand_total: block 11 (Invoice Total)\n- amount_in_words: block 11\n- period_start: null\n- period_end: null\n- consumer_no: null\n\nLines: one line item from block 11.\n\nNow, need to output JSON with fields and lines.\n\nFor lines, each line object: description, hsn_sac, qty, unit, rate, taxable, gst_rate, confidence.\n\nThe line item has GST rate? The table shows CGST @9% and SGST @9%, but the line item itself doesn't have a GST rate column. However, we can infer the GST rate is 18% (9+9). But the instruction says \"gst_rate\" for each line. Usually, the line item may have a GST rate. In this invoice, the line item doesn't show GST rate; the tax is shown separately. But we can include the applicable GST rate (18%) or maybe the CGST and SGST rates. The schema expects a single gst_rate. I'll put 18 (as percentage). But confidence lower because not explicitly printed on the line. However, the tax breakdown shows CGST @9% and SGST @9%, so total 18%. I'll set gst_rate: 18.\n\nBut the instruction: \"gst_rate\": ... for each line. I'll include 18.\n\nNow, qty: \"3,000\" - should we keep as string or number? The schema doesn't specify, but we can keep as string \"3,000\" or number 3000. I'll keep as string as printed.\n\nRate: \"12.40\" - string.\n\nTaxable: \"37,200.00\" - string.\n\nNow, confidence for line: high, 0.95.\n\nNow, produce JSON.\n\nLet's write."
+}

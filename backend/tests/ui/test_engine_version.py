@@ -34,3 +34,9 @@ def test_first_build_keeps_loaded_backend_modules(monkeypatch):
     engine._engine.clear()
     engine._engine(engine.code_version())
     assert sys.modules["ap_agent.core.models"] is models
+
+
+def test_the_demo_invoice_definitions_are_part_of_the_code_version():
+    """samples/ (demo specs, edge cases) is read by the API: changing it must rebuild the API, or a new demo
+    invoice raises KeyError in the old one."""
+    assert engine.ROOT / "samples" in engine.CODE

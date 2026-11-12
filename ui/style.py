@@ -175,6 +175,10 @@ a { color: var(--accent-deep); }
 .ecase .edl dt { font-size: 12.5px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--accent); padding-top: 2px; }
 .ecase .edl dd { margin: 0; color: var(--body); line-height: 1.55; }
 @media (max-width: 760px) { .ecase .edl { grid-template-columns: 1fr; margin-left: 0; } .ecase .ehead { flex-wrap: wrap; } }
+details.reason { margin-top: 10px; border: 1px solid var(--rule); border-radius: 10px; background: var(--card); padding: 8px 12px; }
+details.reason summary { cursor: pointer; font-weight: 600; color: var(--accent-deep); }
+details.reason pre { white-space: pre-wrap; font-family: var(--mono); font-size: 12.5px; line-height: 1.55; color: var(--body);
+  max-height: 420px; overflow-y: auto; margin: 8px 0 0; }
 .timeline { list-style: none; margin: 0 0 12px !important; padding: 0 !important; position: relative; }
 .timeline::before { content: ""; position: absolute; left: 15px; top: 6px; bottom: 6px; width: 2px; background: var(--rule); }
 .timeline li { margin: 0 !important; position: relative; }

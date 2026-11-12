@@ -271,3 +271,17 @@ def test_rates_printed_with_gst_are_converted_then_matched(tmp_path):
     assert case["outcome"] is Outcome.APPROVED and "TAX_INCLUSIVE_NORMALISED" in codes
     assert "PRICE_VARIANCE" not in codes and "ARITHMETIC_MISMATCH" not in codes
     assert json.loads(store.get_case("e2e-S17")["invoice_json"])["lines"][0]["rate"] in ("3500.00", "3500")
+
+
+def test_the_reviewing_agent_holds_a_clean_invoice_that_presses_for_payment(tmp_path):
+    """S18 passes every rule; only the agent, reading the invoice text, puts it on hold."""
+    require_cache("S18")
+    p, store = make_pipeline(tmp_path)
+    case = p.start("e2e-S18", PDF / "S18.pdf", sample_id="S18")
+    assert case["outcome"] is Outcome.ON_HOLD and case["primary_code"] == "AGENT_ESCALATION"
+    rule_fails = [f.code for f in case["findings"] if f.status.value == "fail" and f.check != "agent_review"]
+    assert rule_fails == []
+    esc = next(f for f in case["findings"] if f.code == "AGENT_ESCALATION")
+    assert "ctx:invoice_text" in esc.data["cites"]
+    review = [l for l in store.get_case("e2e-S18")["llm_calls"] if l["node"] == "agent_review"]
+    assert review and len(review[-1]["reasoning"] or "") > 200

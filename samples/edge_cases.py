@@ -54,6 +54,7 @@ EDGE_CASES = [
 ]
 
 ALSO_HANDLED = [
+    {"sample": "S18", "title": "Clean on every rule, but the invoice presses for urgent payment and a new contact: the reviewing agent reads the text and holds it"},
     {"sample": "S05", "title": "The same month billed twice under a new invoice number"},
     {"sample": "S07", "title": "A vendor that must e-invoice sends no IRN: rejected, as only the vendor can fix it"},
     {"sample": "S08", "title": "A scanned invoice with no PO number: the agent works out the PO"},

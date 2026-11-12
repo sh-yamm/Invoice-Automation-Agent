@@ -130,3 +130,19 @@ def test_edge_cases_page_lists_the_four_cases_with_run_buttons():
         assert t in body
     assert "SPLIT_BELOW_LIMIT" not in body and "Invoices split to stay under the approval limit" in body
     assert sum(b.label == "Run this invoice" for b in at.button) == 4
+
+
+# ---------- the reviewing agent's full reasoning, one click away ----------
+
+def test_the_review_reasoning_is_found_among_the_model_calls():
+    c = {"llm_calls": [{"node": "extract", "reasoning": "reading the page"},
+                       {"node": "agent_review", "reasoning": "First I check the bank account <b>matches</b>."}]}
+    assert invoice_view.review_reasoning(c) == "First I check the bank account <b>matches</b>."
+    assert invoice_view.review_reasoning({"llm_calls": [{"node": "extract", "reasoning": "x"}]}) is None
+
+
+def test_the_reasoning_panel_is_collapsed_and_escaped():
+    out = invoice_view.reasoning_panel("Step 1 <script>alert(1)</script>")
+    assert out.startswith("<details") and "<summary>The model's full reasoning</summary>" in out
+    assert "<script>" not in out and "&lt;script&gt;" in out
+    assert invoice_view.reasoning_panel(None) == ""
